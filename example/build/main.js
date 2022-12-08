@@ -120870,10 +120870,54 @@
 
     };
 
+    /*/// falta:
+        lightNode.position.set( 30, 20, 0 );		///  que no aparece en este main
+
+       setupLights() {
+        const light1 = new DirectionalLight(0xffeeff, 0.8);
+        light1.position.set(-5, 10, 10);  //                   (rojo, verde (z),  azul )
+        this.scene.add(light1);
+
+    //*
+    const light4 = new PointLight(0xffeeff, 0.8);			//CREO QUE NO HA FUNCIONADO
+        light1.position.set(0, 2, 0);  //                   (rojo, verde (z),  azul )
+        this.scene.add(light4);
+
+    const light2 = new DirectionalLight(0xffffff, 0.8);
+        light2.position.set(-1, 0.5, -1);
+        this.scene.add(light2);
+        const ambientLight = new AmbientLight(0xffffee, 0.25);
+        this.scene.add(ambientLight);
+    }
+
+
+            setupCameras() {
+                this.setCameraPositionAndTarget(this.perspectiveCamera);
+            }
+            setCameraPositionAndTarget(camera) {
+                camera.position.z = 12;	///* azul
+                camera.position.y = 5;	///* verde  coincide con nuestro z habitual
+                camera.position.x = 22;	///* rojo
+                camera.lookAt(new Vector3(0, 0, 0));			// al cambiarlo NO HACE NADA
+            }
+     
+
+            comentar:
+                            if (fitToFrame)					///*
+                        this.context.fitToFrame();	///*
+
+
+            this.castShadow = true;
+            this.receiveShadow = true;
+
+
+
+    */
+
     const container = document.getElementById('viewer-container');
     const viewer = new IfcViewerAPI({ container, backgroundColor: new Color(255, 255, 255) });
     viewer.axes.setAxes();
-    viewer.grid.setGrid();
+    // viewer.grid.setGrid();    ///*
     // viewer.shadowDropper.darkness = 1.5;
 
     // Set up stats
@@ -120886,7 +120930,7 @@
 
     viewer.context.ifcCamera.cameraControls;
 
-    viewer.IFC.loader.ifcManager;
+    const manager = viewer.IFC.loader.ifcManager;
 
 
 
@@ -120895,7 +120939,7 @@
 
     viewer.IFC.loader.ifcManager.applyWebIfcConfig({
       USE_FAST_BOOLS: true,
-      COORDINATE_TO_ORIGIN: true
+      COORDINATE_TO_ORIGIN: false,	///*  lo comenté en primera versión, el original ponía firstModel
     });
 
     viewer.context.renderer.postProduction.active = true;
@@ -120908,7 +120952,8 @@
     let first = true;
     let model;
 
-    const loadIfc = async (event) => {
+    // const loadIfc = async (event) => {
+    async function miload() {
 
       // tests with glTF
       // const file = event.target.files[0];
@@ -120946,10 +120991,29 @@
         [IFCOPENINGELEMENT]: false
       });
 
-      model = await viewer.IFC.loadIfc(event.target.files[0], false);
+      // model = await viewer.IFC.loadIfc(event.target.files[0], false);
+      model = await viewer.IFC.loadIfcUrl("models/UPV_V3_11112022.ifc", false);
       // model.material.forEach(mat => mat.side = 2);
 
-      if(first) first = false;
+      const wallsIDs = await manager.getAllItemsOfType(0, IFCWALLSTANDARDCASE, false);
+      console.log(wallsIDs);
+      for (const wallID of wallsIDs) {
+        console.log(viewer.IFC);
+        const properties = await viewer.IFC.loader.ifcManager.properties.getItemProperties(0, wallID);
+        console.log(properties);
+        const psetsIDs = await viewer.IFC.loader.ifcManager.properties.getPropertySets(0, wallID);
+        for (const psetsID of psetsIDs) {
+          console.log(psetsID);
+          const pset = await viewer.IFC.loader.ifcManager.properties.getItemProperties(0, psetsID.expressID);
+          console.log(pset);
+          for (const propID of pset.HasProperties) {
+            const data = await viewer.IFC.loader.ifcManager.properties.getItemProperties(0, propID.value);
+            console.log(data);
+          }
+        }
+      }
+
+      if (first) first = false;
       else {
         ClippingEdges.forceStyleUpdate = true;
       }
@@ -120961,12 +121025,12 @@
 
       overlay.classList.add('hidden');
 
-    };
+    }miload();
 
     const inputElement = document.createElement('input');
     inputElement.setAttribute('type', 'file');
     inputElement.classList.add('hidden');
-    inputElement.addEventListener('change', loadIfc, false);
+    // inputElement.addEventListener('change', loadIfc, false);
 
     const handleKeyDown = async (event) => {
       if (event.code === 'Delete') {
@@ -120981,7 +121045,7 @@
       }
     };
 
-    window.onmousemove = () => viewer.IFC.selector.prePickIfcItem();
+    // window.onmousemove = () => viewer.IFC.selector.prePickIfcItem();    ///*
     window.onkeydown = handleKeyDown;
     window.ondblclick = async () => {
 
@@ -120995,11 +121059,17 @@
         console.log(props);
       }
     };
-
+    // loadIfc('./models/UPV_V3_11112022.ifc');
     //Setup UI
     const loadButton = createSideMenuButton('./resources/folder-icon.svg');
     loadButton.addEventListener('click', () => {
       loadButton.blur();
+      inputElement.click();
+    });
+
+    const getFileButton = createSideMenuButton('./resources/folder-icon.svg');
+    getFileButton.addEventListener('click', () => {
+      getFileButton.blur();
       inputElement.click();
     });
 
@@ -121009,10 +121079,17 @@
       viewer.clipper.toggle();
     });
 
-    const dropBoxButton = createSideMenuButton('./resources/dropbox-icon.svg');
-    dropBoxButton.addEventListener('click', () => {
-      dropBoxButton.blur();
-      viewer.dropbox.loadDropboxIfc();
+    // const dropBoxButton = createSideMenuButton('./resources/dropbox-icon.svg');
+    // dropBoxButton.addEventListener('click', () => {
+    //   dropBoxButton.blur();
+    //   viewer.dropbox.loadDropboxIfc();
+    // });
+
+    const toCermaButton = createSideMenuButton('./resources/wireframe-cube.svg');
+    toCermaButton.addEventListener('click', () => {
+      toCermaButton.blur();
+      alert("para exportar a CERMA ");
+      // viewer.dropbox.loadDropboxIfc();
     });
 
 }());
