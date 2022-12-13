@@ -204,24 +204,32 @@ async function miload() {
   // model = await viewer.IFC.loadIfc(event.target.files[0], false);
   model = await viewer.IFC.loadIfcUrl("models/UPV_V3_11112022.ifc", false);
   // model.material.forEach(mat => mat.side = 2);
-
+  const propiedades = [];
+  const propiedadesLimpio = [];
   const wallsIDs = await manager.getAllItemsOfType(0, IFCWALLSTANDARDCASE, false);
-  console.log(wallsIDs);
+  // console.log(wallsIDs);
   for (const wallID of wallsIDs) {
-    console.log(viewer.IFC);
+    // console.log(viewer.IFC);
+    // console.log(wallID);
     const properties = await viewer.IFC.loader.ifcManager.properties.getItemProperties(0, wallID);
-    console.log(properties);
+    // console.log(properties);
+
+    propiedades[wallID]=properties;
+    propiedadesLimpio[wallID]={nombre: properties.ObjectType.value, tag: properties.Tag.value};
+
     const psetsIDs = await viewer.IFC.loader.ifcManager.properties.getPropertySets(0, wallID);
     for (const psetsID of psetsIDs) {
       console.log(psetsID);
       const pset = await viewer.IFC.loader.ifcManager.properties.getItemProperties(0, psetsID.expressID);
-      console.log(pset);
+      // console.log(pset);
       for (const propID of pset.HasProperties) {
         const data = await viewer.IFC.loader.ifcManager.properties.getItemProperties(0, propID.value);
-        console.log(data);
+        // console.log(data);
       }
     }
   }
+  console.table (propiedades);
+  console.table (propiedadesLimpio);
 
   if (first) first = false
   else {
