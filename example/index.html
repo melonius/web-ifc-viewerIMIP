@@ -8,7 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet" />
     <link rel="stylesheet" type="text/css" href="./styles.css" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>IFC.js</title>
+    <title>ImipApp</title>
   </head>
   <body>
     <aside class="side-menu" id="side-menu-left"></aside>
@@ -16,6 +16,26 @@
       <div id="loading-overlay" class="loading-overlay hidden">
       <h1 id="loading-progress" class="loading-progress"></h1>
     </div>
+    <script >
+      var GET = {};
+      // console.log (document.location);
+      console.log (document.location.toString());
+      if(document.location.toString().indexOf('?') !== -1) {
+          var query = document.location
+                        .toString()
+                        // get the query string
+                        .replace(/^.*?\?/, '')
+                        // and remove any existing hash string (thanks, @vrijdenker)
+                        .replace(/#.*$/, '')
+                        // .split('&');
+          console.log (query);
+     
+          // for(var i=0, l=query.length; i<l; i++) {
+          //   var aux = decodeURIComponent(query[i]).split('=');
+          //   GET[aux[0]] = aux[1];
+          // }
+      }
+    </script>
     <script type="module" src="./build/main.js"></script>
   </body>
 </html>
