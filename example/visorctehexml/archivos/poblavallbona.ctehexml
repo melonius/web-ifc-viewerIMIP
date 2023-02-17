@@ -1,0 +1,3693 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CTE-HE-XML>
+	<DatosGenerales>
+		<refCatastral/>
+		<tipoVivienda>Unifamiliar</tipoVivienda>
+		<anio>Posterior a 2013</anio>
+		<tipoDefinicion>Nuevo</tipoDefinicion>
+		<comunidad>Comunidad Valenciana</comunidad>
+		<provincia>Valencia</provincia>
+		<poblacion>Pobla de Vallbona, la</poblacion>
+		<zonaClimatica>B3</zonaClimatica>
+		<altitud>102</altitud>
+		<tipoUso>Residencial</tipoUso>
+		<claseHigrometria>3</claseHigrometria>
+		<numRenovacionesHS3>1</numRenovacionesHS3>
+		<ventilacionPorDefecto>SI</ventilacionPorDefecto>
+		<numViviendasBloque>1</numViviendasBloque>
+		<valorImpulsionAire>1</valorImpulsionAire>
+		<valorExtraccionAireCocina>1</valorExtraccionAireCocina>
+		<valorExtraccionAireBanos>1</valorExtraccionAireBanos>
+		<valorExtraccionAireCocinasBanos>2.00</valorExtraccionAireCocinasBanos>
+		<vent_p1>25.00</vent_p1>
+		<vent_p2>25.00</vent_p2>
+		<vent_p3>25.00</vent_p3>
+		<vent_p4>25.00</vent_p4>
+		<nomPro>Vivienda Unifamiliar Aislada Consumo Cero</nomPro>
+		<usoPro>viviendas unifamiliares de distintos tipos</usoPro>
+		<usoProOtros/>
+		<comunidadPro>Comunidad Valenciana</comunidadPro>
+		<proPro>Valencia</proPro>
+		<locPro>Pobla de Vallbona, la</locPro>
+		<cpPro>46185</cpPro>
+		<tipoViaPro>Calle</tipoViaPro>
+		<viaPro>C/ L´Ametista</viaPro>
+		<tipoNPro>Num</tipoNPro>
+		<nPro>12</nPro>
+		<blqPro>-</blqPro>
+		<portalPro>-</portalPro>
+		<escPro>-</escPro>
+		<pisoPro>-</pisoPro>
+		<puertaPro>-</puertaPro>
+		<datosAdicPro>-</datosAdicPro>
+		<normativaEdificacion>CTE HE 2013</normativaEdificacion>
+		<normativaInstalaciones>RITE (2013)</normativaInstalaciones>
+		<normativaOtros>Ordenanzas municipales</normativaOtros>
+		<normativaEdificacionOtros/>
+		<normativaInstalacionesOtros/>
+		<normativaOtrosOtros/>
+		<superficieConstruida>125.00</superficieConstruida>
+		<alturaTotal>6.75</alturaTotal>
+		<plantaSobreRasante>1</plantaSobreRasante>
+		<plantaBajoRasante>0</plantaBajoRasante>
+		<EEGeneradaAutoconsumida>2545</EEGeneradaAutoconsumida>
+		<panelFotoVoltaicoAutoConsumido>2545</panelFotoVoltaicoAutoConsumido>
+		<puertaPro>-</puertaPro>
+		<cifAut>22682289B</cifAut>
+		<nomAut>Melchor </nomAut>
+		<apellido1Aut>Monleón</apellido1Aut>
+		<apellido2Aut> Doménech</apellido2Aut>
+		<razAut>Razón Social</razAut>
+		<NIFEntidad/>
+		<comunidadAut>Comunidad Valenciana</comunidadAut>
+		<proAut>Valencia</proAut>
+		<locAut>Valencia</locAut>
+		<cpAut>46001</cpAut>
+		<tipoViaAut>Calle</tipoViaAut>
+		<viaAut>Cenia</viaAut>
+		<tipoNAut>Num</tipoNAut>
+		<nAut>2</nAut>
+		<blqAut>-</blqAut>
+		<portalAut>-</portalAut>
+		<escAut>-</escAut>
+		<pisoAut>-</pisoAut>
+		<puertaAut>1</puertaAut>
+		<datosAdicAut>-</datosAdicAut>
+		<correoAut>mel@ctav.es</correoAut>
+		<telAut>963920192</telAut>
+		<titulacionAut>- Seleccione de la lista -</titulacionAut>
+		<titulacionOtrosAut>Arquitecto</titulacionOtrosAut>
+		<colegioAut>- Seleccione de la lista -</colegioAut>
+		<colegioOtrosAut>-</colegioOtrosAut>
+		<numeroColegiadoAut>-</numeroColegiadoAut>
+		<fechaVisita>24/05/19</fechaVisita>
+		<extInfo>NO</extInfo>
+		<pathArchivoMeteorologicoSeleccionado>C:\ProgramasCTEyCEE\DatosClimaticos\GENERICOS\zonaB3.bin</pathArchivoMeteorologicoSeleccionado>
+		<imgEdif>3.jpg</imgEdif>
+		<imgPlano>plano.png</imgPlano>
+		<MesIniPerSom>Junio</MesIniPerSom>
+		<MesFinPerSom>Septiembre</MesFinPerSom>
+		<energiaGT>true</energiaGT>
+		<cambios>NO</cambios>
+		<cambioscalener>NO</cambioscalener>
+	</DatosGenerales>
+	<EntradaGraficaLIDER>
+		<![CDATA[$ +----------------------------------------------------+
+$ |         FICHERO GENERADO CON CTE-HE 2013           |
+$ +----------------------------------------------------+
+$
+$ PROGRAM = LIDER
+$
+$
+CAMBIO = SI
+CAMBIO-CALENER = NO
+     EEGeneradaAutoconsumida = "2545"
+     PANELFOTOVOLTAICOAUTOCONSUMIDO =           2545
+           ENERGIAGT  = YES
+ "DATOS GENERALES" = GENERAL-DATA
+     TYPE-HOUSING        = "Unifamiliar"
+     YEAR                = "Posterior a 2013"
+     TYPE-DEFINITION     = "Nuevo"
+     COMUNITY            = "Comunidad Valenciana"
+     CITY                = "Valencia"
+     TOWN                = "Pobla de Vallbona, la"
+     ZONE                = "B3"
+     ALTITUDE            =            102
+     ArchivoMetSel       = "C:\ProgramasCTEyCEE\DatosClimaticos\GENERICOS\zonaB3.bin"
+     TIPOUSO             = "Residencial"
+     CLASEHIGROMETRIA    = "3"
+     NUMRENHS3           = "1"
+     NUM-VIVIENDAS       = 1
+     VENTILACION-POR-DEFECTO = "SI"
+     VALORES-VENTILACION = ( "1", "1", "1", "2.00" )
+     VALORES-PORCENTAJES = ( 25.000000, 25.000000, 25.000000, 25.000000 )
+     NAME-PROJECT        	= "Vivienda Unifamiliar Aislada Consumo Cero"
+     USE-PROJECT         	= "viviendas unifamiliares de distintos tipos"
+     USE-PROJECT-OTHER      	= ""
+     COMUNITY-PROJECT    	= "Comunidad Valenciana"
+     PROVINCE-PROJECT    	= "Valencia"
+     LOCALITY-PROJECT    	= "Pobla de Vallbona, la"
+     POSTCODE-PROJECT    	= "46185"
+     WAY-PROJECT         	= "C/ L´Ametista"
+     WAY-TYPE-PROJECT    	= "Calle"
+     NUMBER-TYPE-PROJECT 	= "Num"
+     NUMBER-PROJECT      	= "12"
+     BLOCK-PROJECT       	= "-"
+     PORTAL-PROJECT      	= "-"
+     STAIR-PROJECT       	= "-"
+     FLOOR-PROJECT       	= "-"
+     GATE-PROJECT        	= "-"
+     EXTRAINFO-PROJECT  		= "-"
+     NORMATIVE-BUILDING        		= "CTE HE 2013"
+     NORMATIVE-SYSTEM        		= "RITE (2013)"
+     NORMATIVE-OTHER        			= "Ordenanzas municipales"
+     NORMATIVE-BUILDING-OTHER	= ""
+     NORMATIVE-SYSTEM-OTHER      = ""
+     NORMATIVE-OTHER-OTHER       = ""
+     BUILDING-AREA      	= "125.00"
+     TOTAL-HEIGHT      	= "6.75"
+     FLOORS-ABOVE-GROUND-LEVEL   = 1
+     FLOORS-BEYOND-GROUND-LEVEL   = 0
+     IMAGE-PROJECT       = "3.jpg"
+     TEST-PROJECT        = "(null)"
+     CIF-AUTHOR      		= "22682289B"
+     NAME-AUTHOR     		= "Melchor "
+     FIRSTNAME1-AUTHOR     	= "Monleón"
+     FIRSTNAME2-AUTHOR     	= " Doménech"
+     TRADE-NAME-AUTHOR   	= "Razón Social"
+     TRADE-ID   				= ""
+     COMUNITY-AUTHOR    		= "Comunidad Valenciana"
+     PROVINCE-AUTHOR    		= "Valencia"
+     LOCALITY-AUTHOR    		= "Pobla de Vallbona, la"
+     POSTCODE-AUTHOR    		= "46185"
+     WAY-AUTHOR         		= "C/ L´Ametista"
+     WAY-TYPE-AUTHOR    		= "Calle"
+     NUMBER-TYPE-AUTHOR 		= "Num"
+     NUMBER-AUTHOR      		= "12"
+     BLOCK-AUTHOR       		= "-"
+     PORTAL-AUTHOR      		= "-"
+     STAIR-AUTHOR       		= "-"
+     FLOOR-AUTHOR       		= "-"
+     GATE-AUTHOR        		= "-"
+     EXTRAINFO-AUTHOR   		= "-"
+     EMAIL-AUTHOR       		= "mel@ctav.es"
+     TELEPHONE-AUTHOR   		= "963920192"
+     TITULACION         		= "- Seleccione de la lista -"
+     TITULACION-OTROS   		= "Arquitecto"
+     COLEGIO            		= "- Seleccione de la lista -"
+     COLEGIO-OTROS      		= "-"
+     COLEGIO-NUMERO      	= "-"
+     IMAGE-AUTHOR            = "plano.png"
+     MESINIPERSOM            = "Junio"
+     MESFINPERSOM            = "Septiembre"
+     VISIT-DATE              = "24/05/19"
+     EXTINFO                 = "NO"
+     ..
+ "Defectos" = DEFECTOS
+     PEConstruccionV = "Facahda 1pie"
+     VTIPO           = "V1"
+     VX              =              0
+     VY              =              1
+     VAnchura        =              1
+     VAltura         =              1
+     VRetranqueo     =              0
+     ForjadosExteriores     = "Cubierta plana"
+     CUConstruccion         = "Ninguno"
+     MedianerasConstruccion = ""
+     ForjadosTerreno   = "Solera"
+     TEConstruccion    = "Ninguno"
+     PEConstruccionH   = "forjado intermedio"
+     ParticionesInterioresConstruccion       = ""
+   VlongLD         =              0
+   VlongLA         =              0
+   VlongLB         =              0
+   VlongLH         =              0
+   VlongOD         =              0
+   VlongOA         =              0
+   VlongOB         =              0
+   VlongOW         =              0
+   VlongRD         =              0
+   VlongRA         =              0
+   VlongRB         =              0
+   VlongRH         =              0
+   Vangulo         =              0
+   POSITION-LAMAS      = Ninguno
+   LAMAS-WIDTH         =              0
+   LAMAS-DISTANCE      =              0
+   LAMAS-ANGLE         =              0
+   LAMAS-TRANSMISIVITY =              0
+   LAMAS-REFLECTIVITY  =              0
+   ETAncho  =             60
+   ETAlto  =             60
+   RadioEsferas  =           0.15
+   RadioSeleccion  =           0.15
+     ..
+$
+$ ----------------------
+$ Datos de Base de Datos
+$ ----------------------
+$
+TEMPLARY = USER
+$ ++++++++++++++++++++++++++++++
+$           MATERIALES
+$ ++++++++++++++++++++++++++++++
+"Material_Base" = MATERIAL
+    TYPE              = PROPERTIES
+    THICKNESS         =          0.075
+    THICKNESS_CHANGE         = YES
+    THICKNESS_MAX         =              2
+    THICKNESS_MIN         =          0.001
+    CONDUCTIVITY      =              1
+    DENSITY           =           3000
+    SPECIFIC-HEAT     =           1000
+    VAPOUR-DIFFUSIVITY-FACTOR =             10
+    NAME          = "Material_Base"
+    GROUP         = "Otro"
+    IMAGE          = "C:\ProgramasCTEyCEE\CTEHE2013\Imagenes\Ladrillo.bmp"
+    NAME_CALENER   = ""
+    LIBRARY       = NO
+    UTIL          =  NO
+    OBSOLETE      = NO
+    ..
+"Teja cerámica-porcelana" = MATERIAL
+    TYPE              = PROPERTIES
+    THICKNESS         =           0.02
+    THICKNESS_CHANGE         = YES
+    THICKNESS_MAX         =              2
+    THICKNESS_MIN         =          0.001
+    CONDUCTIVITY      =            1.3
+    DENSITY           =           2300
+    SPECIFIC-HEAT     =            840
+    VAPOUR-DIFFUSIVITY-FACTOR =             30
+    NAME          = "Teja cerámica-porcelana"
+    GROUP         = "Cerámicos"
+    IMAGE          = "arcilla.bmp"
+    NAME_CALENER   = "Teja cerámica-porcelana"
+    LIBRARY       = NO
+    UTIL          =  NO
+    OBSOLETE      = NO
+    ..
+"FU Entrevigado de EPS moldeado descolgado -Canto 250 mm" = MATERIAL
+    TYPE              = PROPERTIES
+    THICKNESS         =           0.25
+    THICKNESS_CHANGE         = NO
+    THICKNESS_MAX         =              2
+    THICKNESS_MIN         =          0.001
+    CONDUCTIVITY      =      0.1760563
+    DENSITY           =            710
+    SPECIFIC-HEAT     =           1000
+    VAPOUR-DIFFUSIVITY-FACTOR =             60
+    NAME          = "FU Entrevigado de EPS moldeado descolgado -Canto 250 mm"
+    GROUP         = "Forjados unidireccionales"
+    IMAGE          = "ladrillo.bmp"
+    NAME_CALENER   = "oldeado descolgado -Canto 250 "
+    LIBRARY       = NO
+    UTIL          =  NO
+    OBSOLETE      = NO
+    ..
+"FU Entrevigado de EPS moldeado descolgado -Canto 300 mm" = MATERIAL
+    TYPE              = PROPERTIES
+    THICKNESS         =            0.3
+    THICKNESS_CHANGE         = NO
+    THICKNESS_MAX         =              2
+    THICKNESS_MIN         =          0.001
+    CONDUCTIVITY      =            0.2
+    DENSITY           =            670
+    SPECIFIC-HEAT     =           1000
+    VAPOUR-DIFFUSIVITY-FACTOR =             60
+    NAME          = "FU Entrevigado de EPS moldeado descolgado -Canto 300 mm"
+    GROUP         = "Forjados unidireccionales"
+    IMAGE          = "ladrillo.bmp"
+    NAME_CALENER   = "oldeado descolgado -Canto 30 "
+    LIBRARY       = NO
+    UTIL          =  NO
+    OBSOLETE      = NO
+    ..
+"FU Entrevigado de EPS moldeado descolgado -Canto 350 mm" = MATERIAL
+    TYPE              = PROPERTIES
+    THICKNESS         =           0.35
+    THICKNESS_CHANGE         = NO
+    THICKNESS_MAX         =              2
+    THICKNESS_MIN         =          0.001
+    CONDUCTIVITY      =      0.2229299
+    DENSITY           =            640
+    SPECIFIC-HEAT     =           1000
+    VAPOUR-DIFFUSIVITY-FACTOR =             60
+    NAME          = "FU Entrevigado de EPS moldeado descolgado -Canto 350 mm"
+    GROUP         = "Forjados unidireccionales"
+    IMAGE          = "ladrillo.bmp"
+    NAME_CALENER   = "oldeado descolgado -Canto 35 "
+    LIBRARY       = NO
+    UTIL          =  NO
+    OBSOLETE      = NO
+    ..
+"FR Entrevigado de EPS moldeado descolgado -Canto 300 mm" = MATERIAL
+    TYPE              = PROPERTIES
+    THICKNESS         =            0.3
+    THICKNESS_CHANGE         = YES
+    THICKNESS_MAX         =              2
+    THICKNESS_MIN         =          0.001
+    CONDUCTIVITY      =      0.3571429
+    DENSITY           =           1330
+    SPECIFIC-HEAT     =           1000
+    VAPOUR-DIFFUSIVITY-FACTOR =             60
+    NAME          = "FR Entrevigado de EPS moldeado descolgado -Canto 300 mm"
+    GROUP         = "Forjados reticulares"
+    IMAGE          = "ladrillo.bmp"
+    NAME_CALENER   = "oldeado descolgado -Canto 300 "
+    LIBRARY       = NO
+    UTIL          =  NO
+    OBSOLETE      = NO
+    ..
+"FR Entrevigado de EPS moldeado descolgado -Canto 350 mm" = MATERIAL
+    TYPE              = PROPERTIES
+    THICKNESS         =           0.35
+    THICKNESS_CHANGE         = YES
+    THICKNESS_MAX         =              2
+    THICKNESS_MIN         =          0.001
+    CONDUCTIVITY      =      0.4022988
+    DENSITY           =           1310
+    SPECIFIC-HEAT     =           1000
+    VAPOUR-DIFFUSIVITY-FACTOR =             60
+    NAME          = "FR Entrevigado de EPS moldeado descolgado -Canto 350 mm"
+    GROUP         = "Forjados reticulares"
+    IMAGE          = "ladrillo.bmp"
+    NAME_CALENER   = "oldeado descolgado -Canto 350 "
+    LIBRARY       = NO
+    UTIL          =  NO
+    OBSOLETE      = NO
+    ..
+"FR Entrevigado de EPS moldeado descolgado -Canto 400 mm" = MATERIAL
+    TYPE              = PROPERTIES
+    THICKNESS         =            0.4
+    THICKNESS_CHANGE         = YES
+    THICKNESS_MAX         =              2
+    THICKNESS_MIN         =          0.001
+    CONDUCTIVITY      =      0.4395604
+    DENSITY           =           1290
+    SPECIFIC-HEAT     =           1000
+    VAPOUR-DIFFUSIVITY-FACTOR =             60
+    NAME          = "FR Entrevigado de EPS moldeado descolgado -Canto 400 mm"
+    GROUP         = "Forjados reticulares"
+    IMAGE          = "ladrillo.bmp"
+    NAME_CALENER   = "oldeado descolgado -Canto 400 "
+    LIBRARY       = NO
+    UTIL          =  NO
+    OBSOLETE      = NO
+    ..
+"FR Entrevigado de EPS moldeado descolgado -Canto 450 mm" = MATERIAL
+    TYPE              = PROPERTIES
+    THICKNESS         =           0.45
+    THICKNESS_CHANGE         = YES
+    THICKNESS_MAX         =              2
+    THICKNESS_MIN         =          0.001
+    CONDUCTIVITY      =      0.4787234
+    DENSITY           =           1280
+    SPECIFIC-HEAT     =           1000
+    VAPOUR-DIFFUSIVITY-FACTOR =             60
+    NAME          = "FR Entrevigado de EPS moldeado descolgado -Canto 450 mm"
+    GROUP         = "Forjados reticulares"
+    IMAGE          = "ladrillo.bmp"
+    NAME_CALENER   = "oldeado descolgado -Canto 450 "
+    LIBRARY       = NO
+    UTIL          =  NO
+    OBSOLETE      = NO
+    ..
+"Material_Base" = MATERIAL
+    TYPE              = PROPERTIES
+    THICKNESS         =          0.075
+    THICKNESS_CHANGE         = YES
+    THICKNESS_MAX         =              2
+    THICKNESS_MIN         =          0.001
+    CONDUCTIVITY      =              1
+    DENSITY           =           3000
+    SPECIFIC-HEAT     =           1000
+    VAPOUR-DIFFUSIVITY-FACTOR =             10
+    NAME          = "Material_Base"
+    GROUP         = "Otro"
+    IMAGE          = "C:\ProgramasCTEyCEE\CTEHE2013\Imagenes\Ladrillo.bmp"
+    NAME_CALENER   = ""
+    LIBRARY       = NO
+    UTIL          =  NO
+    OBSOLETE      = NO
+    ..
+"Teja cerámica-porcelana" = MATERIAL
+    TYPE              = PROPERTIES
+    THICKNESS         =           0.02
+    THICKNESS_CHANGE         = YES
+    THICKNESS_MAX         =              2
+    THICKNESS_MIN         =          0.001
+    CONDUCTIVITY      =            1.3
+    DENSITY           =           2300
+    SPECIFIC-HEAT     =            840
+    VAPOUR-DIFFUSIVITY-FACTOR =             30
+    NAME          = "Teja cerámica-porcelana"
+    GROUP         = "Cerámicos"
+    IMAGE          = "arcilla.bmp"
+    NAME_CALENER   = "Teja cerámica-porcelana"
+    LIBRARY       = NO
+    UTIL          =  NO
+    OBSOLETE      = NO
+    ..
+"FU Entrevigado de EPS moldeado descolgado -Canto 250 mm" = MATERIAL
+    TYPE              = PROPERTIES
+    THICKNESS         =           0.25
+    THICKNESS_CHANGE         = NO
+    THICKNESS_MAX         =              2
+    THICKNESS_MIN         =          0.001
+    CONDUCTIVITY      =      0.1760563
+    DENSITY           =            710
+    SPECIFIC-HEAT     =           1000
+    VAPOUR-DIFFUSIVITY-FACTOR =             60
+    NAME          = "FU Entrevigado de EPS moldeado descolgado -Canto 250 mm"
+    GROUP         = "Forjados unidireccionales"
+    IMAGE          = "ladrillo.bmp"
+    NAME_CALENER   = "oldeado descolgado -Canto 250 "
+    LIBRARY       = NO
+    UTIL          =  NO
+    OBSOLETE      = NO
+    ..
+"FU Entrevigado de EPS moldeado descolgado -Canto 300 mm" = MATERIAL
+    TYPE              = PROPERTIES
+    THICKNESS         =            0.3
+    THICKNESS_CHANGE         = NO
+    THICKNESS_MAX         =              2
+    THICKNESS_MIN         =          0.001
+    CONDUCTIVITY      =            0.2
+    DENSITY           =            670
+    SPECIFIC-HEAT     =           1000
+    VAPOUR-DIFFUSIVITY-FACTOR =             60
+    NAME          = "FU Entrevigado de EPS moldeado descolgado -Canto 300 mm"
+    GROUP         = "Forjados unidireccionales"
+    IMAGE          = "ladrillo.bmp"
+    NAME_CALENER   = "oldeado descolgado -Canto 30 "
+    LIBRARY       = NO
+    UTIL          =  NO
+    OBSOLETE      = NO
+    ..
+"FU Entrevigado de EPS moldeado descolgado -Canto 350 mm" = MATERIAL
+    TYPE              = PROPERTIES
+    THICKNESS         =           0.35
+    THICKNESS_CHANGE         = NO
+    THICKNESS_MAX         =              2
+    THICKNESS_MIN         =          0.001
+    CONDUCTIVITY      =      0.2229299
+    DENSITY           =            640
+    SPECIFIC-HEAT     =           1000
+    VAPOUR-DIFFUSIVITY-FACTOR =             60
+    NAME          = "FU Entrevigado de EPS moldeado descolgado -Canto 350 mm"
+    GROUP         = "Forjados unidireccionales"
+    IMAGE          = "ladrillo.bmp"
+    NAME_CALENER   = "oldeado descolgado -Canto 35 "
+    LIBRARY       = NO
+    UTIL          =  NO
+    OBSOLETE      = NO
+    ..
+"FR Entrevigado de EPS moldeado descolgado -Canto 300 mm" = MATERIAL
+    TYPE              = PROPERTIES
+    THICKNESS         =            0.3
+    THICKNESS_CHANGE         = YES
+    THICKNESS_MAX         =              2
+    THICKNESS_MIN         =          0.001
+    CONDUCTIVITY      =      0.3571429
+    DENSITY           =           1330
+    SPECIFIC-HEAT     =           1000
+    VAPOUR-DIFFUSIVITY-FACTOR =             60
+    NAME          = "FR Entrevigado de EPS moldeado descolgado -Canto 300 mm"
+    GROUP         = "Forjados reticulares"
+    IMAGE          = "ladrillo.bmp"
+    NAME_CALENER   = "oldeado descolgado -Canto 300 "
+    LIBRARY       = NO
+    UTIL          =  NO
+    OBSOLETE      = NO
+    ..
+"FR Entrevigado de EPS moldeado descolgado -Canto 350 mm" = MATERIAL
+    TYPE              = PROPERTIES
+    THICKNESS         =           0.35
+    THICKNESS_CHANGE         = YES
+    THICKNESS_MAX         =              2
+    THICKNESS_MIN         =          0.001
+    CONDUCTIVITY      =      0.4022988
+    DENSITY           =           1310
+    SPECIFIC-HEAT     =           1000
+    VAPOUR-DIFFUSIVITY-FACTOR =             60
+    NAME          = "FR Entrevigado de EPS moldeado descolgado -Canto 350 mm"
+    GROUP         = "Forjados reticulares"
+    IMAGE          = "ladrillo.bmp"
+    NAME_CALENER   = "oldeado descolgado -Canto 350 "
+    LIBRARY       = NO
+    UTIL          =  NO
+    OBSOLETE      = NO
+    ..
+"FR Entrevigado de EPS moldeado descolgado -Canto 400 mm" = MATERIAL
+    TYPE              = PROPERTIES
+    THICKNESS         =            0.4
+    THICKNESS_CHANGE         = YES
+    THICKNESS_MAX         =              2
+    THICKNESS_MIN         =          0.001
+    CONDUCTIVITY      =      0.4395604
+    DENSITY           =           1290
+    SPECIFIC-HEAT     =           1000
+    VAPOUR-DIFFUSIVITY-FACTOR =             60
+    NAME          = "FR Entrevigado de EPS moldeado descolgado -Canto 400 mm"
+    GROUP         = "Forjados reticulares"
+    IMAGE          = "ladrillo.bmp"
+    NAME_CALENER   = "oldeado descolgado -Canto 400 "
+    LIBRARY       = NO
+    UTIL          =  NO
+    OBSOLETE      = NO
+    ..
+"FR Entrevigado de EPS moldeado descolgado -Canto 450 mm" = MATERIAL
+    TYPE              = PROPERTIES
+    THICKNESS         =           0.45
+    THICKNESS_CHANGE         = YES
+    THICKNESS_MAX         =              2
+    THICKNESS_MIN         =          0.001
+    CONDUCTIVITY      =      0.4787234
+    DENSITY           =           1280
+    SPECIFIC-HEAT     =           1000
+    VAPOUR-DIFFUSIVITY-FACTOR =             60
+    NAME          = "FR Entrevigado de EPS moldeado descolgado -Canto 450 mm"
+    GROUP         = "Forjados reticulares"
+    IMAGE          = "ladrillo.bmp"
+    NAME_CALENER   = "oldeado descolgado -Canto 450 "
+    LIBRARY       = NO
+    UTIL          =  NO
+    OBSOLETE      = NO
+    ..
+"Material_Base" = MATERIAL
+    TYPE              = PROPERTIES
+    THICKNESS         =          0.075
+    THICKNESS_CHANGE         = YES
+    THICKNESS_MAX         =              2
+    THICKNESS_MIN         =          0.001
+    CONDUCTIVITY      =              1
+    DENSITY           =           3000
+    SPECIFIC-HEAT     =           1000
+    VAPOUR-DIFFUSIVITY-FACTOR =             10
+    NAME          = "Material_Base"
+    GROUP         = "Otro"
+    IMAGE          = "C:\ProgramasCTEyCEE\CTEHE2013\Imagenes\Ladrillo.bmp"
+    NAME_CALENER   = ""
+    LIBRARY       = NO
+    UTIL          =  NO
+    OBSOLETE      = NO
+    ..
+"Teja cerámica-porcelana" = MATERIAL
+    TYPE              = PROPERTIES
+    THICKNESS         =           0.02
+    THICKNESS_CHANGE         = YES
+    THICKNESS_MAX         =              2
+    THICKNESS_MIN         =          0.001
+    CONDUCTIVITY      =            1.3
+    DENSITY           =           2300
+    SPECIFIC-HEAT     =            840
+    VAPOUR-DIFFUSIVITY-FACTOR =             30
+    NAME          = "Teja cerámica-porcelana"
+    GROUP         = "Cerámicos"
+    IMAGE          = "arcilla.bmp"
+    NAME_CALENER   = "Teja cerámica-porcelana"
+    LIBRARY       = NO
+    UTIL          =  NO
+    OBSOLETE      = NO
+    ..
+"FU Entrevigado de EPS moldeado descolgado -Canto 250 mm" = MATERIAL
+    TYPE              = PROPERTIES
+    THICKNESS         =           0.25
+    THICKNESS_CHANGE         = NO
+    THICKNESS_MAX         =              2
+    THICKNESS_MIN         =          0.001
+    CONDUCTIVITY      =      0.1760563
+    DENSITY           =            710
+    SPECIFIC-HEAT     =           1000
+    VAPOUR-DIFFUSIVITY-FACTOR =             60
+    NAME          = "FU Entrevigado de EPS moldeado descolgado -Canto 250 mm"
+    GROUP         = "Forjados unidireccionales"
+    IMAGE          = "ladrillo.bmp"
+    NAME_CALENER   = "oldeado descolgado -Canto 250 "
+    LIBRARY       = NO
+    UTIL          =  NO
+    OBSOLETE      = NO
+    ..
+"FU Entrevigado de EPS moldeado descolgado -Canto 300 mm" = MATERIAL
+    TYPE              = PROPERTIES
+    THICKNESS         =            0.3
+    THICKNESS_CHANGE         = NO
+    THICKNESS_MAX         =              2
+    THICKNESS_MIN         =          0.001
+    CONDUCTIVITY      =            0.2
+    DENSITY           =            670
+    SPECIFIC-HEAT     =           1000
+    VAPOUR-DIFFUSIVITY-FACTOR =             60
+    NAME          = "FU Entrevigado de EPS moldeado descolgado -Canto 300 mm"
+    GROUP         = "Forjados unidireccionales"
+    IMAGE          = "ladrillo.bmp"
+    NAME_CALENER   = "oldeado descolgado -Canto 30 "
+    LIBRARY       = NO
+    UTIL          =  NO
+    OBSOLETE      = NO
+    ..
+"FU Entrevigado de EPS moldeado descolgado -Canto 350 mm" = MATERIAL
+    TYPE              = PROPERTIES
+    THICKNESS         =           0.35
+    THICKNESS_CHANGE         = NO
+    THICKNESS_MAX         =              2
+    THICKNESS_MIN         =          0.001
+    CONDUCTIVITY      =      0.2229299
+    DENSITY           =            640
+    SPECIFIC-HEAT     =           1000
+    VAPOUR-DIFFUSIVITY-FACTOR =             60
+    NAME          = "FU Entrevigado de EPS moldeado descolgado -Canto 350 mm"
+    GROUP         = "Forjados unidireccionales"
+    IMAGE          = "ladrillo.bmp"
+    NAME_CALENER   = "oldeado descolgado -Canto 35 "
+    LIBRARY       = NO
+    UTIL          =  NO
+    OBSOLETE      = NO
+    ..
+"FR Entrevigado de EPS moldeado descolgado -Canto 300 mm" = MATERIAL
+    TYPE              = PROPERTIES
+    THICKNESS         =            0.3
+    THICKNESS_CHANGE         = YES
+    THICKNESS_MAX         =              2
+    THICKNESS_MIN         =          0.001
+    CONDUCTIVITY      =      0.3571429
+    DENSITY           =           1330
+    SPECIFIC-HEAT     =           1000
+    VAPOUR-DIFFUSIVITY-FACTOR =             60
+    NAME          = "FR Entrevigado de EPS moldeado descolgado -Canto 300 mm"
+    GROUP         = "Forjados reticulares"
+    IMAGE          = "ladrillo.bmp"
+    NAME_CALENER   = "oldeado descolgado -Canto 300 "
+    LIBRARY       = NO
+    UTIL          =  NO
+    OBSOLETE      = NO
+    ..
+"FR Entrevigado de EPS moldeado descolgado -Canto 350 mm" = MATERIAL
+    TYPE              = PROPERTIES
+    THICKNESS         =           0.35
+    THICKNESS_CHANGE         = YES
+    THICKNESS_MAX         =              2
+    THICKNESS_MIN         =          0.001
+    CONDUCTIVITY      =      0.4022988
+    DENSITY           =           1310
+    SPECIFIC-HEAT     =           1000
+    VAPOUR-DIFFUSIVITY-FACTOR =             60
+    NAME          = "FR Entrevigado de EPS moldeado descolgado -Canto 350 mm"
+    GROUP         = "Forjados reticulares"
+    IMAGE          = "ladrillo.bmp"
+    NAME_CALENER   = "oldeado descolgado -Canto 350 "
+    LIBRARY       = NO
+    UTIL          =  NO
+    OBSOLETE      = NO
+    ..
+"FR Entrevigado de EPS moldeado descolgado -Canto 400 mm" = MATERIAL
+    TYPE              = PROPERTIES
+    THICKNESS         =            0.4
+    THICKNESS_CHANGE         = YES
+    THICKNESS_MAX         =              2
+    THICKNESS_MIN         =          0.001
+    CONDUCTIVITY      =      0.4395604
+    DENSITY           =           1290
+    SPECIFIC-HEAT     =           1000
+    VAPOUR-DIFFUSIVITY-FACTOR =             60
+    NAME          = "FR Entrevigado de EPS moldeado descolgado -Canto 400 mm"
+    GROUP         = "Forjados reticulares"
+    IMAGE          = "ladrillo.bmp"
+    NAME_CALENER   = "oldeado descolgado -Canto 400 "
+    LIBRARY       = NO
+    UTIL          =  NO
+    OBSOLETE      = NO
+    ..
+"FR Entrevigado de EPS moldeado descolgado -Canto 450 mm" = MATERIAL
+    TYPE              = PROPERTIES
+    THICKNESS         =           0.45
+    THICKNESS_CHANGE         = YES
+    THICKNESS_MAX         =              2
+    THICKNESS_MIN         =          0.001
+    CONDUCTIVITY      =      0.4787234
+    DENSITY           =           1280
+    SPECIFIC-HEAT     =           1000
+    VAPOUR-DIFFUSIVITY-FACTOR =             60
+    NAME          = "FR Entrevigado de EPS moldeado descolgado -Canto 450 mm"
+    GROUP         = "Forjados reticulares"
+    IMAGE          = "ladrillo.bmp"
+    NAME_CALENER   = "oldeado descolgado -Canto 450 "
+    LIBRARY       = NO
+    UTIL          =  NO
+    OBSOLETE      = NO
+    ..
+"Material_Base" = MATERIAL
+    TYPE              = PROPERTIES
+    THICKNESS         =          0.075
+    THICKNESS_CHANGE         = YES
+    THICKNESS_MAX         =              2
+    THICKNESS_MIN         =          0.001
+    CONDUCTIVITY      =              1
+    DENSITY           =           3000
+    SPECIFIC-HEAT     =           1000
+    VAPOUR-DIFFUSIVITY-FACTOR =             10
+    NAME          = "Material_Base"
+    GROUP         = "Otro"
+    IMAGE          = "C:\ProgramasCTEyCEE\CTEHE2013\Imagenes\Ladrillo.bmp"
+    NAME_CALENER   = ""
+    LIBRARY       = NO
+    UTIL          =  NO
+    OBSOLETE      = NO
+    ..
+"Teja cerámica-porcelana" = MATERIAL
+    TYPE              = PROPERTIES
+    THICKNESS         =           0.02
+    THICKNESS_CHANGE         = YES
+    THICKNESS_MAX         =              2
+    THICKNESS_MIN         =          0.001
+    CONDUCTIVITY      =            1.3
+    DENSITY           =           2300
+    SPECIFIC-HEAT     =            840
+    VAPOUR-DIFFUSIVITY-FACTOR =             30
+    NAME          = "Teja cerámica-porcelana"
+    GROUP         = "Cerámicos"
+    IMAGE          = "arcilla.bmp"
+    NAME_CALENER   = "Teja cerámica-porcelana"
+    LIBRARY       = NO
+    UTIL          =  NO
+    OBSOLETE      = NO
+    ..
+"FU Entrevigado de EPS moldeado descolgado -Canto 250 mm" = MATERIAL
+    TYPE              = PROPERTIES
+    THICKNESS         =           0.25
+    THICKNESS_CHANGE         = NO
+    THICKNESS_MAX         =              2
+    THICKNESS_MIN         =          0.001
+    CONDUCTIVITY      =      0.1760563
+    DENSITY           =            710
+    SPECIFIC-HEAT     =           1000
+    VAPOUR-DIFFUSIVITY-FACTOR =             60
+    NAME          = "FU Entrevigado de EPS moldeado descolgado -Canto 250 mm"
+    GROUP         = "Forjados unidireccionales"
+    IMAGE          = "ladrillo.bmp"
+    NAME_CALENER   = "oldeado descolgado -Canto 250 "
+    LIBRARY       = NO
+    UTIL          =  NO
+    OBSOLETE      = NO
+    ..
+"FU Entrevigado de EPS moldeado descolgado -Canto 300 mm" = MATERIAL
+    TYPE              = PROPERTIES
+    THICKNESS         =            0.3
+    THICKNESS_CHANGE         = NO
+    THICKNESS_MAX         =              2
+    THICKNESS_MIN         =          0.001
+    CONDUCTIVITY      =            0.2
+    DENSITY           =            670
+    SPECIFIC-HEAT     =           1000
+    VAPOUR-DIFFUSIVITY-FACTOR =             60
+    NAME          = "FU Entrevigado de EPS moldeado descolgado -Canto 300 mm"
+    GROUP         = "Forjados unidireccionales"
+    IMAGE          = "ladrillo.bmp"
+    NAME_CALENER   = "oldeado descolgado -Canto 30 "
+    LIBRARY       = NO
+    UTIL          =  NO
+    OBSOLETE      = NO
+    ..
+"FU Entrevigado de EPS moldeado descolgado -Canto 350 mm" = MATERIAL
+    TYPE              = PROPERTIES
+    THICKNESS         =           0.35
+    THICKNESS_CHANGE         = NO
+    THICKNESS_MAX         =              2
+    THICKNESS_MIN         =          0.001
+    CONDUCTIVITY      =      0.2229299
+    DENSITY           =            640
+    SPECIFIC-HEAT     =           1000
+    VAPOUR-DIFFUSIVITY-FACTOR =             60
+    NAME          = "FU Entrevigado de EPS moldeado descolgado -Canto 350 mm"
+    GROUP         = "Forjados unidireccionales"
+    IMAGE          = "ladrillo.bmp"
+    NAME_CALENER   = "oldeado descolgado -Canto 35 "
+    LIBRARY       = NO
+    UTIL          =  NO
+    OBSOLETE      = NO
+    ..
+"FR Entrevigado de EPS moldeado descolgado -Canto 300 mm" = MATERIAL
+    TYPE              = PROPERTIES
+    THICKNESS         =            0.3
+    THICKNESS_CHANGE         = YES
+    THICKNESS_MAX         =              2
+    THICKNESS_MIN         =          0.001
+    CONDUCTIVITY      =      0.3571429
+    DENSITY           =           1330
+    SPECIFIC-HEAT     =           1000
+    VAPOUR-DIFFUSIVITY-FACTOR =             60
+    NAME          = "FR Entrevigado de EPS moldeado descolgado -Canto 300 mm"
+    GROUP         = "Forjados reticulares"
+    IMAGE          = "ladrillo.bmp"
+    NAME_CALENER   = "oldeado descolgado -Canto 300 "
+    LIBRARY       = NO
+    UTIL          =  NO
+    OBSOLETE      = NO
+    ..
+"FR Entrevigado de EPS moldeado descolgado -Canto 350 mm" = MATERIAL
+    TYPE              = PROPERTIES
+    THICKNESS         =           0.35
+    THICKNESS_CHANGE         = YES
+    THICKNESS_MAX         =              2
+    THICKNESS_MIN         =          0.001
+    CONDUCTIVITY      =      0.4022988
+    DENSITY           =           1310
+    SPECIFIC-HEAT     =           1000
+    VAPOUR-DIFFUSIVITY-FACTOR =             60
+    NAME          = "FR Entrevigado de EPS moldeado descolgado -Canto 350 mm"
+    GROUP         = "Forjados reticulares"
+    IMAGE          = "ladrillo.bmp"
+    NAME_CALENER   = "oldeado descolgado -Canto 350 "
+    LIBRARY       = NO
+    UTIL          =  NO
+    OBSOLETE      = NO
+    ..
+"FR Entrevigado de EPS moldeado descolgado -Canto 400 mm" = MATERIAL
+    TYPE              = PROPERTIES
+    THICKNESS         =            0.4
+    THICKNESS_CHANGE         = YES
+    THICKNESS_MAX         =              2
+    THICKNESS_MIN         =          0.001
+    CONDUCTIVITY      =      0.4395604
+    DENSITY           =           1290
+    SPECIFIC-HEAT     =           1000
+    VAPOUR-DIFFUSIVITY-FACTOR =             60
+    NAME          = "FR Entrevigado de EPS moldeado descolgado -Canto 400 mm"
+    GROUP         = "Forjados reticulares"
+    IMAGE          = "ladrillo.bmp"
+    NAME_CALENER   = "oldeado descolgado -Canto 400 "
+    LIBRARY       = NO
+    UTIL          =  NO
+    OBSOLETE      = NO
+    ..
+"FR Entrevigado de EPS moldeado descolgado -Canto 450 mm" = MATERIAL
+    TYPE              = PROPERTIES
+    THICKNESS         =           0.45
+    THICKNESS_CHANGE         = YES
+    THICKNESS_MAX         =              2
+    THICKNESS_MIN         =          0.001
+    CONDUCTIVITY      =      0.4787234
+    DENSITY           =           1280
+    SPECIFIC-HEAT     =           1000
+    VAPOUR-DIFFUSIVITY-FACTOR =             60
+    NAME          = "FR Entrevigado de EPS moldeado descolgado -Canto 450 mm"
+    GROUP         = "Forjados reticulares"
+    IMAGE          = "ladrillo.bmp"
+    NAME_CALENER   = "oldeado descolgado -Canto 450 "
+    LIBRARY       = NO
+    UTIL          =  NO
+    OBSOLETE      = NO
+    ..
+"Material_Base" = MATERIAL
+    TYPE              = PROPERTIES
+    THICKNESS         =          0.075
+    THICKNESS_CHANGE         = YES
+    THICKNESS_MAX         =              2
+    THICKNESS_MIN         =          0.001
+    CONDUCTIVITY      =              1
+    DENSITY           =           3000
+    SPECIFIC-HEAT     =           1000
+    VAPOUR-DIFFUSIVITY-FACTOR =             10
+    NAME          = "Material_Base"
+    GROUP         = "Otro"
+    IMAGE          = "C:\ProgramasCTEyCEE\CTEHE2013\Imagenes\Ladrillo.bmp"
+    NAME_CALENER   = ""
+    LIBRARY       = NO
+    UTIL          =  NO
+    OBSOLETE      = NO
+    ..
+"Teja cerámica-porcelana" = MATERIAL
+    TYPE              = PROPERTIES
+    THICKNESS         =           0.02
+    THICKNESS_CHANGE         = YES
+    THICKNESS_MAX         =              2
+    THICKNESS_MIN         =          0.001
+    CONDUCTIVITY      =            1.3
+    DENSITY           =           2300
+    SPECIFIC-HEAT     =            840
+    VAPOUR-DIFFUSIVITY-FACTOR =             30
+    NAME          = "Teja cerámica-porcelana"
+    GROUP         = "Cerámicos"
+    IMAGE          = "arcilla.bmp"
+    NAME_CALENER   = "Teja cerámica-porcelana"
+    LIBRARY       = NO
+    UTIL          =  NO
+    OBSOLETE      = NO
+    ..
+"FU Entrevigado de EPS moldeado descolgado -Canto 250 mm" = MATERIAL
+    TYPE              = PROPERTIES
+    THICKNESS         =           0.25
+    THICKNESS_CHANGE         = NO
+    THICKNESS_MAX         =              2
+    THICKNESS_MIN         =          0.001
+    CONDUCTIVITY      =      0.1760563
+    DENSITY           =            710
+    SPECIFIC-HEAT     =           1000
+    VAPOUR-DIFFUSIVITY-FACTOR =             60
+    NAME          = "FU Entrevigado de EPS moldeado descolgado -Canto 250 mm"
+    GROUP         = "Forjados unidireccionales"
+    IMAGE          = "ladrillo.bmp"
+    NAME_CALENER   = "oldeado descolgado -Canto 250 "
+    LIBRARY       = NO
+    UTIL          =  NO
+    OBSOLETE      = NO
+    ..
+"FU Entrevigado de EPS moldeado descolgado -Canto 300 mm" = MATERIAL
+    TYPE              = PROPERTIES
+    THICKNESS         =            0.3
+    THICKNESS_CHANGE         = NO
+    THICKNESS_MAX         =              2
+    THICKNESS_MIN         =          0.001
+    CONDUCTIVITY      =            0.2
+    DENSITY           =            670
+    SPECIFIC-HEAT     =           1000
+    VAPOUR-DIFFUSIVITY-FACTOR =             60
+    NAME          = "FU Entrevigado de EPS moldeado descolgado -Canto 300 mm"
+    GROUP         = "Forjados unidireccionales"
+    IMAGE          = "ladrillo.bmp"
+    NAME_CALENER   = "oldeado descolgado -Canto 30 "
+    LIBRARY       = NO
+    UTIL          =  NO
+    OBSOLETE      = NO
+    ..
+"FU Entrevigado de EPS moldeado descolgado -Canto 350 mm" = MATERIAL
+    TYPE              = PROPERTIES
+    THICKNESS         =           0.35
+    THICKNESS_CHANGE         = NO
+    THICKNESS_MAX         =              2
+    THICKNESS_MIN         =          0.001
+    CONDUCTIVITY      =      0.2229299
+    DENSITY           =            640
+    SPECIFIC-HEAT     =           1000
+    VAPOUR-DIFFUSIVITY-FACTOR =             60
+    NAME          = "FU Entrevigado de EPS moldeado descolgado -Canto 350 mm"
+    GROUP         = "Forjados unidireccionales"
+    IMAGE          = "ladrillo.bmp"
+    NAME_CALENER   = "oldeado descolgado -Canto 35 "
+    LIBRARY       = NO
+    UTIL          =  NO
+    OBSOLETE      = NO
+    ..
+"FR Entrevigado de EPS moldeado descolgado -Canto 300 mm" = MATERIAL
+    TYPE              = PROPERTIES
+    THICKNESS         =            0.3
+    THICKNESS_CHANGE         = YES
+    THICKNESS_MAX         =              2
+    THICKNESS_MIN         =          0.001
+    CONDUCTIVITY      =      0.3571429
+    DENSITY           =           1330
+    SPECIFIC-HEAT     =           1000
+    VAPOUR-DIFFUSIVITY-FACTOR =             60
+    NAME          = "FR Entrevigado de EPS moldeado descolgado -Canto 300 mm"
+    GROUP         = "Forjados reticulares"
+    IMAGE          = "ladrillo.bmp"
+    NAME_CALENER   = "oldeado descolgado -Canto 300 "
+    LIBRARY       = NO
+    UTIL          =  NO
+    OBSOLETE      = NO
+    ..
+"FR Entrevigado de EPS moldeado descolgado -Canto 350 mm" = MATERIAL
+    TYPE              = PROPERTIES
+    THICKNESS         =           0.35
+    THICKNESS_CHANGE         = YES
+    THICKNESS_MAX         =              2
+    THICKNESS_MIN         =          0.001
+    CONDUCTIVITY      =      0.4022988
+    DENSITY           =           1310
+    SPECIFIC-HEAT     =           1000
+    VAPOUR-DIFFUSIVITY-FACTOR =             60
+    NAME          = "FR Entrevigado de EPS moldeado descolgado -Canto 350 mm"
+    GROUP         = "Forjados reticulares"
+    IMAGE          = "ladrillo.bmp"
+    NAME_CALENER   = "oldeado descolgado -Canto 350 "
+    LIBRARY       = NO
+    UTIL          =  NO
+    OBSOLETE      = NO
+    ..
+"FR Entrevigado de EPS moldeado descolgado -Canto 400 mm" = MATERIAL
+    TYPE              = PROPERTIES
+    THICKNESS         =            0.4
+    THICKNESS_CHANGE         = YES
+    THICKNESS_MAX         =              2
+    THICKNESS_MIN         =          0.001
+    CONDUCTIVITY      =      0.4395604
+    DENSITY           =           1290
+    SPECIFIC-HEAT     =           1000
+    VAPOUR-DIFFUSIVITY-FACTOR =             60
+    NAME          = "FR Entrevigado de EPS moldeado descolgado -Canto 400 mm"
+    GROUP         = "Forjados reticulares"
+    IMAGE          = "ladrillo.bmp"
+    NAME_CALENER   = "oldeado descolgado -Canto 400 "
+    LIBRARY       = NO
+    UTIL          =  NO
+    OBSOLETE      = NO
+    ..
+"FR Entrevigado de EPS moldeado descolgado -Canto 450 mm" = MATERIAL
+    TYPE              = PROPERTIES
+    THICKNESS         =           0.45
+    THICKNESS_CHANGE         = YES
+    THICKNESS_MAX         =              2
+    THICKNESS_MIN         =          0.001
+    CONDUCTIVITY      =      0.4787234
+    DENSITY           =           1280
+    SPECIFIC-HEAT     =           1000
+    VAPOUR-DIFFUSIVITY-FACTOR =             60
+    NAME          = "FR Entrevigado de EPS moldeado descolgado -Canto 450 mm"
+    GROUP         = "Forjados reticulares"
+    IMAGE          = "ladrillo.bmp"
+    NAME_CALENER   = "oldeado descolgado -Canto 450 "
+    LIBRARY       = NO
+    UTIL          =  NO
+    OBSOLETE      = NO
+    ..
+"Material_Base" = MATERIAL
+    TYPE              = PROPERTIES
+    THICKNESS         =          0.075
+    THICKNESS_CHANGE         = YES
+    THICKNESS_MAX         =              2
+    THICKNESS_MIN         =          0.001
+    CONDUCTIVITY      =              1
+    DENSITY           =           3000
+    SPECIFIC-HEAT     =           1000
+    VAPOUR-DIFFUSIVITY-FACTOR =             10
+    NAME          = "Material_Base"
+    GROUP         = "Otro"
+    IMAGE          = "C:\ProgramasCTEyCEE\CTEHE2013\Imagenes\Ladrillo.bmp"
+    NAME_CALENER   = ""
+    LIBRARY       = NO
+    UTIL          =  NO
+    OBSOLETE      = NO
+    ..
+"Teja cerámica-porcelana" = MATERIAL
+    TYPE              = PROPERTIES
+    THICKNESS         =           0.02
+    THICKNESS_CHANGE         = YES
+    THICKNESS_MAX         =              2
+    THICKNESS_MIN         =          0.001
+    CONDUCTIVITY      =            1.3
+    DENSITY           =           2300
+    SPECIFIC-HEAT     =            840
+    VAPOUR-DIFFUSIVITY-FACTOR =             30
+    NAME          = "Teja cerámica-porcelana"
+    GROUP         = "Cerámicos"
+    IMAGE          = "arcilla.bmp"
+    NAME_CALENER   = "Teja cerámica-porcelana"
+    LIBRARY       = NO
+    UTIL          =  NO
+    OBSOLETE      = NO
+    ..
+"FU Entrevigado de EPS moldeado descolgado -Canto 250 mm" = MATERIAL
+    TYPE              = PROPERTIES
+    THICKNESS         =           0.25
+    THICKNESS_CHANGE         = NO
+    THICKNESS_MAX         =              2
+    THICKNESS_MIN         =          0.001
+    CONDUCTIVITY      =      0.1760563
+    DENSITY           =            710
+    SPECIFIC-HEAT     =           1000
+    VAPOUR-DIFFUSIVITY-FACTOR =             60
+    NAME          = "FU Entrevigado de EPS moldeado descolgado -Canto 250 mm"
+    GROUP         = "Forjados unidireccionales"
+    IMAGE          = "ladrillo.bmp"
+    NAME_CALENER   = "oldeado descolgado -Canto 250 "
+    LIBRARY       = NO
+    UTIL          =  NO
+    OBSOLETE      = NO
+    ..
+"FU Entrevigado de EPS moldeado descolgado -Canto 300 mm" = MATERIAL
+    TYPE              = PROPERTIES
+    THICKNESS         =            0.3
+    THICKNESS_CHANGE         = NO
+    THICKNESS_MAX         =              2
+    THICKNESS_MIN         =          0.001
+    CONDUCTIVITY      =            0.2
+    DENSITY           =            670
+    SPECIFIC-HEAT     =           1000
+    VAPOUR-DIFFUSIVITY-FACTOR =             60
+    NAME          = "FU Entrevigado de EPS moldeado descolgado -Canto 300 mm"
+    GROUP         = "Forjados unidireccionales"
+    IMAGE          = "ladrillo.bmp"
+    NAME_CALENER   = "oldeado descolgado -Canto 30 "
+    LIBRARY       = NO
+    UTIL          =  NO
+    OBSOLETE      = NO
+    ..
+"FU Entrevigado de EPS moldeado descolgado -Canto 350 mm" = MATERIAL
+    TYPE              = PROPERTIES
+    THICKNESS         =           0.35
+    THICKNESS_CHANGE         = NO
+    THICKNESS_MAX         =              2
+    THICKNESS_MIN         =          0.001
+    CONDUCTIVITY      =      0.2229299
+    DENSITY           =            640
+    SPECIFIC-HEAT     =           1000
+    VAPOUR-DIFFUSIVITY-FACTOR =             60
+    NAME          = "FU Entrevigado de EPS moldeado descolgado -Canto 350 mm"
+    GROUP         = "Forjados unidireccionales"
+    IMAGE          = "ladrillo.bmp"
+    NAME_CALENER   = "oldeado descolgado -Canto 35 "
+    LIBRARY       = NO
+    UTIL          =  NO
+    OBSOLETE      = NO
+    ..
+"FR Entrevigado de EPS moldeado descolgado -Canto 300 mm" = MATERIAL
+    TYPE              = PROPERTIES
+    THICKNESS         =            0.3
+    THICKNESS_CHANGE         = YES
+    THICKNESS_MAX         =              2
+    THICKNESS_MIN         =          0.001
+    CONDUCTIVITY      =      0.3571429
+    DENSITY           =           1330
+    SPECIFIC-HEAT     =           1000
+    VAPOUR-DIFFUSIVITY-FACTOR =             60
+    NAME          = "FR Entrevigado de EPS moldeado descolgado -Canto 300 mm"
+    GROUP         = "Forjados reticulares"
+    IMAGE          = "ladrillo.bmp"
+    NAME_CALENER   = "oldeado descolgado -Canto 300 "
+    LIBRARY       = NO
+    UTIL          =  NO
+    OBSOLETE      = NO
+    ..
+"FR Entrevigado de EPS moldeado descolgado -Canto 350 mm" = MATERIAL
+    TYPE              = PROPERTIES
+    THICKNESS         =           0.35
+    THICKNESS_CHANGE         = YES
+    THICKNESS_MAX         =              2
+    THICKNESS_MIN         =          0.001
+    CONDUCTIVITY      =      0.4022988
+    DENSITY           =           1310
+    SPECIFIC-HEAT     =           1000
+    VAPOUR-DIFFUSIVITY-FACTOR =             60
+    NAME          = "FR Entrevigado de EPS moldeado descolgado -Canto 350 mm"
+    GROUP         = "Forjados reticulares"
+    IMAGE          = "ladrillo.bmp"
+    NAME_CALENER   = "oldeado descolgado -Canto 350 "
+    LIBRARY       = NO
+    UTIL          =  NO
+    OBSOLETE      = NO
+    ..
+"FR Entrevigado de EPS moldeado descolgado -Canto 400 mm" = MATERIAL
+    TYPE              = PROPERTIES
+    THICKNESS         =            0.4
+    THICKNESS_CHANGE         = YES
+    THICKNESS_MAX         =              2
+    THICKNESS_MIN         =          0.001
+    CONDUCTIVITY      =      0.4395604
+    DENSITY           =           1290
+    SPECIFIC-HEAT     =           1000
+    VAPOUR-DIFFUSIVITY-FACTOR =             60
+    NAME          = "FR Entrevigado de EPS moldeado descolgado -Canto 400 mm"
+    GROUP         = "Forjados reticulares"
+    IMAGE          = "ladrillo.bmp"
+    NAME_CALENER   = "oldeado descolgado -Canto 400 "
+    LIBRARY       = NO
+    UTIL          =  NO
+    OBSOLETE      = NO
+    ..
+"FR Entrevigado de EPS moldeado descolgado -Canto 450 mm" = MATERIAL
+    TYPE              = PROPERTIES
+    THICKNESS         =           0.45
+    THICKNESS_CHANGE         = YES
+    THICKNESS_MAX         =              2
+    THICKNESS_MIN         =          0.001
+    CONDUCTIVITY      =      0.4787234
+    DENSITY           =           1280
+    SPECIFIC-HEAT     =           1000
+    VAPOUR-DIFFUSIVITY-FACTOR =             60
+    NAME          = "FR Entrevigado de EPS moldeado descolgado -Canto 450 mm"
+    GROUP         = "Forjados reticulares"
+    IMAGE          = "ladrillo.bmp"
+    NAME_CALENER   = "oldeado descolgado -Canto 450 "
+    LIBRARY       = NO
+    UTIL          =  NO
+    OBSOLETE      = NO
+    ..
+$ ++++++++++++++++++++++++++++++
+$         CERRAMIENTOS
+$ ++++++++++++++++++++++++++++++
+"Facahda 1pie" = LAYERS
+    GROUP        = "Fachadas"
+    NAME_CALENER = ""
+    NAME         = "Facahda 1pie"
+    TYPE-DEFINITION = 1
+    MATERIAL     = ("XPS Expandido con dióxido de carbono CO4 [ 0.042 W/[mK]]","1 pie LP métrico o catalán 60 mm< G < 80 mm","Enlucido de yeso 1000 < d < 1300")
+    THICKNESS = (           0.08,           0.24,          0.015)
+    LIBRARY       =  NO
+    UTIL          =  YES
+    IMAGE = ""
+    DEFAULT = NO
+..
+"Fachada medio pie" = LAYERS
+    GROUP        = "Fachadas"
+    NAME_CALENER = ""
+    NAME         = "Fachada medio pie"
+    TYPE-DEFINITION = 1
+    MATERIAL     = ("XPS Expandido con dióxido de carbono CO4 [ 0.042 W/[mK]]","1/2 pie LP métrico o catalán 60 mm< G < 80 mm","Enlucido de yeso d < 1000")
+    THICKNESS = (           0.08,          0.115,          0.015)
+    LIBRARY       =  NO
+    UTIL          =  YES
+    IMAGE = ""
+    DEFAULT = NO
+..
+"Cubierta plana" = LAYERS
+    GROUP        = "Cubiertas"
+    NAME_CALENER = ""
+    NAME         = "Cubierta plana"
+    TYPE-DEFINITION = 1
+    MATERIAL     = ("Plaqueta o baldosa de gres","Mortero de cemento o cal para albañilería y para revoco/enlucido 1000 < d < 1250","XPS Expandido con dióxido de carbono CO3 [ 0.038 W/[mK]]","Betún fieltro o lámina","FU Entrevigado cerámico -Canto 300 mm","Enlucido de yeso 1000 < d < 1300")
+    THICKNESS = (           0.02,           0.02,            0.1,           0.02,            0.3,          0.015)
+    LIBRARY       =  NO
+    UTIL          =  YES
+    IMAGE = ""
+    DEFAULT = NO
+..
+"Solera" = LAYERS
+    GROUP        = "Solera"
+    NAME_CALENER = ""
+    NAME         = "Solera"
+    TYPE-DEFINITION = 1
+    MATERIAL     = ("Plaqueta o baldosa de gres","Mortero de cemento o cal para albañilería y para revoco/enlucido 1000 < d < 1250","Hormigón armado d > 2500","Hormigón celular curado en autoclave d 1000","Arena y grava [1700 < d < 2200]")
+    THICKNESS = (           0.02,           0.02,            0.4,            0.1,            0.2)
+    LIBRARY       =  NO
+    UTIL          =  YES
+    IMAGE = ""
+    DEFAULT = NO
+..
+"Cubierta inclinada" = LAYERS
+    GROUP        = "Cubiertas"
+    NAME_CALENER = ""
+    NAME         = "Cubierta inclinada"
+    TYPE-DEFINITION = 1
+    MATERIAL     = ("Teja de arcilla cocida","XPS Expandido con hidrofluorcarbonos HFC [ 0.032 W/[mK]]","FUr310_12")
+    THICKNESS = (           0.02,            0.1,           0.31)
+    LIBRARY       =  NO
+    UTIL          =  YES
+    IMAGE = ""
+    DEFAULT = NO
+..
+"Frojado intermedio" = LAYERS
+    GROUP        = "Forjado "
+    NAME_CALENER = ""
+    NAME         = "Frojado intermedio"
+    TYPE-DEFINITION = 1
+    MATERIAL     = ("Plaqueta o baldosa de gres","Mortero de cemento o cal para albañilería y para revoco/enlucido 1000 < d < 1250","FU Entrevigado de hormigón aligerado -Canto 300 mm","Enlucido de yeso 1000 < d < 1300")
+    THICKNESS = (           0.02,           0.02,            0.3,           0.02)
+    LIBRARY       =  NO
+    UTIL          =  YES
+    IMAGE = ""
+    DEFAULT = NO
+..
+$ ++++++++++++++++++++++++++++++
+$  ACRISTALAMIENTOS - VIDRIOS
+$ ++++++++++++++++++++++++++++++
+"VER_DC_4-12-331" = GLASS-TYPE
+     GROUP             = "Dobles en posición vertical"
+     TYPE              = SHADING-COEF
+     SHADING-COEF      =      0.8823529
+     GLASS-CONDUCTANCE =            2.8
+     NAME_CALENER      = ""
+     LIBRARY       =  NO
+    UTIL          =  YES
+    CHANGE          =  NO
+    ..
+"VER_DB3_4-12-331" = GLASS-TYPE
+     GROUP             = "Dobles bajo emisivos <0.03 en posición vertical"
+     TYPE              = SHADING-COEF
+     SHADING-COEF      =      0.8235294
+     GLASS-CONDUCTANCE =            1.6
+     NAME_CALENER      = ""
+     LIBRARY       =  NO
+    UTIL          =  YES
+    CHANGE          =  NO
+    ..
+$ ++++++++++++++++++++++++++++++
+$            MARCOS
+$ ++++++++++++++++++++++++++++++
+ "Met - Gris claro" = NAME-FRAME
+      GROUP         = "Marcos"
+      FRAME-WIDTH   =            0.1
+      FRAME-CONDUCT =            5.7
+      FRAME-ABS     =            0.4
+      NAME_CALENER  = ""
+                LIBRARY       = NO
+    UTIL          =  NO
+..
+ "Mrpt - Gris claro" = NAME-FRAME
+      GROUP         = "Marcos"
+      FRAME-WIDTH   =            0.1
+      FRAME-CONDUCT =            3.2
+      FRAME-ABS     =            0.4
+      NAME_CALENER  = ""
+                LIBRARY       = NO
+    UTIL          =  NO
+..
+ "Mpvc o mad - Gris claro" = NAME-FRAME
+      GROUP         = "Marcos"
+      FRAME-WIDTH   =            0.1
+      FRAME-CONDUCT =            2.2
+      FRAME-ABS     =            0.4
+      NAME_CALENER  = ""
+                LIBRARY       = NO
+    UTIL          =  NO
+..
+ "Met - Gris claro" = NAME-FRAME
+      GROUP         = "Marcos"
+      FRAME-WIDTH   =            0.1
+      FRAME-CONDUCT =            5.7
+      FRAME-ABS     =            0.4
+      NAME_CALENER  = ""
+                LIBRARY       = NO
+    UTIL          =  NO
+..
+ "Mrpt - Gris claro" = NAME-FRAME
+      GROUP         = "Marcos"
+      FRAME-WIDTH   =            0.1
+      FRAME-CONDUCT =            3.2
+      FRAME-ABS     =            0.4
+      NAME_CALENER  = ""
+                LIBRARY       = NO
+    UTIL          =  NO
+..
+ "Mpvc o mad - Gris claro" = NAME-FRAME
+      GROUP         = "Marcos"
+      FRAME-WIDTH   =            0.1
+      FRAME-CONDUCT =            2.2
+      FRAME-ABS     =            0.4
+      NAME_CALENER  = ""
+                LIBRARY       = NO
+    UTIL          =  NO
+..
+ "Met - Gris claro" = NAME-FRAME
+      GROUP         = "Marcos"
+      FRAME-WIDTH   =            0.1
+      FRAME-CONDUCT =            5.7
+      FRAME-ABS     =            0.4
+      NAME_CALENER  = ""
+                LIBRARY       = NO
+    UTIL          =  NO
+..
+ "Mrpt - Gris claro" = NAME-FRAME
+      GROUP         = "Marcos"
+      FRAME-WIDTH   =            0.1
+      FRAME-CONDUCT =            3.2
+      FRAME-ABS     =            0.4
+      NAME_CALENER  = ""
+                LIBRARY       = NO
+    UTIL          =  NO
+..
+ "Mpvc o mad - Gris claro" = NAME-FRAME
+      GROUP         = "Marcos"
+      FRAME-WIDTH   =            0.1
+      FRAME-CONDUCT =            2.2
+      FRAME-ABS     =            0.4
+      NAME_CALENER  = ""
+                LIBRARY       = NO
+    UTIL          =  NO
+..
+ "Met - Gris claro" = NAME-FRAME
+      GROUP         = "Marcos"
+      FRAME-WIDTH   =            0.1
+      FRAME-CONDUCT =            5.7
+      FRAME-ABS     =            0.4
+      NAME_CALENER  = ""
+                LIBRARY       = NO
+    UTIL          =  NO
+..
+ "Mrpt - Gris claro" = NAME-FRAME
+      GROUP         = "Marcos"
+      FRAME-WIDTH   =            0.1
+      FRAME-CONDUCT =            3.2
+      FRAME-ABS     =            0.4
+      NAME_CALENER  = ""
+                LIBRARY       = NO
+    UTIL          =  NO
+..
+ "Mpvc o mad - Gris claro" = NAME-FRAME
+      GROUP         = "Marcos"
+      FRAME-WIDTH   =            0.1
+      FRAME-CONDUCT =            2.2
+      FRAME-ABS     =            0.4
+      NAME_CALENER  = ""
+                LIBRARY       = NO
+    UTIL          =  NO
+..
+ "Met - Gris claro" = NAME-FRAME
+      GROUP         = "Marcos"
+      FRAME-WIDTH   =            0.1
+      FRAME-CONDUCT =            5.7
+      FRAME-ABS     =            0.4
+      NAME_CALENER  = ""
+                LIBRARY       = NO
+    UTIL          =  NO
+..
+ "Mrpt - Gris claro" = NAME-FRAME
+      GROUP         = "Marcos"
+      FRAME-WIDTH   =            0.1
+      FRAME-CONDUCT =            3.2
+      FRAME-ABS     =            0.4
+      NAME_CALENER  = ""
+                LIBRARY       = NO
+    UTIL          =  NO
+..
+ "Mpvc o mad - Gris claro" = NAME-FRAME
+      GROUP         = "Marcos"
+      FRAME-WIDTH   =            0.1
+      FRAME-CONDUCT =            2.2
+      FRAME-ABS     =            0.4
+      NAME_CALENER  = ""
+                LIBRARY       = NO
+    UTIL          =  NO
+..
+ "Met - Gris claro" = NAME-FRAME
+      GROUP         = "Marcos"
+      FRAME-WIDTH   =            0.1
+      FRAME-CONDUCT =            5.7
+      FRAME-ABS     =            0.4
+      NAME_CALENER  = ""
+                LIBRARY       = NO
+    UTIL          =  NO
+..
+ "Mrpt - Gris claro" = NAME-FRAME
+      GROUP         = "Marcos"
+      FRAME-WIDTH   =            0.1
+      FRAME-CONDUCT =            3.2
+      FRAME-ABS     =            0.4
+      NAME_CALENER  = ""
+                LIBRARY       = NO
+    UTIL          =  NO
+..
+ "Mpvc o mad - Gris claro" = NAME-FRAME
+      GROUP         = "Marcos"
+      FRAME-WIDTH   =            0.1
+      FRAME-CONDUCT =            2.2
+      FRAME-ABS     =            0.4
+      NAME_CALENER  = ""
+                LIBRARY       = NO
+    UTIL          =  NO
+..
+$ ++++++++++++++++++++++++++++++
+$             HUECOS
+$ ++++++++++++++++++++++++++++++
+"V1" = GAP
+     NAME           = "V1"
+     TYPE           = 1
+     GROUP          = "Ventanas"
+     GROUP-GLASS         = "Dobles en posición vertical"
+     GLASS-TYPE          = "VER_DC_4-12-331"
+     GROUP-FRAME       = "De Madera en posición vertical"
+     NAME-FRAME        = "VER_Madera de densidad media alta"
+     PORCENTAGE        = 24.000000
+     INF-COEF          = 3.000000
+     NAME_CALENER      = ""
+    VIGENCIA = ( "A", "B", "C", "D", "E", "F")
+    IMAGE = ""
+     TRANSMITANCIA       =            5.7
+     SHADING-COEF        =           0.86
+     SHADE-COEF-SUMMER   =              1
+     SHADE-COEF-WINTER   =              1
+     MARKER-SUMMER       =              1
+     MARKER-WINTER       =              1
+     LIBRARY           =  NO
+     UTIL              =  YES
+     ISDOOR            = NO
+     DEFAULT           = NO
+    ..
+"V2" = GAP
+     NAME           = "V2"
+     TYPE           = 1
+     GROUP          = "Ventanas"
+     GROUP-GLASS         = "Dobles en posición vertical"
+     GLASS-TYPE          = "VER_DC_4-12-331"
+     GROUP-FRAME       = "De Madera en posición vertical"
+     NAME-FRAME        = "VER_Madera de densidad media alta"
+     PORCENTAGE        = 22.000000
+     INF-COEF          = 3.000000
+     NAME_CALENER      = ""
+    VIGENCIA = ( "A", "B", "C", "D", "E", "F")
+    IMAGE = ""
+     TRANSMITANCIA       =            5.7
+     SHADING-COEF        =           0.86
+     SHADE-COEF-SUMMER   =              1
+     SHADE-COEF-WINTER   =              1
+     MARKER-SUMMER       =              1
+     MARKER-WINTER       =              1
+     LIBRARY           =  NO
+     UTIL              =  YES
+     ISDOOR            = NO
+     DEFAULT           = NO
+    ..
+"PE1" = GAP
+     NAME           = "PE1"
+     TYPE           = 1
+     GROUP          = "Puertas"
+     GROUP-GLASS         = "Dobles bajo emisivos <0.03 en posición vertical"
+     GLASS-TYPE          = "VER_DB3_4-12-331"
+     GROUP-FRAME       = "De Madera en posición vertical"
+     NAME-FRAME        = "VER_Madera de densidad media alta"
+     PORCENTAGE        = 99.000000
+     INF-COEF          = 60.000000
+     NAME_CALENER      = ""
+    VIGENCIA = ( "A", "B", "C", "D", "E", "F")
+    IMAGE = ""
+     TRANSMITANCIA       =            5.7
+     SHADING-COEF        =           0.86
+     SHADE-COEF-SUMMER   =              1
+     SHADE-COEF-WINTER   =              1
+     MARKER-SUMMER       =              1
+     MARKER-WINTER       =              1
+     LIBRARY           =  NO
+     UTIL              =  YES
+     ISDOOR            = YES
+     DEFAULT           = NO
+    ..
+"PE2" = GAP
+     NAME           = "PE2"
+     TYPE           = 1
+     GROUP          = "Puertas"
+     GROUP-GLASS         = "Dobles bajo emisivos <0.03 en posición vertical"
+     GLASS-TYPE          = "VER_DB3_4-12-331"
+     GROUP-FRAME       = "De Madera en posición vertical"
+     NAME-FRAME        = "VER_Madera de densidad media alta"
+     PORCENTAGE        = 40.000000
+     INF-COEF          = 60.000000
+     NAME_CALENER      = ""
+    VIGENCIA = ( "A", "B", "C", "D", "E", "F")
+    IMAGE = ""
+     TRANSMITANCIA       =            5.7
+     SHADING-COEF        =           0.86
+     SHADE-COEF-SUMMER   =              1
+     SHADE-COEF-WINTER   =              1
+     MARKER-SUMMER       =              1
+     MARKER-WINTER       =              1
+     LIBRARY           =  NO
+     UTIL              =  YES
+     ISDOOR            = YES
+     DEFAULT           = NO
+    ..
+"V3" = GAP
+     NAME           = "V3"
+     TYPE           = 1
+     GROUP          = "Ventanas"
+     GROUP-GLASS         = "Dobles bajo emisivos <0.03 en posición vertical"
+     GLASS-TYPE          = "VER_DB3_4-12-331"
+     GROUP-FRAME       = "De Madera en posición vertical"
+     NAME-FRAME        = "VER_Madera de densidad media alta"
+     PORCENTAGE        = 40.000000
+     INF-COEF          = 3.000000
+     NAME_CALENER      = ""
+    VIGENCIA = ( "A", "B", "C", "D", "E", "F")
+    IMAGE = ""
+     TRANSMITANCIA       =            5.7
+     SHADING-COEF        =           0.86
+     SHADE-COEF-SUMMER   =              1
+     SHADE-COEF-WINTER   =              1
+     MARKER-SUMMER       =              1
+     MARKER-WINTER       =              1
+     LIBRARY           =  NO
+     UTIL              =  YES
+     ISDOOR            = NO
+     DEFAULT           = NO
+    ..
+"V4" = GAP
+     NAME           = "V4"
+     TYPE           = 1
+     GROUP          = "Ventanas"
+     GROUP-GLASS         = "Dobles bajo emisivos <0.03 en posición vertical"
+     GLASS-TYPE          = "VER_DB3_4-12-331"
+     GROUP-FRAME       = "De Madera en posición vertical"
+     NAME-FRAME        = "VER_Madera de densidad media alta"
+     PORCENTAGE        = 10.000000
+     INF-COEF          = 3.000000
+     NAME_CALENER      = ""
+    VIGENCIA = ( "A", "B", "C", "D", "E", "F")
+    IMAGE = ""
+     TRANSMITANCIA       =            5.7
+     SHADING-COEF        =           0.86
+     SHADE-COEF-SUMMER   =              1
+     SHADE-COEF-WINTER   =              1
+     MARKER-SUMMER       =              1
+     MARKER-WINTER       =              1
+     LIBRARY           =  NO
+     UTIL              =  YES
+     ISDOOR            = NO
+     DEFAULT           = NO
+    ..
+$ -------------------------
+$ Final de la base de datos 
+$ -------------------------
+$
+$ +--------------------+
+$ | Espacio de Trabajo |
+$ +--------------------+
+$
+"Espacio de Trabajo" = WORK-SPACE
+    WIDTH      =             60
+    HIGHT      =             60
+    Z          =              0
+    BULB-TRA   = "Default.bulb"
+    BULB-REF   = "Default.bulb"
+    TRAN       =              0
+    REFL       =            0.7
+      ..
+
+$
+$ +------------------------+
+$ | Datos de Base de Datos |
+$ +------------------------+
+$
+
+$ ------------------
+$ Sombras exteriores
+$ ------------------
+$
+$ --------------------
+$ Sombras Del Edificio
+$ --------------------
+$
+"Sombra001" = BUILDING-SHADE
+      BULB-TRA = "Default.bulb"
+      BULB-REF = "Default.bulb"
+      TRAN     =              0
+      REFL     =            0.7
+      X        = 0.000000
+      Y        = -0.820000
+      Z        = 3.050000
+      HEIGHT   = 0.820000
+      WIDTH    = 11.360000
+      TILT     = 0.000000
+      AZIMUTH  = 180.000000
+           ..
+"Sombra002" = BUILDING-SHADE
+      BULB-TRA = "Default.bulb"
+      BULB-REF = "Default.bulb"
+      TRAN     =              0
+      REFL     =            0.7
+      X        = 2.400000
+      Y        = -1.800000
+      Z        = 6.460000
+      HEIGHT   = 1.800000
+      WIDTH    = 8.920000
+      TILT     = 0.000000
+      AZIMUTH  = 180.000000
+           ..
+$ -----------------
+$ Lineas Auxiliares
+$ -----------------
+$
+"Linea1" = AUX-LINE
+           TYPE = 1
+           X0   = 2.380146
+           Y0   = 0.000002
+           Z0   = 7.570000
+           X1   = 11.260146
+           Y1   = 0.000002
+           Z1   = 7.570000
+           OWNERF = "P02"
+           OWNERS = "(null)"
+           ..
+"Linea2" = AUX-LINE
+           TYPE = 1
+           X0   = 2.380146
+           Y0   = 0.000002
+           Z0   = 5.900000
+           X1   = 11.260146
+           Y1   = 0.000002
+           Z1   = 5.900000
+           OWNERF = "P02"
+           OWNERS = "(null)"
+           ..
+"Linea3" = AUX-LINE
+           TYPE = 1
+           X0   = 2.380146
+           Y0   = 5.560001
+           Z0   = 5.900000
+           X1   = 11.260146
+           Y1   = 5.560001
+           Z1   = 5.900000
+           OWNERF = "P02"
+           OWNERS = "(null)"
+           ..
+$ ------
+$ Planos
+$ ------
+$
+
+$ ---------
+$ POLIGONOS
+$ ---------
+$
+"P01_Poligono1" = POLYGON
+    V1   =( 0, 0 )
+    V2   =( 1, 0 )
+    V3   =( 1, 1 )
+    V4   =( 0, 1 )
+    ..
+"P01_E01_Poligono2" = POLYGON
+    V1   =( 2.985344e-06, 5.559999 )
+    V2   =( 0.0001462053, 1.577594e-06 )
+    V3   =( 11.26015, 1.577594e-06 )
+    V4   =( 11.26015, 5.560001 )
+    ..
+"P02_Poligono3" = POLYGON
+    V1   =( 0, 0 )
+    V2   =( 1, 0 )
+    V3   =( 1, 1 )
+    V4   =( 0, 1 )
+    ..
+"P02_E02_Poligono4" = POLYGON
+    V1   =( 11.26015, 1.577594e-06 )
+    V2   =( 11.26015, 5.560001 )
+    V3   =( 2.380146, 5.560001 )
+    V4   =( 2.380146, 1.577594e-06 )
+    ..
+"P01_E01_FE001_Poligono1" = POLYGON
+    V1   =( 0, 0 )
+    V2   =( 5.5599, 4.321543e-12 )
+    V3   =( 5.559943, 2.38 )
+    V4   =( 4.280832e-05, 2.3801 )
+    ..
+"P02_E02C002_Poligono1" = POLYGON
+    V1   =( 0, 0 )
+    V2   =( 8.88, -1.670001 )
+    V3   =( 8.88, 0 )
+    ..
+"P02_E02C001_Poligono2" = POLYGON
+    V1   =( 0, 0 )
+    V2   =( 0, -1.670001 )
+    V3   =( 8.88, -1.670001 )
+    ..
+"P02_E02C001_Poligono1" = POLYGON
+    V1   =( 0, 0 )
+    V2   =( -5.56, -1.670001 )
+    V3   =( -0, -1.670001 )
+    ..
+"P02_E02C001_Poligono3" = POLYGON
+    V1   =( 0, 0 )
+    V2   =( -5.56, -1.670001 )
+    V3   =( -0, -1.670001 )
+    ..
+"P02_E02C002_Poligono2" = POLYGON
+    V1   =( 0, 0 )
+    V2   =( 8.88, -5.805386 )
+    V3   =( 8.88, 0 )
+    ..
+"P02_E02C001_Poligono4" = POLYGON
+    V1   =( 0, 0 )
+    V2   =( -9.261831e-08, -5.805386 )
+    V3   =( 8.88, -5.805386 )
+    ..
+$
+$ +-------------------+
+$ | DATOS GEOMÉTRICOS |
+$ +-------------------+
+$
+         "Run Period 1" = RUN-PERIOD-PD
+           END-MONTH = 12
+           END-DAY   = 31
+           ..
+    "Edificio" = BUILD-PARAMETERS
+$          NOMBRE    = "Edificio"
+           LATITUDE  = 0.000000
+           ALTITUDE  = 102.000000
+           ISPENINSULAR  = YES
+           AZIMUTH   = 0.000000
+$          LOCALIDAD = "Ninguna"
+$          ZONE      = "-- Todas --"
+           CLASE-HIGROMETRIA  = 3
+           ANGLE              = 0.000000
+$          COND-OPER = "Residencial"
+$          TYPE-OPER = "Ninguno"
+           HEATING-PERIOD = (  1, 2, 3, 4, 5, 10, 11, 12)
+           COOLING-PERIOD = (  6, 7, 8, 9)
+           INTERNAL-PARTITIONS = CUSTOM
+           TYPE-CASE          = Nuevo
+           TYPE-BUILD         = Unifamiliar
+           INF-FLOW  = ( -190.211472, -370.211487 )
+           PERCENTAGE-AIR-CHANGES  = ( 23, 1 )
+           D-AISLAMIENTO-PERIMETRAL  = 1.000000
+           RA-AISLAMIENTO-PERIMETRAL = 2.100000
+           STOP-AFTER-MINIMUM-REQUIREMENTS = "NO"
+           LONGITUD-DE-REFERENCIA = 15.000000
+           ALTITUD = 102.000000
+           EXTINFO            = "NO"
+           ..
+"P01" = FLOOR
+      POLYGON       =  "P01_Poligono1"
+      FLOOR-HEIGHT  =           3.05
+      SPACE-HEIGHT  =           3.05
+      SHAPE         =  POLYGON
+      PREVIOUS      =  ""
+      ..
+    "P01_E01" = SPACE
+              HEIGHT        =           3.05
+            SHAPE             = POLYGON 
+            POLYGON           = "P01_E01_Poligono2"
+            TYPE              = CONDITIONED
+            SPACE-TYPE        = "Residencial"
+            SYSTEM-CONDITIONS = "Residencial"
+            SPACE-CONDITIONS  = "Residencial"
+            FLOOR-WEIGHT      =              0
+            MULTIPLIER        = 1
+            MULTIPLIED        = 0
+            PILLARS-NUMBERS   = 0
+           INTERIOR-RADIATION  = FIXED
+           POWER     = 4.4
+           VEEI-OBJ  = 7.000000
+           VEEI-REF  = 10.000000
+            ..
+            "P01_E01_PE001" = EXTERIOR-WALL
+                  ABSORPTANCE   =            0.6
+                  COMPROBAR-REQUISITOS-MINIMOS = YES
+                  TYPE_ABSORPTANCE    = 0
+                  COLOR_ABSORPTANCE   = 0
+                  DEGREE_ABSORPTANCE   = 2
+                  CONSTRUCCION_MURO  = "Facahda 1pie"  
+                  CONSTRUCTION  = "Facahda 1pie0.60"  
+                  LOCATION      = SPACE-V1  
+                        ..
+                  "Facahda 1pie0.60" =  CONSTRUCTION
+                        TYPE   = LAYERS  
+                        LAYERS = "Facahda 1pie" 
+                        ABSORPTANCE = 0.600000
+                        ..
+                  "P01_E01_PE001_V1" = WINDOW
+                        X              =              0
+                        Y              =              1
+                        SETBACK        =           0.05
+                        HEIGHT         =            1.1
+                        WIDTH          =           0.53
+                        GAP            = "V4"
+                        COEFF = ( 1.000000, 1.000000, 1.000000, 1.000000)
+                        GLASS-TYPE     = "VER_DB3_4-12-331"
+                        FRAME-WIDTH   =     0.01829408
+                        FRAME-CONDUCT =            2.2
+                        FRAME-ABS     =            0.7
+                        INF-COEF       =              3
+                        OVERHANG-A     =              0
+                        OVERHANG-B     =              0
+                        OVERHANG-W     =              0
+                        OVERHANG-D     =              0
+                        OVERHANG-ANGLE =              0
+                        LEFT-FIN-A     =              0
+                        LEFT-FIN-B     =              0
+                        LEFT-FIN-H     =              0
+                        LEFT-FIN-D     =              0
+                        RIGHT-FIN-A    =              0
+                        RIGHT-FIN-B    =              0
+                        RIGHT-FIN-H    =              0
+                        RIGHT-FIN-D    =              0
+                        ..
+                  "P01_E01_PE001_V2" = WINDOW
+                        X              =           0.85
+                        Y              =              1
+                        SETBACK        =           0.05
+                        HEIGHT         =            1.1
+                        WIDTH          =           0.95
+                        GAP            = "V3"
+                        COEFF = ( 1.000000, 0.200000, 1.000000, 1.000000)
+                        GLASS-TYPE     = "VER_DB3_4-12-331"
+                        FRAME-WIDTH   =      0.1148114
+                        FRAME-CONDUCT =            2.2
+                        FRAME-ABS     =            0.7
+                        INF-COEF       =              3
+                        OVERHANG-A     =              0
+                        OVERHANG-B     =              0
+                        OVERHANG-W     =              0
+                        OVERHANG-D     =              0
+                        OVERHANG-ANGLE =              0
+                        LEFT-FIN-A     =              0
+                        LEFT-FIN-B     =              0
+                        LEFT-FIN-H     =              0
+                        LEFT-FIN-D     =              0
+                        RIGHT-FIN-A    =              0
+                        RIGHT-FIN-B    =              0
+                        RIGHT-FIN-H    =              0
+                        RIGHT-FIN-D    =              0
+                        ..
+            "P01_E01_PE002" = EXTERIOR-WALL
+                  ABSORPTANCE   =            0.6
+                  COMPROBAR-REQUISITOS-MINIMOS = YES
+                  TYPE_ABSORPTANCE    = 0
+                  COLOR_ABSORPTANCE   = 0
+                  DEGREE_ABSORPTANCE   = 2
+                  CONSTRUCCION_MURO  = "Fachada medio pie"  
+                  CONSTRUCTION  = "Fachada medio pie0.60"  
+                  LOCATION      = SPACE-V2  
+                        ..
+                  "Fachada medio pie0.60" =  CONSTRUCTION
+                        TYPE   = LAYERS  
+                        LAYERS = "Fachada medio pie" 
+                        ABSORPTANCE = 0.600000
+                        ..
+                  "P01_E01_PE002_V1" = WINDOW
+                        X              =              0
+                        Y              =              0
+                        SETBACK        =           0.05
+                        HEIGHT         =            2.5
+                        WIDTH          =           2.06
+                        GAP            = "V1"
+                        COEFF = ( 1.000000, 0.200000, 1.000000, 1.000000)
+                        GLASS-TYPE     = "VER_DC_4-12-331"
+                        FRAME-WIDTH   =      0.1447111
+                        FRAME-CONDUCT =            2.2
+                        FRAME-ABS     =            0.7
+                        INF-COEF       =              3
+                        OVERHANG-A     =              0
+                        OVERHANG-B     =              0
+                        OVERHANG-W     =              0
+                        OVERHANG-D     =              0
+                        OVERHANG-ANGLE =              0
+                        LEFT-FIN-A     =              0
+                        LEFT-FIN-B     =              0
+                        LEFT-FIN-H     =              0
+                        LEFT-FIN-D     =              0
+                        RIGHT-FIN-A    =              0
+                        RIGHT-FIN-B    =              0
+                        RIGHT-FIN-H    =              0
+                        RIGHT-FIN-D    =              0
+                        ..
+                  "P01_E01_PE002_V2" = WINDOW
+                        X              =           2.38
+                        Y              =              0
+                        SETBACK        =           0.05
+                        HEIGHT         =            2.5
+                        WIDTH          =            5.3
+                        GAP            = "V2"
+                        COEFF = ( 1.000000, 0.200000, 1.000000, 1.000000)
+                        GLASS-TYPE     = "VER_DC_4-12-331"
+                        FRAME-WIDTH   =      0.1967887
+                        FRAME-CONDUCT =            2.2
+                        FRAME-ABS     =            0.7
+                        INF-COEF       =              3
+                        OVERHANG-A     =              0
+                        OVERHANG-B     =              0
+                        OVERHANG-W     =              0
+                        OVERHANG-D     =              0
+                        OVERHANG-ANGLE =              0
+                        LEFT-FIN-A     =              0
+                        LEFT-FIN-B     =              0
+                        LEFT-FIN-H     =              0
+                        LEFT-FIN-D     =              0
+                        RIGHT-FIN-A    =              0
+                        RIGHT-FIN-B    =              0
+                        RIGHT-FIN-H    =              0
+                        RIGHT-FIN-D    =              0
+                        ..
+                  "P01_E01_PE002_V3" = WINDOW
+                        X              =           8.38
+                        Y              =              0
+                        SETBACK        =           0.05
+                        HEIGHT         =            2.5
+                        WIDTH          =           2.88
+                        GAP            = "V1"
+                        COEFF = ( 1.000000, 0.200000, 1.000000, 1.000000)
+                        GLASS-TYPE     = "VER_DC_4-12-331"
+                        FRAME-WIDTH   =      0.1715329
+                        FRAME-CONDUCT =            2.2
+                        FRAME-ABS     =            0.7
+                        INF-COEF       =              3
+                        OVERHANG-A     =              0
+                        OVERHANG-B     =              0
+                        OVERHANG-W     =              0
+                        OVERHANG-D     =              0
+                        OVERHANG-ANGLE =              0
+                        LEFT-FIN-A     =              0
+                        LEFT-FIN-B     =              0
+                        LEFT-FIN-H     =              0
+                        LEFT-FIN-D     =              0
+                        RIGHT-FIN-A    =              0
+                        RIGHT-FIN-B    =              0
+                        RIGHT-FIN-H    =              0
+                        RIGHT-FIN-D    =              0
+                        ..
+            "P01_E01_PE003" = EXTERIOR-WALL
+                  ABSORPTANCE   =            0.6
+                  COMPROBAR-REQUISITOS-MINIMOS = YES
+                  TYPE_ABSORPTANCE    = 0
+                  COLOR_ABSORPTANCE   = 0
+                  DEGREE_ABSORPTANCE   = 2
+                  CONSTRUCCION_MURO  = "Facahda 1pie"  
+                  CONSTRUCTION  = "Facahda 1pie0.60"  
+                  LOCATION      = SPACE-V3  
+                        ..
+                  "Facahda 1pie0.60" =  CONSTRUCTION
+                        TYPE   = LAYERS  
+                        LAYERS = "Facahda 1pie" 
+                        ABSORPTANCE = 0.600000
+                        ..
+                  "P01_E01_PE003_V1" = WINDOW
+                        X              =           3.94
+                        Y              =              1
+                        SETBACK        =           0.05
+                        HEIGHT         =            1.1
+                        WIDTH          =            0.8
+                        GAP            = "V3"
+                        COEFF = ( 1.000000, 1.000000, 1.000000, 0.200000)
+                        GLASS-TYPE     = "VER_DB3_4-12-331"
+                        FRAME-WIDTH   =      0.1040216
+                        FRAME-CONDUCT =            2.2
+                        FRAME-ABS     =            0.7
+                        INF-COEF       =              3
+                        OVERHANG-A     =              0
+                        OVERHANG-B     =              0
+                        OVERHANG-W     =              0
+                        OVERHANG-D     =              0
+                        OVERHANG-ANGLE =              0
+                        LEFT-FIN-A     =              0
+                        LEFT-FIN-B     =              0
+                        LEFT-FIN-H     =              0
+                        LEFT-FIN-D     =              0
+                        RIGHT-FIN-A    =              0
+                        RIGHT-FIN-B    =              0
+                        RIGHT-FIN-H    =              0
+                        RIGHT-FIN-D    =              0
+                        ..
+            "P01_E01_PE004" = EXTERIOR-WALL
+                  ABSORPTANCE   =            0.6
+                  COMPROBAR-REQUISITOS-MINIMOS = YES
+                  TYPE_ABSORPTANCE    = 0
+                  COLOR_ABSORPTANCE   = 0
+                  DEGREE_ABSORPTANCE   = 2
+                  CONSTRUCCION_MURO  = "Facahda 1pie"  
+                  CONSTRUCTION  = "Facahda 1pie0.60"  
+                  LOCATION      = SPACE-V4  
+                        ..
+                  "Facahda 1pie0.60" =  CONSTRUCTION
+                        TYPE   = LAYERS  
+                        LAYERS = "Facahda 1pie" 
+                        ABSORPTANCE = 0.600000
+                        ..
+                  "P01_E01_PE004_V1" = WINDOW
+                        X              =          10.62
+                        Y              =              1
+                        SETBACK        =           0.05
+                        HEIGHT         =            1.1
+                        WIDTH          =           0.64
+                        GAP            = "V4"
+                        COEFF = ( 1.000000, 1.000000, 1.000000, 1.000000)
+                        GLASS-TYPE     = "VER_DB3_4-12-331"
+                        FRAME-WIDTH   =     0.02072352
+                        FRAME-CONDUCT =            2.2
+                        FRAME-ABS     =            0.7
+                        INF-COEF       =              3
+                        OVERHANG-A     =              0
+                        OVERHANG-B     =              0
+                        OVERHANG-W     =              0
+                        OVERHANG-D     =              0
+                        OVERHANG-ANGLE =              0
+                        LEFT-FIN-A     =              0
+                        LEFT-FIN-B     =              0
+                        LEFT-FIN-H     =              0
+                        LEFT-FIN-D     =              0
+                        RIGHT-FIN-A    =              0
+                        RIGHT-FIN-B    =              0
+                        RIGHT-FIN-H    =              0
+                        RIGHT-FIN-D    =              0
+                        ..
+                  "P01_E01_PE004_V2" = WINDOW
+                        X              =            9.3
+                        Y              =              0
+                        SETBACK        =           0.05
+                        HEIGHT         =            2.1
+                        WIDTH          =              1
+                        GAP            = "PE1"
+                        COEFF = ( 1.000000, 1.000000, 1.000000, 1.000000)
+                        GLASS-TYPE     = "VER_DB3_4-12-331"
+                        FRAME-WIDTH   =      0.4906147
+                        FRAME-CONDUCT =            2.2
+                        FRAME-ABS     =            0.7
+                        INF-COEF       =             60
+                        OVERHANG-A     =              0
+                        OVERHANG-B     =              0
+                        OVERHANG-W     =              0
+                        OVERHANG-D     =              0
+                        OVERHANG-ANGLE =              0
+                        LEFT-FIN-A     =              0
+                        LEFT-FIN-B     =              0
+                        LEFT-FIN-H     =              0
+                        LEFT-FIN-D     =              0
+                        RIGHT-FIN-A    =              0
+                        RIGHT-FIN-B    =              0
+                        RIGHT-FIN-H    =              0
+                        RIGHT-FIN-D    =              0
+                        ..
+                  "P01_E01_PE004_V3" = WINDOW
+                        X              =            5.7
+                        Y              =            1.6
+                        SETBACK        =           0.05
+                        HEIGHT         =            1.4
+                        WIDTH          =           0.35
+                        GAP            = "V4"
+                        COEFF = ( 1.000000, 1.000000, 1.000000, 1.000000)
+                        GLASS-TYPE     = "VER_DB3_4-12-331"
+                        FRAME-WIDTH   =     0.01423147
+                        FRAME-CONDUCT =            2.2
+                        FRAME-ABS     =            0.7
+                        INF-COEF       =              3
+                        OVERHANG-A     =              0
+                        OVERHANG-B     =              0
+                        OVERHANG-W     =              0
+                        OVERHANG-D     =              0
+                        OVERHANG-ANGLE =              0
+                        LEFT-FIN-A     =              0
+                        LEFT-FIN-B     =              0
+                        LEFT-FIN-H     =              0
+                        LEFT-FIN-D     =              0
+                        RIGHT-FIN-A    =              0
+                        RIGHT-FIN-B    =              0
+                        RIGHT-FIN-H    =              0
+                        RIGHT-FIN-D    =              0
+                        ..
+                  "P01_E01_PE004_V4" = WINDOW
+                        X              =            6.5
+                        Y              =              1
+                        SETBACK        =           0.05
+                        HEIGHT         =            1.4
+                        WIDTH          =           0.35
+                        GAP            = "V4"
+                        COEFF = ( 1.000000, 1.000000, 1.000000, 1.000000)
+                        GLASS-TYPE     = "VER_DB3_4-12-331"
+                        FRAME-WIDTH   =     0.01423147
+                        FRAME-CONDUCT =            2.2
+                        FRAME-ABS     =            0.7
+                        INF-COEF       =              3
+                        OVERHANG-A     =              0
+                        OVERHANG-B     =              0
+                        OVERHANG-W     =              0
+                        OVERHANG-D     =              0
+                        OVERHANG-ANGLE =              0
+                        LEFT-FIN-A     =              0
+                        LEFT-FIN-B     =              0
+                        LEFT-FIN-H     =              0
+                        LEFT-FIN-D     =              0
+                        RIGHT-FIN-A    =              0
+                        RIGHT-FIN-B    =              0
+                        RIGHT-FIN-H    =              0
+                        RIGHT-FIN-D    =              0
+                        ..
+            "P01_E01_FTER001" = UNDERGROUND-WALL
+                  Z-GROUND      =              0
+   COMPROBAR-REQUISITOS-MINIMOS = YES
+                  CONSTRUCTION  = "Solera"  
+                  LOCATION      = BOTTOM  
+                   AREA          =        62.60599
+                   PERIMETRO     =        33.64014
+                        ..
+                  "Solera" =  CONSTRUCTION
+                        TYPE   = LAYERS  
+                        LAYERS = "Solera" 
+                        ..
+            "P01_E01_CUB001" = ROOF
+                  ABSORPTANCE   =            0.6
+                  COMPROBAR-REQUISITOS-MINIMOS = YES
+                  TYPE_ABSORPTANCE    = 0
+                  COLOR_ABSORPTANCE   = 0
+                  DEGREE_ABSORPTANCE   = 2
+                  CONSTRUCTION  = "Cubierta plana"  
+                  X             =              0
+                  Y             =         5.5599
+                  Z             =           3.05
+                  AZIMUTH       =            270
+                  LOCATION      = TOP  
+                  POLYGON       = "P01_E01_FE001_Poligono1"
+                        ..
+                  "Cubierta plana" =  CONSTRUCTION
+                        TYPE   = LAYERS  
+                        LAYERS = "Cubierta plana" 
+                        ..
+"P02" = FLOOR
+      Z             =            3.05
+      POLYGON       =  "P02_Poligono3"
+      FLOOR-HEIGHT  =           2.85
+      SPACE-HEIGHT  =           2.85
+      SHAPE         =  POLYGON
+      PREVIOUS      =  "P01"
+      ..
+    "P02_E02" = SPACE
+              HEIGHT        =           2.85
+            SHAPE             = POLYGON 
+            POLYGON           = "P02_E02_Poligono4"
+            TYPE              = CONDITIONED
+            SPACE-TYPE        = "Residencial"
+            SYSTEM-CONDITIONS = "Residencial"
+            SPACE-CONDITIONS  = "Residencial"
+            FLOOR-WEIGHT      =              0
+            MULTIPLIER        = 1
+            MULTIPLIED        = 0
+            PILLARS-NUMBERS   = 0
+           INTERIOR-RADIATION  = FIXED
+           POWER     = 4.4
+           VEEI-OBJ  = 7.000000
+           VEEI-REF  = 10.000000
+            ..
+            "P02_E02_PE001" = EXTERIOR-WALL
+                  ABSORPTANCE   =            0.6
+                  COMPROBAR-REQUISITOS-MINIMOS = YES
+                  TYPE_ABSORPTANCE    = 0
+                  COLOR_ABSORPTANCE   = 0
+                  DEGREE_ABSORPTANCE   = 2
+                  CONSTRUCCION_MURO  = "Facahda 1pie"  
+                  CONSTRUCTION  = "Facahda 1pie0.60"  
+                  LOCATION      = SPACE-V1  
+                        ..
+                  "Facahda 1pie0.60" =  CONSTRUCTION
+                        TYPE   = LAYERS  
+                        LAYERS = "Facahda 1pie" 
+                        ABSORPTANCE = 0.600000
+                        ..
+                  "P02_E02_PE001_V1" = WINDOW
+                        X              =           3.96
+                        Y              =              1
+                        SETBACK        =           0.05
+                        HEIGHT         =            1.1
+                        WIDTH          =            0.8
+                        GAP            = "V3"
+                        COEFF = ( 1.000000, 0.200000, 1.000000, 1.000000)
+                        GLASS-TYPE     = "VER_DB3_4-12-331"
+                        FRAME-WIDTH   =      0.1040216
+                        FRAME-CONDUCT =            2.2
+                        FRAME-ABS     =            0.7
+                        INF-COEF       =              3
+                        OVERHANG-A     =              0
+                        OVERHANG-B     =              0
+                        OVERHANG-W     =              0
+                        OVERHANG-D     =              0
+                        OVERHANG-ANGLE =              0
+                        LEFT-FIN-A     =              0
+                        LEFT-FIN-B     =              0
+                        LEFT-FIN-H     =              0
+                        LEFT-FIN-D     =              0
+                        RIGHT-FIN-A    =              0
+                        RIGHT-FIN-B    =              0
+                        RIGHT-FIN-H    =              0
+                        RIGHT-FIN-D    =              0
+                        ..
+            "P02_E02_PE002" = EXTERIOR-WALL
+                  ABSORPTANCE   =            0.6
+                  COMPROBAR-REQUISITOS-MINIMOS = YES
+                  TYPE_ABSORPTANCE    = 0
+                  COLOR_ABSORPTANCE   = 0
+                  DEGREE_ABSORPTANCE   = 2
+                  CONSTRUCCION_MURO  = "Facahda 1pie"  
+                  CONSTRUCTION  = "Facahda 1pie0.60"  
+                  LOCATION      = SPACE-V2  
+                        ..
+                  "Facahda 1pie0.60" =  CONSTRUCTION
+                        TYPE   = LAYERS  
+                        LAYERS = "Facahda 1pie" 
+                        ABSORPTANCE = 0.600000
+                        ..
+                  "P02_E02_PE002_V1" = WINDOW
+                        X              =           4.84
+                        Y              =              0
+                        SETBACK        =           0.05
+                        HEIGHT         =            1.4
+                        WIDTH          =           0.35
+                        GAP            = "V4"
+                        COEFF = ( 1.000000, 1.000000, 1.000000, 1.000000)
+                        GLASS-TYPE     = "VER_DB3_4-12-331"
+                        FRAME-WIDTH   =     0.01423147
+                        FRAME-CONDUCT =            2.2
+                        FRAME-ABS     =            0.7
+                        INF-COEF       =              3
+                        OVERHANG-A     =              0
+                        OVERHANG-B     =              0
+                        OVERHANG-W     =              0
+                        OVERHANG-D     =              0
+                        OVERHANG-ANGLE =              0
+                        LEFT-FIN-A     =              0
+                        LEFT-FIN-B     =              0
+                        LEFT-FIN-H     =              0
+                        LEFT-FIN-D     =              0
+                        RIGHT-FIN-A    =              0
+                        RIGHT-FIN-B    =              0
+                        RIGHT-FIN-H    =              0
+                        RIGHT-FIN-D    =              0
+                        ..
+                  "P02_E02_PE002_V2" = WINDOW
+                        X              =              1
+                        Y              =            1.5
+                        SETBACK        =           0.05
+                        HEIGHT         =            0.5
+                        WIDTH          =            0.5
+                        GAP            = "V3"
+                        COEFF = ( 1.000000, 1.000000, 1.000000, 1.000000)
+                        GLASS-TYPE     = "VER_DB3_4-12-331"
+                        FRAME-WIDTH   =     0.05635083
+                        FRAME-CONDUCT =            2.2
+                        FRAME-ABS     =            0.7
+                        INF-COEF       =              3
+                        OVERHANG-A     =              0
+                        OVERHANG-B     =              0
+                        OVERHANG-W     =              0
+                        OVERHANG-D     =              0
+                        OVERHANG-ANGLE =              0
+                        LEFT-FIN-A     =              0
+                        LEFT-FIN-B     =              0
+                        LEFT-FIN-H     =              0
+                        LEFT-FIN-D     =              0
+                        RIGHT-FIN-A    =              0
+                        RIGHT-FIN-B    =              0
+                        RIGHT-FIN-H    =              0
+                        RIGHT-FIN-D    =              0
+                        ..
+                  "P02_E02_PE002_V3" = WINDOW
+                        X              =            2.6
+                        Y              =            1.5
+                        SETBACK        =           0.05
+                        HEIGHT         =            0.5
+                        WIDTH          =            0.5
+                        GAP            = "V3"
+                        COEFF = ( 1.000000, 1.000000, 1.000000, 1.000000)
+                        GLASS-TYPE     = "VER_DB3_4-12-331"
+                        FRAME-WIDTH   =     0.05635083
+                        FRAME-CONDUCT =            2.2
+                        FRAME-ABS     =            0.7
+                        INF-COEF       =              3
+                        OVERHANG-A     =              0
+                        OVERHANG-B     =              0
+                        OVERHANG-W     =              0
+                        OVERHANG-D     =              0
+                        OVERHANG-ANGLE =              0
+                        LEFT-FIN-A     =              0
+                        LEFT-FIN-B     =              0
+                        LEFT-FIN-H     =              0
+                        LEFT-FIN-D     =              0
+                        RIGHT-FIN-A    =              0
+                        RIGHT-FIN-B    =              0
+                        RIGHT-FIN-H    =              0
+                        RIGHT-FIN-D    =              0
+                        ..
+            "P02_E02_PE003" = EXTERIOR-WALL
+                  ABSORPTANCE   =            0.6
+                  COMPROBAR-REQUISITOS-MINIMOS = YES
+                  TYPE_ABSORPTANCE    = 0
+                  COLOR_ABSORPTANCE   = 0
+                  DEGREE_ABSORPTANCE   = 2
+                  CONSTRUCCION_MURO  = "Facahda 1pie"  
+                  CONSTRUCTION  = "Facahda 1pie0.60"  
+                  LOCATION      = SPACE-V3  
+                        ..
+                  "Facahda 1pie0.60" =  CONSTRUCTION
+                        TYPE   = LAYERS  
+                        LAYERS = "Facahda 1pie" 
+                        ABSORPTANCE = 0.600000
+                        ..
+                  "P02_E02_PE003_V1" = WINDOW
+                        X              =           0.85
+                        Y              =              0
+                        SETBACK        =           0.05
+                        HEIGHT         =            2.1
+                        WIDTH          =           0.95
+                        GAP            = "PE2"
+                        COEFF = ( 1.000000, 0.200000, 1.000000, 1.000000)
+                        GLASS-TYPE     = "VER_DB3_4-12-331"
+                        FRAME-WIDTH   =      0.1445144
+                        FRAME-CONDUCT =            2.2
+                        FRAME-ABS     =            0.7
+                        INF-COEF       =             60
+                        OVERHANG-A     =              0
+                        OVERHANG-B     =              0
+                        OVERHANG-W     =              0
+                        OVERHANG-D     =              0
+                        OVERHANG-ANGLE =              0
+                        LEFT-FIN-A     =              0
+                        LEFT-FIN-B     =              0
+                        LEFT-FIN-H     =              0
+                        LEFT-FIN-D     =              0
+                        RIGHT-FIN-A    =              0
+                        RIGHT-FIN-B    =              0
+                        RIGHT-FIN-H    =              0
+                        RIGHT-FIN-D    =              0
+                        ..
+            "P02_E02_PE004" = EXTERIOR-WALL
+                  ABSORPTANCE   =            0.6
+                  COMPROBAR-REQUISITOS-MINIMOS = YES
+                  TYPE_ABSORPTANCE    = 0
+                  COLOR_ABSORPTANCE   = 0
+                  DEGREE_ABSORPTANCE   = 2
+                  CONSTRUCCION_MURO  = "Fachada medio pie"  
+                  CONSTRUCTION  = "Fachada medio pie0.60"  
+                  LOCATION      = SPACE-V4  
+                        ..
+                  "Fachada medio pie0.60" =  CONSTRUCTION
+                        TYPE   = LAYERS  
+                        LAYERS = "Fachada medio pie" 
+                        ABSORPTANCE = 0.600000
+                        ..
+                  "P02_E02_PE004_V1" = WINDOW
+                        X              =              0
+                        Y              =              0
+                        SETBACK        =           0.05
+                        HEIGHT         =            2.4
+                        WIDTH          =            5.3
+                        GAP            = "V2"
+                        COEFF = ( 1.000000, 0.200000, 1.000000, 1.000000)
+                        GLASS-TYPE     = "VER_DC_4-12-331"
+                        FRAME-WIDTH   =      0.1912108
+                        FRAME-CONDUCT =            2.2
+                        FRAME-ABS     =            0.7
+                        INF-COEF       =              3
+                        OVERHANG-A     =              0
+                        OVERHANG-B     =              0
+                        OVERHANG-W     =              0
+                        OVERHANG-D     =              0
+                        OVERHANG-ANGLE =              0
+                        LEFT-FIN-A     =              0
+                        LEFT-FIN-B     =              0
+                        LEFT-FIN-H     =              0
+                        LEFT-FIN-D     =              0
+                        RIGHT-FIN-A    =              0
+                        RIGHT-FIN-B    =              0
+                        RIGHT-FIN-H    =              0
+                        RIGHT-FIN-D    =              0
+                        ..
+                  "P02_E02_PE004_V2" = WINDOW
+                        X              =              6
+                        Y              =              0
+                        SETBACK        =           0.05
+                        HEIGHT         =            2.4
+                        WIDTH          =           2.88
+                        GAP            = "V1"
+                        COEFF = ( 1.000000, 0.200000, 1.000000, 1.000000)
+                        GLASS-TYPE     = "VER_DC_4-12-331"
+                        FRAME-WIDTH   =        0.16775
+                        FRAME-CONDUCT =            2.2
+                        FRAME-ABS     =            0.7
+                        INF-COEF       =              3
+                        OVERHANG-A     =              0
+                        OVERHANG-B     =              0
+                        OVERHANG-W     =              0
+                        OVERHANG-D     =              0
+                        OVERHANG-ANGLE =              0
+                        LEFT-FIN-A     =              0
+                        LEFT-FIN-B     =              0
+                        LEFT-FIN-H     =              0
+                        LEFT-FIN-D     =              0
+                        RIGHT-FIN-A    =              0
+                        RIGHT-FIN-B    =              0
+                        RIGHT-FIN-H    =              0
+                        RIGHT-FIN-D    =              0
+                        ..
+            "P02_E02_ME001" = EXTERIOR-WALL
+                  ABSORPTANCE   =            0.6
+                  COMPROBAR-REQUISITOS-MINIMOS = YES
+                  TYPE_ABSORPTANCE    = 0
+                  COLOR_ABSORPTANCE   = 0
+                  DEGREE_ABSORPTANCE   = 2
+                  CONSTRUCCION_MURO  = "Fachada medio pie"  
+                  CONSTRUCTION  = "Fachada medio pie0.60"  
+                  X             =       2.380146
+                  Y             =   1.577594e-06
+                  Z             =           4.52
+                  AZIMUTH       =            180
+                  TILT          =             90
+                  POLYGON       = "P02_E02C001_Poligono2"
+                        ..
+                  "Fachada medio pie0.60" =  CONSTRUCTION
+                        TYPE   = LAYERS  
+                        LAYERS = "Fachada medio pie" 
+                        ABSORPTANCE = 0.600000
+                        ..
+            "P02_E02_ME002" = EXTERIOR-WALL
+                  ABSORPTANCE   =            0.6
+                  COMPROBAR-REQUISITOS-MINIMOS = YES
+                  TYPE_ABSORPTANCE    = 1
+                  COLOR_ABSORPTANCE   = 0
+                  DEGREE_ABSORPTANCE   = 2
+                  CONSTRUCCION_MURO  = "Fachada medio pie"  
+                  CONSTRUCTION  = "Fachada medio pie0.60"  
+                  X             =       2.380146
+                  Y             =   1.577594e-06
+                  Z             =           4.52
+                  AZIMUTH       =            180
+                  TILT          =             90
+                  POLYGON       = "P02_E02C002_Poligono1"
+                        ..
+                  "Fachada medio pie0.60" =  CONSTRUCTION
+                        TYPE   = LAYERS  
+                        LAYERS = "Fachada medio pie" 
+                        ABSORPTANCE = 0.600000
+                        ..
+            "P02_E02_ME003" = EXTERIOR-WALL
+                  ABSORPTANCE   =            0.6
+                  COMPROBAR-REQUISITOS-MINIMOS = YES
+                  TYPE_ABSORPTANCE    = 0
+                  COLOR_ABSORPTANCE   = 0
+                  DEGREE_ABSORPTANCE   = 2
+                  CONSTRUCCION_MURO  = "Facahda 1pie"  
+                  CONSTRUCTION  = "Facahda 1pie0.60"  
+                  X             =       2.380146
+                  Y             =   1.577594e-06
+                  Z             =           4.52
+                  AZIMUTH       =            270
+                  TILT          =             90
+                  POLYGON       = "P02_E02C001_Poligono1"
+                        ..
+                  "Facahda 1pie0.60" =  CONSTRUCTION
+                        TYPE   = LAYERS  
+                        LAYERS = "Facahda 1pie" 
+                        ABSORPTANCE = 0.600000
+                        ..
+            "P02_E02_ME004" = EXTERIOR-WALL
+                  ABSORPTANCE   =            0.6
+                  COMPROBAR-REQUISITOS-MINIMOS = YES
+                  TYPE_ABSORPTANCE    = 0
+                  COLOR_ABSORPTANCE   = 0
+                  DEGREE_ABSORPTANCE   = 2
+                  CONSTRUCCION_MURO  = "Facahda 1pie"  
+                  CONSTRUCTION  = "Facahda 1pie0.60"  
+                  X             =       11.26015
+                  Y             =   1.577594e-06
+                  Z             =           4.52
+                  AZIMUTH       =            270
+                  TILT          =             90
+                  POLYGON       = "P02_E02C001_Poligono3"
+                        ..
+                  "Facahda 1pie0.60" =  CONSTRUCTION
+                        TYPE   = LAYERS  
+                        LAYERS = "Facahda 1pie" 
+                        ABSORPTANCE = 0.600000
+                        ..
+            "P02_E02_FI001" = INTERIOR-WALL
+                  INT-WALL-TYPE = STANDARD  
+                  NEXT-TO       = "P01_E01"  
+   COMPROBAR-REQUISITOS-MINIMOS = NO
+                  CONSTRUCTION  = "Frojado intermedio"  
+                  LOCATION      = BOTTOM  
+                        ..
+                  "Frojado intermedio" =  CONSTRUCTION
+                        TYPE   = LAYERS  
+                        LAYERS = "Frojado intermedio" 
+                        ..
+            "P02_E02C001" = ROOF
+                  ABSORPTANCE   =            0.6
+                  COMPROBAR-REQUISITOS-MINIMOS = YES
+                  TYPE_ABSORPTANCE    = 0
+                  COLOR_ABSORPTANCE   = 0
+                  DEGREE_ABSORPTANCE   = 2
+                  CONSTRUCTION  = "Cubierta inclinada"  
+                  X             =       11.26015
+                  Y             =   1.577594e-06
+                  Z             =           4.52
+                  AZIMUTH       =              0
+                  TILT          =       16.71816
+                  POLYGON       = "P02_E02C001_Poligono4"
+                        ..
+                  "Cubierta inclinada" =  CONSTRUCTION
+                        TYPE   = LAYERS  
+                        LAYERS = "Cubierta inclinada" 
+                        ..
+            "P02_E02C002" = ROOF
+                  ABSORPTANCE   =            0.6
+                  COMPROBAR-REQUISITOS-MINIMOS = YES
+                  TYPE_ABSORPTANCE    = 0
+                  COLOR_ABSORPTANCE   = 0
+                  DEGREE_ABSORPTANCE   = 2
+                  CONSTRUCTION  = "Cubierta inclinada"  
+                  X             =       11.26015
+                  Y             =   1.577594e-06
+                  Z             =           4.52
+                  AZIMUTH       =              0
+                  TILT          =       16.71815
+                  POLYGON       = "P02_E02C002_Poligono2"
+                        ..
+                  "Cubierta inclinada" =  CONSTRUCTION
+                        TYPE   = LAYERS  
+                        LAYERS = "Cubierta inclinada" 
+                        ..
+$
+$ +---------------------------+
+$ | CONDICIONES OPERACIONALES |
+$ +---------------------------+
+$
+"Residencial" = SPACE-CONDITIONS
+    NAME               = "Residencial"
+    TEMPERATURE        = 22.5
+    PEOPLE-SCHEDULE    = "Ocupacion-Residencia"
+    PEOPLE-HG-LAT      =          45.42
+    PEOPLE-HG-SENS     =          71.79
+    PEOPLE-SPLIT-CR    =            0.4
+    LIGHTING-SCHEDULE  = "Iluminacion-Residencia"
+    AREA/PERSON        =          33.33
+    LIGHTING-TYPE      = SUS-FLUOR
+    LIGHTING-W/AREA    =            4.4
+    LIGHTING-SPLIT-CR =             0.5
+    EQUIP-SCHEDULE        = "Iluminacion-Residencia"
+    EQUIP-SENSIBLE        =             90
+    EQUIP-LATENT          =             10
+    EQUIPMENT-SPLIT-CR    =            0.3
+    EQUIPMENT-W/AREA      =            4.4
+    FURN-FRACTION         =            0.5
+    FURN-WEIGHT           =             45
+    FRACCION-SOLAR-SUELO  =            0.6
+    INF-SCHEDULE          = "Infiltracion-Residencia"
+    AIR-CHANGES/HR        =              4
+    INF-METHOD            = CRACK
+    PEAK-LOAD-TYPE        = CONDITIONED
+    MET-LEVEL           = 1
+      ..
+"Residencial" = SYSTEM-CONDITIONS
+    NAME               = "Residencial"
+    ZONAL-ZONE-METHOD  = FULLY-MIXED
+    HEAT-TEMP-SCH      = "Horario-Calefaccion"
+    COOL-TEMP-SCH      = "Horario-Refrigeracion"
+    TYPE               = CONDITIONED
+    MAX-HEAT-RATE      = -1e20
+    MAX-COOL-RATE      = 1e20
+    HEATING-SCHEDULE   = "Funcionam-Residencia"
+    COOLING-SCHEDULE   = "Funcionam-Residencia"
+    FLOW/AREA          = 0
+    FAN-SCHEDULE       = "Funcionam-Residencia"
+    SEASON-SCH         = "SSHA"
+    OUTSIDE-AIR-FLOW   = 0
+    RECOV-TEMP         = 0
+    RECOV-KW           = 0
+    RECOV-EFF          = 0
+    THROTTLING-RANGE   = 0
+    OA-CONTROL         = TEMP
+            ..
+
+"SSHDV" = DAY-SCHEDULE-PD
+  TYPE  = FRACTION
+  VALUES  = ( 0)
+  ..
+"SSHDI" = DAY-SCHEDULE-PD
+  TYPE  = FRACTION
+  VALUES  = ( 1)
+  ..
+"SSHSV" = WEEK-SCHEDULE-PD
+  TYPE  = FRACTION
+  DAY-SCHEDULES = ( "SSHDV")
+  ..
+"SSHSI" = WEEK-SCHEDULE-PD
+  TYPE  = FRACTION
+  DAY-SCHEDULES = ( "SSHDI")
+  ..
+"SSHA" = SCHEDULE-PD
+  TYPE  = FRACTION
+  MONTH = ( 5, 9, 12)
+  DAY   = ( 31, 30, 31)
+  WEEK-SCHEDULES = ( "SSHSI", "SSHSV", "SSHSI")
+  ..
+$
+$ +----------+
+$ | HORARIOS |
+$ +----------+
+$
+"HA0_SS_D-Refrig-Temp-Lab" = DAY-SCHEDULE-PD
+    TYPE  = "TEMPERATURE"
+    GROUP = "Temperaturas"
+    INDEX = 0
+    VALUES  = ( 27.0, 27.0, 27.0, 27.0, 27.0, 27.0, 27.0, 99.0, 99.0, 99.0, 99.0, 99.0, 99.0, 99.0, 99.0, 25.0, 25.0, 25.0, 25.0, 25.0, 25.0, 25.0, 25.0, 27.0)
+    ..
+"HA0_SS_D-Refrig-Temp-Sab" = DAY-SCHEDULE-PD
+    TYPE  = "TEMPERATURE"
+    GROUP = "Temperaturas"
+    INDEX = 1
+    VALUES  = ( 27.0, 27.0, 27.0, 27.0, 27.0, 27.0, 27.0, 99.0, 99.0, 99.0, 99.0, 99.0, 99.0, 99.0, 99.0, 25.0, 25.0, 25.0, 25.0, 25.0, 25.0, 25.0, 25.0, 27.0)
+    ..
+"HA0_SS_D-Refrig-Temp-Fest" = DAY-SCHEDULE-PD
+    TYPE  = "TEMPERATURE"
+    GROUP = "Temperaturas"
+    INDEX = 2
+    VALUES  = ( 27.0, 27.0, 27.0, 27.0, 27.0, 27.0, 27.0, 99.0, 99.0, 99.0, 99.0, 99.0, 99.0, 99.0, 99.0, 25.0, 25.0, 25.0, 25.0, 25.0, 25.0, 25.0, 25.0, 27.0)
+    ..
+  "HA0_HS0_SS_" = WEEK-SCHEDULE-PD
+    TYPE  = TEMPERATURE
+    DAY-SCHEDULES = ( "HA0_SS_D-Refrig-Temp-Lab",
+                      "HA0_SS_D-Refrig-Temp-Lab",
+                      "HA0_SS_D-Refrig-Temp-Lab",
+                      "HA0_SS_D-Refrig-Temp-Lab",
+                      "HA0_SS_D-Refrig-Temp-Lab",
+                      "HA0_SS_D-Refrig-Temp-Sab",
+                      "HA0_SS_D-Refrig-Temp-Fest")
+    ..
+"Horario-Refrigeracion" = SCHEDULE-PD
+    TYPE   = "TEMPERATURE"
+    GROUP  = "Temperaturas"
+    MONTH = ( 12)
+    DAY   = ( 31)
+    WEEK-SCHEDULES = ( "HA0_HS0_SS_")
+    ..
+"HA1_SS_D-Calef-Temp-Lab" = DAY-SCHEDULE-PD
+    TYPE  = "TEMPERATURE"
+    GROUP = "Temperaturas"
+    INDEX = 0
+    VALUES  = ( 17.0, 17.0, 17.0, 17.0, 17.0, 17.0, 17.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 17.0)
+    ..
+"HA1_SS_D-Calef-Temp-Sab" = DAY-SCHEDULE-PD
+    TYPE  = "TEMPERATURE"
+    GROUP = "Temperaturas"
+    INDEX = 1
+    VALUES  = ( 17.0, 17.0, 17.0, 17.0, 17.0, 17.0, 17.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 17.0)
+    ..
+"HA1_SS_D-Calef-Temp-Fest" = DAY-SCHEDULE-PD
+    TYPE  = "TEMPERATURE"
+    GROUP = "Temperaturas"
+    INDEX = 2
+    VALUES  = ( 17.0, 17.0, 17.0, 17.0, 17.0, 17.0, 17.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 17.0)
+    ..
+  "HA1_HS0_SS_" = WEEK-SCHEDULE-PD
+    TYPE  = TEMPERATURE
+    DAY-SCHEDULES = ( "HA1_SS_D-Calef-Temp-Lab",
+                      "HA1_SS_D-Calef-Temp-Lab",
+                      "HA1_SS_D-Calef-Temp-Lab",
+                      "HA1_SS_D-Calef-Temp-Lab",
+                      "HA1_SS_D-Calef-Temp-Lab",
+                      "HA1_SS_D-Calef-Temp-Sab",
+                      "HA1_SS_D-Calef-Temp-Fest")
+    ..
+"Horario-Calefaccion" = SCHEDULE-PD
+    TYPE   = "TEMPERATURE"
+    GROUP  = "Temperaturas"
+    MONTH = ( 12)
+    DAY   = ( 31)
+    WEEK-SCHEDULES = ( "HA1_HS0_SS_")
+    ..
+"HA2_SS_D-Refrig-Temp-Lab-t" = DAY-SCHEDULE-PD
+    TYPE  = "TEMPERATURE"
+    GROUP = "Temperaturas"
+    INDEX = 0
+    VALUES  = ( 25.0, 25.0, 25.0, 25.0, 25.0, 25.0, 25.0, 25.0, 25.0, 25.0, 25.0, 25.0, 25.0, 25.0, 25.0, 25.0, 25.0, 25.0, 25.0, 25.0, 25.0, 25.0, 25.0, 25.0)
+    ..
+"HA2_SS_D-Refrig-Temp-Sab-t" = DAY-SCHEDULE-PD
+    TYPE  = "TEMPERATURE"
+    GROUP = "Temperaturas"
+    INDEX = 1
+    VALUES  = ( 25.0, 25.0, 25.0, 25.0, 25.0, 25.0, 25.0, 25.0, 25.0, 25.0, 25.0, 25.0, 25.0, 25.0, 25.0, 25.0, 25.0, 25.0, 25.0, 25.0, 25.0, 25.0, 25.0, 25.0)
+    ..
+"HA2_SS_D-Refrig-Temp-Fest-t" = DAY-SCHEDULE-PD
+    TYPE  = "TEMPERATURE"
+    GROUP = "Temperaturas"
+    INDEX = 2
+    VALUES  = ( 25.0, 25.0, 25.0, 25.0, 25.0, 25.0, 25.0, 25.0, 25.0, 25.0, 25.0, 25.0, 25.0, 25.0, 25.0, 25.0, 25.0, 25.0, 25.0, 25.0, 25.0, 25.0, 25.0, 25.0)
+    ..
+  "HA2_HS0_SS_" = WEEK-SCHEDULE-PD
+    TYPE  = TEMPERATURE
+    DAY-SCHEDULES = ( "HA2_SS_D-Refrig-Temp-Lab-t",
+                      "HA2_SS_D-Refrig-Temp-Lab-t",
+                      "HA2_SS_D-Refrig-Temp-Lab-t",
+                      "HA2_SS_D-Refrig-Temp-Lab-t",
+                      "HA2_SS_D-Refrig-Temp-Lab-t",
+                      "HA2_SS_D-Refrig-Temp-Sab-t",
+                      "HA2_SS_D-Refrig-Temp-Fest-t")
+    ..
+"Horario-Refrigeracion-t" = SCHEDULE-PD
+    TYPE   = "TEMPERATURE"
+    GROUP  = "Temperaturas"
+    MONTH = ( 12)
+    DAY   = ( 31)
+    WEEK-SCHEDULES = ( "HA2_HS0_SS_")
+    ..
+"HA3_SS_D-Calef-Temp-Lab-t" = DAY-SCHEDULE-PD
+    TYPE  = "TEMPERATURE"
+    GROUP = "Temperaturas"
+    INDEX = 0
+    VALUES  = ( 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0)
+    ..
+"HA3_SS_D-Calef-Temp-Sab-t" = DAY-SCHEDULE-PD
+    TYPE  = "TEMPERATURE"
+    GROUP = "Temperaturas"
+    INDEX = 1
+    VALUES  = ( 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0)
+    ..
+"HA3_SS_D-Calef-Temp-Fest-t" = DAY-SCHEDULE-PD
+    TYPE  = "TEMPERATURE"
+    GROUP = "Temperaturas"
+    INDEX = 2
+    VALUES  = ( 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0)
+    ..
+  "HA3_HS0_SS_" = WEEK-SCHEDULE-PD
+    TYPE  = TEMPERATURE
+    DAY-SCHEDULES = ( "HA3_SS_D-Calef-Temp-Lab-t",
+                      "HA3_SS_D-Calef-Temp-Lab-t",
+                      "HA3_SS_D-Calef-Temp-Lab-t",
+                      "HA3_SS_D-Calef-Temp-Lab-t",
+                      "HA3_SS_D-Calef-Temp-Lab-t",
+                      "HA3_SS_D-Calef-Temp-Sab-t",
+                      "HA3_SS_D-Calef-Temp-Fest-t")
+    ..
+"Horario-Calefaccion-t" = SCHEDULE-PD
+    TYPE   = "TEMPERATURE"
+    GROUP  = "Temperaturas"
+    MONTH = ( 12)
+    DAY   = ( 31)
+    WEEK-SCHEDULES = ( "HA3_HS0_SS_")
+    ..
+"HA4_SS_D-8h-Lab" = DAY-SCHEDULE-PD
+    TYPE  = "FRACTION"
+    GROUP = "Internas"
+    INDEX = 0
+    VALUES  = ( 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00)
+    ..
+"HA4_SS_D-8h-Sab" = DAY-SCHEDULE-PD
+    TYPE  = "FRACTION"
+    GROUP = "Internas"
+    INDEX = 1
+    VALUES  = ( 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00)
+    ..
+"HA4_SS_D-8h-Fest" = DAY-SCHEDULE-PD
+    TYPE  = "FRACTION"
+    GROUP = "Internas"
+    INDEX = 2
+    VALUES  = ( 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00)
+    ..
+  "HA4_HS0_SS_" = WEEK-SCHEDULE-PD
+    TYPE  = FRACTION
+    DAY-SCHEDULES = ( "HA4_SS_D-8h-Lab",
+                      "HA4_SS_D-8h-Lab",
+                      "HA4_SS_D-8h-Lab",
+                      "HA4_SS_D-8h-Lab",
+                      "HA4_SS_D-8h-Lab",
+                      "HA4_SS_D-8h-Sab",
+                      "HA4_SS_D-8h-Fest")
+    ..
+"UsoEspacio-8h" = SCHEDULE-PD
+    TYPE   = "FRACTION"
+    GROUP  = "Internas"
+    MONTH = ( 12)
+    DAY   = ( 31)
+    WEEK-SCHEDULES = ( "HA4_HS0_SS_")
+    ..
+"HA5_SS_D-8h-Lab_eq" = DAY-SCHEDULE-PD
+    TYPE  = "ON/OFF"
+    GROUP = "Equipos"
+    INDEX = 0
+    VALUES  = ( 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+    ..
+"HA5_SS_D-8h-Sab_eq" = DAY-SCHEDULE-PD
+    TYPE  = "ON/OFF"
+    GROUP = "Equipos"
+    INDEX = 1
+    VALUES  = ( 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+    ..
+"HA5_SS_D-8h-Fest_eq" = DAY-SCHEDULE-PD
+    TYPE  = "ON/OFF"
+    GROUP = "Equipos"
+    INDEX = 2
+    VALUES  = ( 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+    ..
+  "HA5_HS0_SS_" = WEEK-SCHEDULE-PD
+    TYPE  = ON/OFF
+    DAY-SCHEDULES = ( "HA5_SS_D-8h-Lab_eq",
+                      "HA5_SS_D-8h-Lab_eq",
+                      "HA5_SS_D-8h-Lab_eq",
+                      "HA5_SS_D-8h-Lab_eq",
+                      "HA5_SS_D-8h-Lab_eq",
+                      "HA5_SS_D-8h-Sab_eq",
+                      "HA5_SS_D-8h-Fest_eq")
+    ..
+"UsoEspacio-8h_eq" = SCHEDULE-PD
+    TYPE   = "ON/OFF"
+    GROUP  = "Equipos"
+    MONTH = ( 12)
+    DAY   = ( 31)
+    WEEK-SCHEDULES = ( "HA5_HS0_SS_")
+    ..
+"HA6_SS_D-8h-Lab_vent" = DAY-SCHEDULE-PD
+    TYPE  = "FRACTION"
+    GROUP = "Ventilación"
+    INDEX = 0
+    VALUES  = ( 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00)
+    ..
+"HA6_SS_D-8h-Sab_vent" = DAY-SCHEDULE-PD
+    TYPE  = "FRACTION"
+    GROUP = "Ventilación"
+    INDEX = 1
+    VALUES  = ( 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00)
+    ..
+"HA6_SS_D-8h-Fest_vent" = DAY-SCHEDULE-PD
+    TYPE  = "FRACTION"
+    GROUP = "Ventilación"
+    INDEX = 2
+    VALUES  = ( 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00)
+    ..
+  "HA6_HS0_SS_" = WEEK-SCHEDULE-PD
+    TYPE  = FRACTION
+    DAY-SCHEDULES = ( "HA6_SS_D-8h-Lab_vent",
+                      "HA6_SS_D-8h-Lab_vent",
+                      "HA6_SS_D-8h-Lab_vent",
+                      "HA6_SS_D-8h-Lab_vent",
+                      "HA6_SS_D-8h-Lab_vent",
+                      "HA6_SS_D-8h-Sab_vent",
+                      "HA6_SS_D-8h-Fest_vent")
+    ..
+"UsoEspacio-8h_vent" = SCHEDULE-PD
+    TYPE   = "FRACTION"
+    GROUP  = "Ventilación"
+    MONTH = ( 12)
+    DAY   = ( 31)
+    WEEK-SCHEDULES = ( "HA6_HS0_SS_")
+    ..
+"HA7_SS_D-12h-Lab" = DAY-SCHEDULE-PD
+    TYPE  = "FRACTION"
+    GROUP = "Internas"
+    INDEX = 0
+    VALUES  = ( 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 0.00, 0.00, 1.00, 1.00, 1.00, 1.00, 0.00, 0.00, 0.00, 0.00)
+    ..
+"HA7_SS_D-12h-Sab" = DAY-SCHEDULE-PD
+    TYPE  = "FRACTION"
+    GROUP = "Internas"
+    INDEX = 1
+    VALUES  = ( 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00)
+    ..
+"HA7_SS_D-12h-Fest" = DAY-SCHEDULE-PD
+    TYPE  = "FRACTION"
+    GROUP = "Internas"
+    INDEX = 2
+    VALUES  = ( 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00)
+    ..
+  "HA7_HS0_SS_" = WEEK-SCHEDULE-PD
+    TYPE  = FRACTION
+    DAY-SCHEDULES = ( "HA7_SS_D-12h-Lab",
+                      "HA7_SS_D-12h-Lab",
+                      "HA7_SS_D-12h-Lab",
+                      "HA7_SS_D-12h-Lab",
+                      "HA7_SS_D-12h-Lab",
+                      "HA7_SS_D-12h-Sab",
+                      "HA7_SS_D-12h-Fest")
+    ..
+"UsoEspacio-12h" = SCHEDULE-PD
+    TYPE   = "FRACTION"
+    GROUP  = "Internas"
+    MONTH = ( 12)
+    DAY   = ( 31)
+    WEEK-SCHEDULES = ( "HA7_HS0_SS_")
+    ..
+"HA8_SS_D-12h-Lab_eq" = DAY-SCHEDULE-PD
+    TYPE  = "ON/OFF"
+    GROUP = "Equipos"
+    INDEX = 0
+    VALUES  = ( 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0)
+    ..
+"HA8_SS_D-12h-Sab_eq" = DAY-SCHEDULE-PD
+    TYPE  = "ON/OFF"
+    GROUP = "Equipos"
+    INDEX = 1
+    VALUES  = ( 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+    ..
+"HA8_SS_D-12h-Fest_eq" = DAY-SCHEDULE-PD
+    TYPE  = "ON/OFF"
+    GROUP = "Equipos"
+    INDEX = 2
+    VALUES  = ( 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+    ..
+  "HA8_HS0_SS_" = WEEK-SCHEDULE-PD
+    TYPE  = ON/OFF
+    DAY-SCHEDULES = ( "HA8_SS_D-12h-Lab_eq",
+                      "HA8_SS_D-12h-Lab_eq",
+                      "HA8_SS_D-12h-Lab_eq",
+                      "HA8_SS_D-12h-Lab_eq",
+                      "HA8_SS_D-12h-Lab_eq",
+                      "HA8_SS_D-12h-Sab_eq",
+                      "HA8_SS_D-12h-Fest_eq")
+    ..
+"UsoEspacio-12h_eq" = SCHEDULE-PD
+    TYPE   = "ON/OFF"
+    GROUP  = "Equipos"
+    MONTH = ( 12)
+    DAY   = ( 31)
+    WEEK-SCHEDULES = ( "HA8_HS0_SS_")
+    ..
+"HA9_SS_D-12h-Lab" = DAY-SCHEDULE-PD
+    TYPE  = "FRACTION"
+    GROUP = "Ventilación"
+    INDEX = 0
+    VALUES  = ( 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 0.00, 0.00, 1.00, 1.00, 1.00, 1.00, 0.00, 0.00, 0.00, 0.00)
+    ..
+"HA9_SS_D-12h-Sab" = DAY-SCHEDULE-PD
+    TYPE  = "FRACTION"
+    GROUP = "Ventilación"
+    INDEX = 1
+    VALUES  = ( 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00)
+    ..
+"HA9_SS_D-12h-Fest" = DAY-SCHEDULE-PD
+    TYPE  = "FRACTION"
+    GROUP = "Ventilación"
+    INDEX = 2
+    VALUES  = ( 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00)
+    ..
+  "HA9_HS0_SS_" = WEEK-SCHEDULE-PD
+    TYPE  = FRACTION
+    DAY-SCHEDULES = ( "HA9_SS_D-12h-Lab",
+                      "HA9_SS_D-12h-Lab",
+                      "HA9_SS_D-12h-Lab",
+                      "HA9_SS_D-12h-Lab",
+                      "HA9_SS_D-12h-Lab",
+                      "HA9_SS_D-12h-Sab",
+                      "HA9_SS_D-12h-Fest")
+    ..
+"UsoEspacio-12h_vent" = SCHEDULE-PD
+    TYPE   = "FRACTION"
+    GROUP  = "Ventilación"
+    MONTH = ( 12)
+    DAY   = ( 31)
+    WEEK-SCHEDULES = ( "HA9_HS0_SS_")
+    ..
+"HA10_SS_D-16h-Lab" = DAY-SCHEDULE-PD
+    TYPE  = "FRACTION"
+    GROUP = "Internas"
+    INDEX = 0
+    VALUES  = ( 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 0.00, 0.00)
+    ..
+"HA10_SS_D-16h-Sab" = DAY-SCHEDULE-PD
+    TYPE  = "FRACTION"
+    GROUP = "Internas"
+    INDEX = 1
+    VALUES  = ( 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00)
+    ..
+"HA10_SS_D-16h-Fest" = DAY-SCHEDULE-PD
+    TYPE  = "FRACTION"
+    GROUP = "Internas"
+    INDEX = 2
+    VALUES  = ( 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00)
+    ..
+  "HA10_HS0_SS_" = WEEK-SCHEDULE-PD
+    TYPE  = FRACTION
+    DAY-SCHEDULES = ( "HA10_SS_D-16h-Lab",
+                      "HA10_SS_D-16h-Lab",
+                      "HA10_SS_D-16h-Lab",
+                      "HA10_SS_D-16h-Lab",
+                      "HA10_SS_D-16h-Lab",
+                      "HA10_SS_D-16h-Sab",
+                      "HA10_SS_D-16h-Fest")
+    ..
+"UsoEspacio-16h" = SCHEDULE-PD
+    TYPE   = "FRACTION"
+    GROUP  = "Internas"
+    MONTH = ( 12)
+    DAY   = ( 31)
+    WEEK-SCHEDULES = ( "HA10_HS0_SS_")
+    ..
+"HA11_SS_D-16h-Lab_eq" = DAY-SCHEDULE-PD
+    TYPE  = "ON/OFF"
+    GROUP = "Equipos"
+    INDEX = 0
+    VALUES  = ( 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0)
+    ..
+"HA11_SS_D-16h-Sab_eq" = DAY-SCHEDULE-PD
+    TYPE  = "ON/OFF"
+    GROUP = "Equipos"
+    INDEX = 1
+    VALUES  = ( 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+    ..
+"HA11_SS_D-16h-Fest_eq" = DAY-SCHEDULE-PD
+    TYPE  = "ON/OFF"
+    GROUP = "Equipos"
+    INDEX = 2
+    VALUES  = ( 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+    ..
+  "HA11_HS0_SS_" = WEEK-SCHEDULE-PD
+    TYPE  = ON/OFF
+    DAY-SCHEDULES = ( "HA11_SS_D-16h-Lab_eq",
+                      "HA11_SS_D-16h-Lab_eq",
+                      "HA11_SS_D-16h-Lab_eq",
+                      "HA11_SS_D-16h-Lab_eq",
+                      "HA11_SS_D-16h-Lab_eq",
+                      "HA11_SS_D-16h-Sab_eq",
+                      "HA11_SS_D-16h-Fest_eq")
+    ..
+"UsoEspacio-16h_eq" = SCHEDULE-PD
+    TYPE   = "ON/OFF"
+    GROUP  = "Equipos"
+    MONTH = ( 12)
+    DAY   = ( 31)
+    WEEK-SCHEDULES = ( "HA11_HS0_SS_")
+    ..
+"HA12_SS_D-16h-Lab_vent" = DAY-SCHEDULE-PD
+    TYPE  = "FRACTION"
+    GROUP = "Ventilación"
+    INDEX = 0
+    VALUES  = ( 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 0.00, 0.00)
+    ..
+"HA12_SS_D-16h-Sab_vent" = DAY-SCHEDULE-PD
+    TYPE  = "FRACTION"
+    GROUP = "Ventilación"
+    INDEX = 1
+    VALUES  = ( 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00)
+    ..
+"HA12_SS_D-16h-Fest_vent" = DAY-SCHEDULE-PD
+    TYPE  = "FRACTION"
+    GROUP = "Ventilación"
+    INDEX = 2
+    VALUES  = ( 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00)
+    ..
+  "HA12_HS0_SS_" = WEEK-SCHEDULE-PD
+    TYPE  = FRACTION
+    DAY-SCHEDULES = ( "HA12_SS_D-16h-Lab_vent",
+                      "HA12_SS_D-16h-Lab_vent",
+                      "HA12_SS_D-16h-Lab_vent",
+                      "HA12_SS_D-16h-Lab_vent",
+                      "HA12_SS_D-16h-Lab_vent",
+                      "HA12_SS_D-16h-Sab_vent",
+                      "HA12_SS_D-16h-Fest_vent")
+    ..
+"UsoEspacio-16h_vent" = SCHEDULE-PD
+    TYPE   = "FRACTION"
+    GROUP  = "Ventilación"
+    MONTH = ( 12)
+    DAY   = ( 31)
+    WEEK-SCHEDULES = ( "HA12_HS0_SS_")
+    ..
+"HA13_SS_D-24h-Lab" = DAY-SCHEDULE-PD
+    TYPE  = "FRACTION"
+    GROUP = "Internas"
+    INDEX = 0
+    VALUES  = ( 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00)
+    ..
+"HA13_SS_D-24h-Sab" = DAY-SCHEDULE-PD
+    TYPE  = "FRACTION"
+    GROUP = "Internas"
+    INDEX = 1
+    VALUES  = ( 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00)
+    ..
+"HA13_SS_D-24h-Fest" = DAY-SCHEDULE-PD
+    TYPE  = "FRACTION"
+    GROUP = "Internas"
+    INDEX = 2
+    VALUES  = ( 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00)
+    ..
+  "HA13_HS0_SS_" = WEEK-SCHEDULE-PD
+    TYPE  = FRACTION
+    DAY-SCHEDULES = ( "HA13_SS_D-24h-Lab",
+                      "HA13_SS_D-24h-Lab",
+                      "HA13_SS_D-24h-Lab",
+                      "HA13_SS_D-24h-Lab",
+                      "HA13_SS_D-24h-Lab",
+                      "HA13_SS_D-24h-Sab",
+                      "HA13_SS_D-24h-Fest")
+    ..
+"UsoEspacio-24h" = SCHEDULE-PD
+    TYPE   = "FRACTION"
+    GROUP  = "Internas"
+    MONTH = ( 12)
+    DAY   = ( 31)
+    WEEK-SCHEDULES = ( "HA13_HS0_SS_")
+    ..
+"HA14_SS_D-24h-Lab_eq" = DAY-SCHEDULE-PD
+    TYPE  = "ON/OFF"
+    GROUP = "Equipos"
+    INDEX = 0
+    VALUES  = ( 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
+    ..
+"HA14_SS_D-24h-Sab_eq" = DAY-SCHEDULE-PD
+    TYPE  = "ON/OFF"
+    GROUP = "Equipos"
+    INDEX = 1
+    VALUES  = ( 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+    ..
+"HA14_SS_D-24h-Fest_eq" = DAY-SCHEDULE-PD
+    TYPE  = "ON/OFF"
+    GROUP = "Equipos"
+    INDEX = 2
+    VALUES  = ( 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+    ..
+  "HA14_HS0_SS_" = WEEK-SCHEDULE-PD
+    TYPE  = ON/OFF
+    DAY-SCHEDULES = ( "HA14_SS_D-24h-Lab_eq",
+                      "HA14_SS_D-24h-Lab_eq",
+                      "HA14_SS_D-24h-Lab_eq",
+                      "HA14_SS_D-24h-Lab_eq",
+                      "HA14_SS_D-24h-Lab_eq",
+                      "HA14_SS_D-24h-Sab_eq",
+                      "HA14_SS_D-24h-Fest_eq")
+    ..
+"UsoEspacio-24h_eq" = SCHEDULE-PD
+    TYPE   = "ON/OFF"
+    GROUP  = "Equipos"
+    MONTH = ( 12)
+    DAY   = ( 31)
+    WEEK-SCHEDULES = ( "HA14_HS0_SS_")
+    ..
+"HA15_SS_D-24h-Lab_vent" = DAY-SCHEDULE-PD
+    TYPE  = "FRACTION"
+    GROUP = "Ventilación"
+    INDEX = 0
+    VALUES  = ( 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00)
+    ..
+"HA15_SS_D-24h-Sab_vent" = DAY-SCHEDULE-PD
+    TYPE  = "FRACTION"
+    GROUP = "Ventilación"
+    INDEX = 1
+    VALUES  = ( 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00)
+    ..
+"HA15_SS_D-24h-Fest_vent" = DAY-SCHEDULE-PD
+    TYPE  = "FRACTION"
+    GROUP = "Ventilación"
+    INDEX = 2
+    VALUES  = ( 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00)
+    ..
+  "HA15_HS0_SS_" = WEEK-SCHEDULE-PD
+    TYPE  = FRACTION
+    DAY-SCHEDULES = ( "HA15_SS_D-24h-Lab_vent",
+                      "HA15_SS_D-24h-Lab_vent",
+                      "HA15_SS_D-24h-Lab_vent",
+                      "HA15_SS_D-24h-Lab_vent",
+                      "HA15_SS_D-24h-Lab_vent",
+                      "HA15_SS_D-24h-Sab_vent",
+                      "HA15_SS_D-24h-Fest_vent")
+    ..
+"UsoEspacio-24h_vent" = SCHEDULE-PD
+    TYPE   = "FRACTION"
+    GROUP  = "Ventilación"
+    MONTH = ( 12)
+    DAY   = ( 31)
+    WEEK-SCHEDULES = ( "HA15_HS0_SS_")
+    ..
+"HA16_SS_D-Resid-Ocup-Lab" = DAY-SCHEDULE-PD
+    TYPE  = "FRACTION"
+    GROUP = "Internas"
+    INDEX = 0
+    VALUES  = ( 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.50, 0.50, 0.50, 0.50, 0.50, 0.50, 0.50, 0.50, 1.00)
+    ..
+"HA16_SS_D-Resid-Ocup-Sab" = DAY-SCHEDULE-PD
+    TYPE  = "FRACTION"
+    GROUP = "Internas"
+    INDEX = 1
+    VALUES  = ( 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00)
+    ..
+"HA16_SS_D-Resid-Ocup-Fest" = DAY-SCHEDULE-PD
+    TYPE  = "FRACTION"
+    GROUP = "Internas"
+    INDEX = 2
+    VALUES  = ( 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00)
+    ..
+  "HA16_HS0_SS_" = WEEK-SCHEDULE-PD
+    TYPE  = FRACTION
+    DAY-SCHEDULES = ( "HA16_SS_D-Resid-Ocup-Lab",
+                      "HA16_SS_D-Resid-Ocup-Lab",
+                      "HA16_SS_D-Resid-Ocup-Lab",
+                      "HA16_SS_D-Resid-Ocup-Lab",
+                      "HA16_SS_D-Resid-Ocup-Lab",
+                      "HA16_SS_D-Resid-Ocup-Sab",
+                      "HA16_SS_D-Resid-Ocup-Fest")
+    ..
+"Ocupacion-Residencia" = SCHEDULE-PD
+    TYPE   = "FRACTION"
+    GROUP  = "Internas"
+    MONTH = ( 12)
+    DAY   = ( 31)
+    WEEK-SCHEDULES = ( "HA16_HS0_SS_")
+    ..
+"HA17_SS_D-Resid-ilum-Lab" = DAY-SCHEDULE-PD
+    TYPE  = "FRACTION"
+    GROUP = "Internas"
+    INDEX = 0
+    VALUES  = ( 0.10, 0.10, 0.10, 0.10, 0.10, 0.10, 0.10, 0.30, 0.30, 0.30, 0.30, 0.30, 0.30, 0.30, 0.30, 0.30, 0.30, 0.30, 0.50, 1.00, 1.00, 1.00, 1.00, 0.50)
+    ..
+"HA17_SS_D-Resid-ilum-Sab" = DAY-SCHEDULE-PD
+    TYPE  = "FRACTION"
+    GROUP = "Internas"
+    INDEX = 1
+    VALUES  = ( 0.10, 0.10, 0.10, 0.10, 0.10, 0.10, 0.10, 0.30, 0.30, 0.30, 0.30, 0.30, 0.30, 0.30, 0.30, 0.30, 0.30, 0.30, 0.50, 1.00, 1.00, 1.00, 1.00, 0.50)
+    ..
+"HA17_SS_D-Resid-ilum-Fest" = DAY-SCHEDULE-PD
+    TYPE  = "FRACTION"
+    GROUP = "Internas"
+    INDEX = 2
+    VALUES  = ( 0.10, 0.10, 0.10, 0.10, 0.10, 0.10, 0.10, 0.30, 0.30, 0.30, 0.30, 0.30, 0.30, 0.30, 0.30, 0.30, 0.30, 0.30, 0.50, 1.00, 1.00, 1.00, 1.00, 0.50)
+    ..
+  "HA17_HS0_SS_" = WEEK-SCHEDULE-PD
+    TYPE  = FRACTION
+    DAY-SCHEDULES = ( "HA17_SS_D-Resid-ilum-Lab",
+                      "HA17_SS_D-Resid-ilum-Lab",
+                      "HA17_SS_D-Resid-ilum-Lab",
+                      "HA17_SS_D-Resid-ilum-Lab",
+                      "HA17_SS_D-Resid-ilum-Lab",
+                      "HA17_SS_D-Resid-ilum-Sab",
+                      "HA17_SS_D-Resid-ilum-Fest")
+    ..
+"Iluminacion-Residencia" = SCHEDULE-PD
+    TYPE   = "FRACTION"
+    GROUP  = "Internas"
+    MONTH = ( 12)
+    DAY   = ( 31)
+    WEEK-SCHEDULES = ( "HA17_HS0_SS_")
+    ..
+"HA18_SS_D-Resid-Func-Lab" = DAY-SCHEDULE-PD
+    TYPE  = "ON/OFF"
+    GROUP = "Equipos"
+    INDEX = 0
+    VALUES  = ( 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
+    ..
+"HA18_SS_D-Resid-Func-Sab" = DAY-SCHEDULE-PD
+    TYPE  = "ON/OFF"
+    GROUP = "Equipos"
+    INDEX = 1
+    VALUES  = ( 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
+    ..
+"HA18_SS_D-Resid-Func-Fest" = DAY-SCHEDULE-PD
+    TYPE  = "ON/OFF"
+    GROUP = "Equipos"
+    INDEX = 2
+    VALUES  = ( 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
+    ..
+  "HA18_HS0_SS_" = WEEK-SCHEDULE-PD
+    TYPE  = ON/OFF
+    DAY-SCHEDULES = ( "HA18_SS_D-Resid-Func-Lab",
+                      "HA18_SS_D-Resid-Func-Lab",
+                      "HA18_SS_D-Resid-Func-Lab",
+                      "HA18_SS_D-Resid-Func-Lab",
+                      "HA18_SS_D-Resid-Func-Lab",
+                      "HA18_SS_D-Resid-Func-Sab",
+                      "HA18_SS_D-Resid-Func-Fest")
+    ..
+"Funcionam-Residencia" = SCHEDULE-PD
+    TYPE   = "ON/OFF"
+    GROUP  = "Equipos"
+    MONTH = ( 12)
+    DAY   = ( 31)
+    WEEK-SCHEDULES = ( "HA18_HS0_SS_")
+    ..
+"HA19_SS_D-Resid-Inf-Inv" = DAY-SCHEDULE-PD
+    TYPE  = "FRACTION"
+    GROUP = "Ventilación"
+    INDEX = 0
+    VALUES  = ( 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00)
+    ..
+"HA19_SS_D-Resid-Inf-Ver" = DAY-SCHEDULE-PD
+    TYPE  = "FRACTION"
+    GROUP = "Ventilación"
+    INDEX = 1
+    VALUES  = ( 6.11, 6.11, 6.11, 6.11, 6.11, 6.11, 6.11, 6.11, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00)
+    ..
+  "HA19_HS0_SS_" = WEEK-SCHEDULE-PD
+    TYPE  = FRACTION
+    DAY-SCHEDULES = ( "HA19_SS_D-Resid-Inf-Inv",
+                      "HA19_SS_D-Resid-Inf-Inv",
+                      "HA19_SS_D-Resid-Inf-Inv",
+                      "HA19_SS_D-Resid-Inf-Inv",
+                      "HA19_SS_D-Resid-Inf-Inv",
+                      "HA19_SS_D-Resid-Inf-Inv",
+                      "HA19_SS_D-Resid-Inf-Inv")
+    ..
+  "HA19_HS1_SS_" = WEEK-SCHEDULE-PD
+    TYPE  = FRACTION
+    DAY-SCHEDULES = ( "HA19_SS_D-Resid-Inf-Inv",
+                      "HA19_SS_D-Resid-Inf-Inv",
+                      "HA19_SS_D-Resid-Inf-Inv",
+                      "HA19_SS_D-Resid-Inf-Inv",
+                      "HA19_SS_D-Resid-Inf-Ver",
+                      "HA19_SS_D-Resid-Inf-Ver",
+                      "HA19_SS_D-Resid-Inf-Ver")
+    ..
+  "HA19_HS2_SS_" = WEEK-SCHEDULE-PD
+    TYPE  = FRACTION
+    DAY-SCHEDULES = ( "HA19_SS_D-Resid-Inf-Ver",
+                      "HA19_SS_D-Resid-Inf-Ver",
+                      "HA19_SS_D-Resid-Inf-Ver",
+                      "HA19_SS_D-Resid-Inf-Ver",
+                      "HA19_SS_D-Resid-Inf-Ver",
+                      "HA19_SS_D-Resid-Inf-Ver",
+                      "HA19_SS_D-Resid-Inf-Ver")
+    ..
+"Infiltracion-Residencia" = SCHEDULE-PD
+    TYPE   = "FRACTION"
+    GROUP  = "Ventilación"
+    MONTH = ( 5, 6, 9, 12)
+    DAY   = ( 27, 3, 30, 31)
+    WEEK-SCHEDULES = ( "HA19_HS0_SS_",
+                       "HA19_HS1_SS_",
+                       "HA19_HS2_SS_",
+                       "HA19_HS0_SS_")
+    ..
+"HA20_SS_D-No-Habitable" = DAY-SCHEDULE-PD
+    TYPE  = "FRACTION"
+    GROUP = "Internas"
+    INDEX = 0
+    VALUES  = ( 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00)
+    ..
+  "HA20_HS0_SS_" = WEEK-SCHEDULE-PD
+    TYPE  = FRACTION
+    DAY-SCHEDULES = ( "HA20_SS_D-No-Habitable",
+                      "HA20_SS_D-No-Habitable",
+                      "HA20_SS_D-No-Habitable",
+                      "HA20_SS_D-No-Habitable",
+                      "HA20_SS_D-No-Habitable",
+                      "HA20_SS_D-No-Habitable",
+                      "HA20_SS_D-No-Habitable")
+    ..
+"Anual-No-Habitable" = SCHEDULE-PD
+    TYPE   = "FRACTION"
+    GROUP  = "Internas"
+    MONTH = ( 12)
+    DAY   = ( 31)
+    WEEK-SCHEDULES = ( "HA20_HS0_SS_")
+    ..
+"HA21_SS_D-No-habitable-Func" = DAY-SCHEDULE-PD
+    TYPE  = "ON/OFF"
+    GROUP = "Equipos"
+    INDEX = 0
+    VALUES  = ( 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+    ..
+  "HA21_HS0_SS_" = WEEK-SCHEDULE-PD
+    TYPE  = ON/OFF
+    DAY-SCHEDULES = ( "HA21_SS_D-No-habitable-Func",
+                      "HA21_SS_D-No-habitable-Func",
+                      "HA21_SS_D-No-habitable-Func",
+                      "HA21_SS_D-No-habitable-Func",
+                      "HA21_SS_D-No-habitable-Func",
+                      "HA21_SS_D-No-habitable-Func",
+                      "HA21_SS_D-No-habitable-Func")
+    ..
+"Anual-No-habitable-Func" = SCHEDULE-PD
+    TYPE   = "ON/OFF"
+    GROUP  = "Equipos"
+    MONTH = ( 12)
+    DAY   = ( 31)
+    WEEK-SCHEDULES = ( "HA21_HS0_SS_")
+    ..
+"HA22_SS_D-No-habitable-Inf" = DAY-SCHEDULE-PD
+    TYPE  = "FRACTION"
+    GROUP = "Ventilación"
+    INDEX = 0
+    VALUES  = ( 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00)
+    ..
+  "HA22_HS0_SS_" = WEEK-SCHEDULE-PD
+    TYPE  = FRACTION
+    DAY-SCHEDULES = ( "HA22_SS_D-No-habitable-Inf",
+                      "HA22_SS_D-No-habitable-Inf",
+                      "HA22_SS_D-No-habitable-Inf",
+                      "HA22_SS_D-No-habitable-Inf",
+                      "HA22_SS_D-No-habitable-Inf",
+                      "HA22_SS_D-No-habitable-Inf",
+                      "HA22_SS_D-No-habitable-Inf")
+    ..
+"Anual-No-habitable-Inf" = SCHEDULE-PD
+    TYPE   = "FRACTION"
+    GROUP  = "Ventilación"
+    MONTH = ( 12)
+    DAY   = ( 31)
+    WEEK-SCHEDULES = ( "HA22_HS0_SS_")
+    ..
+$
+$ +----------------------------+
+$ | DESCRIPCIÓN DE CONDICIONES |
+$ +----------------------------+
+$
+$
+$ +------------------+
+$ | PUENTES TÉRMICOS |
+$ +------------------+
+$
+"LONGITUDES_CALCULADAS" = THERMAL-BRIDGE
+      LONG-TOTAL = 0.000000
+      DEFINICION = 1
+    ..
+"FRENTE_FORJADO" = THERMAL-BRIDGE
+      LONG-TOTAL = 19.399952
+      DEFINICION = 3
+      TTL    = 0.006923
+      LISTA-N   = ( "Frentes de forjados - Forjado no interrumpe el aislamiento en fachada") 
+       LISTA-L   = ( 100)
+       LISTA-MURO   = ( 0.400000)
+       LISTA-MARCO   = ( 0.300000) 
+      FRSI        = 0.45
+      ANGLE-MIN   = 135
+      ANGLE-MAX   = 225
+      TYPE        = SLAB
+      PARTITION   = YES
+    ..
+"UNION_CUBIERTA" = THERMAL-BRIDGE
+      LONG-TOTAL = 79.335678
+      DEFINICION = 3
+      TTL    = 0.274769
+      LISTA-N   = ( "Cubiertas planas - Forjado no interrumpe el aislamiento en fachada") 
+       LISTA-L   = ( 100)
+       LISTA-MURO   = ( 0.400000)
+       LISTA-MARCO   = ( 0.300000) 
+      FRSI        = 0.28
+      ANGLE-MIN   = 0
+      ANGLE-MAX   = 135
+      TYPE        = SLAB
+      PARTITION   = BOTH
+    ..
+"ESQUINA_CONVEXA_FORJADO" = THERMAL-BRIDGE
+      LONG-TOTAL = 0.000000
+      DEFINICION = 1
+      TTL    = 0.860000
+      FRSI        = 0.03
+      ANGLE-MIN   = 225
+      ANGLE-MAX   = 360
+      TYPE        = MASONRY
+      PARTITION   = BOTH
+    ..
+"ESQUINA_CONCAVA" = THERMAL-BRIDGE
+      LONG-TOTAL = 0.000000
+      DEFINICION = 3
+      TTL    = -0.100769
+      LISTA-N   = ( "Esquinas entrantes") 
+       LISTA-L   = ( 100)
+       LISTA-MURO   = ( 0.400000)
+       FRSI        = 0.02
+      ANGLE-MIN   = 0
+      ANGLE-MAX   = 135
+      TYPE        = MASONRY
+      PARTITION   = BOTH
+    ..
+"ESQUINA_CONVEXA" = THERMAL-BRIDGE
+      LONG-TOTAL = 14.590000
+      DEFINICION = 3
+      TTL    = 0.073846
+      LISTA-N   = ( "Esquinas salientes") 
+       LISTA-L   = ( 100)
+       LISTA-MURO   = ( 0.400000)
+       FRSI        = 0.32
+      ANGLE-MIN   = 225
+      ANGLE-MAX   = 360
+      TYPE        = SLAB
+      PARTITION   = BOTH
+    ..
+"PILAR" = THERMAL-BRIDGE
+      LONG-TOTAL = 1.000000
+      DEFINICION = 3
+      TTL    = 0.006923
+      LISTA-N   = ( "Pilar aislado") 
+       LISTA-L   = ( 100)
+       LISTA-MURO   = ( 0.400000)
+       LISTA-MARCO   = ( 0.300000) 
+      FRSI        = 0.2
+      TYPE        = PILLAR
+    ..
+"HUECO_CAPIALZADO" = THERMAL-BRIDGE
+      LONG-TOTAL = 26.140003
+      DEFINICION = 3
+      TTL    = 0.103846
+      LISTA-N   = ( "Dintel - Continuidad entre aislamiento de muro y carpinteria") 
+       LISTA-L   = ( 100)
+       LISTA-MURO   = ( 0.400000)
+       LISTA-MARCO   = ( 2.200000) 
+      FRSI        = 0.17
+      TYPE        = WINDOW-FRAME
+    ..
+"HUECO_JAMBA" = THERMAL-BRIDGE
+      LONG-TOTAL = 54.399998
+      DEFINICION = 3
+      TTL    = 0.016923
+      LISTA-N   = ( "Jamba - Continuidad entre aislamiento de muro y carpinteria") 
+       LISTA-L   = ( 100)
+       LISTA-MURO   = ( 0.400000)
+       LISTA-MARCO   = ( 2.200000) 
+      FRSI        = 0.17
+      TYPE        = WINDOW-FRAME
+    ..
+"HUECO_ALFEIZAR" = THERMAL-BRIDGE
+      LONG-TOTAL = 26.140003
+      DEFINICION = 3
+      TTL    = 0.086923
+      LISTA-N   = ( "Alfeizar - Continuidad entre el aislamiento de muro y la carpinteria") 
+       LISTA-L   = ( 100)
+       LISTA-MURO   = ( 0.400000)
+       LISTA-MARCO   = ( 2.200000) 
+      FRSI        = 0.17
+      TYPE        = WINDOW-FRAME
+    ..
+"UNION_SOLERA_PAREDEXT" = THERMAL-BRIDGE
+      LONG-TOTAL = 22.400143
+      DEFINICION = 1
+      TTL    = 0.570000
+      FRSI        = 0.09
+      ANGLE-MIN   = 135
+      ANGLE-MAX   = 225
+      TYPE        = UNDER-EXT
+      PARTITION   = BOTH
+    ..
+$
+$ +-----------------------------------------------------------------+
+$ |                        Final del fichero                        |
+$ +-----------------------------------------------------------------+
+]]>
+	</EntradaGraficaLIDER>
+	<Definicion_Sistema>
+		<elementos>
+			<FactoresDeCorreccion>
+				<CurvaComportamiento nombre="ren_FCP_Tiempo-EQ_Caldera-ACS-Electrica-Defecto">
+					<nombre_usuario>ren_FCP_Tiempo-EQ_Caldera-ACS-Electrica-Defecto</nombre_usuario>
+					<tipoObjeto>EQ_Caldera</tipoObjeto>
+					<tipoPropiedad>ren_FCP_Tiempo</tipoPropiedad>
+					<numeroVariablesIndependientes>1</numeroVariablesIndependientes>
+					<nombreVI_1>Factor Carga Parcial</nombreVI_1>
+					<minVI_1>0</minVI_1>
+					<maxVI_1>1</maxVI_1>
+					<coeficientes>"1;0"</coeficientes>
+					<exponentes>"0;1"</exponentes>
+				</CurvaComportamiento>
+				<CurvaComportamiento nombre="ren_FCP_Potencia-EQ_Caldera-unidad">
+					<nombre_usuario>ren_FCP_Potencia-EQ_Caldera-unidad</nombre_usuario>
+					<tipoObjeto>EQ_Caldera</tipoObjeto>
+					<tipoPropiedad>ren_FCP_Potencia</tipoPropiedad>
+					<numeroVariablesIndependientes>1</numeroVariablesIndependientes>
+					<nombreVI_1>Factor Carga Parcial</nombreVI_1>
+					<minVI_1>0</minVI_1>
+					<maxVI_1>1</maxVI_1>
+					<coeficientes>"1;0"</coeficientes>
+					<exponentes>"0;1"</exponentes>
+				</CurvaComportamiento>
+				<CurvaComportamiento nombre="ren_T-EQ_Caldera-unidad">
+					<nombre_usuario>ren_T-EQ_Caldera-unidad</nombre_usuario>
+					<tipoObjeto>EQ_Caldera</tipoObjeto>
+					<tipoPropiedad>ren_T</tipoPropiedad>
+					<numeroVariablesIndependientes>1</numeroVariablesIndependientes>
+					<nombreVI_1>Temperatura impulsion</nombreVI_1>
+					<minVI_1>0</minVI_1>
+					<maxVI_1>1</maxVI_1>
+					<coeficientes>"1;0"</coeficientes>
+					<exponentes>"0;1"</exponentes>
+				</CurvaComportamiento>
+				<CurvaComportamiento nombre="cap_T-EQ_Caldera-unidad">
+					<nombre_usuario>cap_T-EQ_Caldera-unidad</nombre_usuario>
+					<tipoObjeto>EQ_Caldera</tipoObjeto>
+					<tipoPropiedad>cap_T</tipoPropiedad>
+					<numeroVariablesIndependientes>1</numeroVariablesIndependientes>
+					<nombreVI_1>Temperatura impulsion</nombreVI_1>
+					<minVI_1>0</minVI_1>
+					<maxVI_1>1</maxVI_1>
+					<coeficientes>"1;0"</coeficientes>
+					<exponentes>"0;1"</exponentes>
+				</CurvaComportamiento>
+			</FactoresDeCorreccion>
+			<Sistemas>
+				<SIS_Acs nombre="SIS">
+					<nombre_usuario>SIS_ACS</nombre_usuario>
+					<porcentajeES>70</porcentajeES>
+					<contribucionSolarMinima>50</contribucionSolarMinima>
+					<multiplicador>1</multiplicador>
+					<tImpulsion>60</tImpulsion>
+					<equipos>
+						<EQ_Caldera nombre="SIS_EQ1">
+							<nombre_usuario>SIS_EQ2_EQ_Caldera-ACS-Electrica-Defecto</nombre_usuario>
+							<capNom>2.00</capNom>
+							<renNom>0.90</renNom>
+							<tipoEnergia>"Electricidad"</tipoEnergia>
+							<tipoCaldera>electrica</tipoCaldera>
+							<cap_T>"cap_T-EQ_Caldera-unidad"</cap_T>
+							<ren_T>"ren_T-EQ_Caldera-unidad"</ren_T>
+							<ren_FCP_Potencia>"ren_FCP_Potencia-EQ_Caldera-unidad"</ren_FCP_Potencia>
+							<ren_FCP_Tiempo>"ren_FCP_Tiempo-EQ_Caldera-ACS-Electrica-Defecto"</ren_FCP_Tiempo>
+						</EQ_Caldera>
+						<EQ_Acumulador_AC nombre="SIS_EQ2">
+							<nombre_usuario>SIS_EQ1_Acumulador_de_agua_caliente</nombre_usuario>
+							<Volumen>250</Volumen>
+							<UA>1</UA>
+							<tConsignaBaja>60</tConsignaBaja>
+							<tConsignaAlta>80</tConsignaAlta>
+							<temperaturaEntrada>14.7</temperaturaEntrada>
+							<temperaturaAmbiente>25</temperaturaAmbiente>
+						</EQ_Acumulador_AC>
+					</equipos>
+					<demandas>
+						<DemandaACS nombre="SIS_ACS1">
+							<perfilDiario>Demanda_Hor</perfilDiario>
+							<conACSDiario>84</conACSDiario>
+							<TUso>60</TUso>
+							<TRed>14.6999998092651</TRed>
+							<nombre_usuario>SIS_ACS1_Demanda_de_ACS</nombre_usuario>
+						</DemandaACS>
+					</demandas>
+				</SIS_Acs>
+			</Sistemas>
+		</elementos>
+	</Definicion_Sistema>
+</CTE-HE-XML>

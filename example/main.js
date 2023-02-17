@@ -117,7 +117,7 @@ async function aCerma() {
   const propiedades = [];
   const propiedadesLimpio = [];
   const wallsIDs = await manager.getAllItemsOfType(0, IFCWALLSTANDARDCASE, false);
-  // console.log(wallsIDs);
+  console.log(wallsIDs);
   for (const wallID of wallsIDs) {
     // console.log(viewer.IFC);
     // console.log(wallID);
@@ -204,6 +204,8 @@ const loadIfc = async (event) => {
   model = await viewer.IFC.loadIfc(event.target.files[0], false);
   // model.material.forEach(mat => mat.side = 2);
 
+  aCerma();
+  
   if(first) first = false
   else {
     ClippingEdges.forceStyleUpdate = true;
@@ -215,9 +217,56 @@ const loadIfc = async (event) => {
   await viewer.shadowDropper.renderShadow(model.modelID);
 
   overlay.classList.add('hidden');
-  aCerma();
 
 };
+
+ 
+function XML2jsobj(node) {
+  /**
+   * XML2jsobj v1.0
+   * Converts XML to a JavaScript object
+   * so it can be handled like a JSON message
+   *
+   * By Craig Buckler, @craigbuckler, http://optimalworks.net
+   *
+   * As featured on SitePoint.com:
+   * http://www.sitepoint.com/xml-to-javascript-object/
+   *
+   * Please use as you wish at your own risk.
+   */
+	var	data = {};
+	// append a value
+	function Add(name, value) {
+		if (data[name]) {
+			if (data[name].constructor != Array) {
+				data[name] = [data[name]];
+			}
+			data[name][data[name].length] = value;
+		}
+		else {
+			data[name] = value;
+		}
+	};
+	// element attributes
+	var c, cn;
+	for (c = 0; cn = node.attributes[c]; c++) {
+		Add(cn.name, cn.value);
+	}
+	// child elements
+	for (c = 0; cn = node.childNodes[c]; c++) {
+		if (cn.nodeType == 1) {
+			if (cn.childNodes.length == 1 && cn.firstChild.nodeType == 3) {
+				// text value
+				Add(cn.nodeName, cn.firstChild.nodeValue);
+			}
+			else {
+				// sub-object
+				Add(cn.nodeName, XML2jsobj(cn));
+			}
+		}
+	}
+	return data;
+}
 
 // let textoaCerma ='';
 async function miload() {
@@ -259,8 +308,28 @@ async function miload() {
   });
 
   model = await viewer.IFC.loadIfcUrl("models/"+query+".ifc", false);
-    
+
+
+// adquisición de datos desde el fichero ...gb.xml
+  var url = "models/" + query + ".xml";
+  // AJAX request
+  var xhr = (window.XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP"));
+  xhr.onreadystatechange = XHRhandler;
+  xhr.open("GET", url, true);
+  xhr.send(null);
+  // handle response
+  function XHRhandler() {
+    if (xhr.readyState == 4) {
+      var obj = XML2jsobj(xhr.responseXML.documentElement);
+      xhr = null;
+      console.log('datos gbXml');
+      console.log(obj);
+    }
+  }
+
   // model.material.forEach(mat => mat.side = 2);
+
+  aCerma();
 
   if (first) first = false
   else {
@@ -273,8 +342,6 @@ async function miload() {
   await viewer.shadowDropper.renderShadow(model.modelID);
 
   overlay.classList.add('hidden');
-    
-  aCerma();
 
 };
 
@@ -332,19 +399,14 @@ async function opendir() {
       divListaarchivos.style.position="fixed";		
       divListaarchivos.id="divColores";						document.getElementsByTagName('body')[0].appendChild(divListaarchivos);
       
-
-
       listaArchivos.forEach((archivo) => {
         const row = document.createElement('div');         divListaarchivos.appendChild(row);
         row.className = 'row';
-        // row.onclick = 'parent.open(`index.html?'+archivo[0]+'`)';
         row.setAttribute('onclick', 'parent.open(`index.html?'+archivo[0]+'`)');
-        // row.value = 'click to open model';
         row.setAttribute('title', 'click to open model');
           const cell = document.createElement('div');         row.appendChild(cell);
           cell.className = 'cell colIni';
           cell.innerHTML = archivo[0];
-          // cell.setAttribute('value', 'click to open model');
 
           const cell2 = document.createElement('div');         row.appendChild(cell2);
           cell2.className = 'cell textPeque';
@@ -364,8 +426,6 @@ async function opendir() {
   enviaArray["datos"]= {pru:pru};
   hr.send(JSON.stringify(enviaArray));	
 }
-
-
 
 //Setup UI
 const loadButton = createSideMenuButton('./resources/folder-icon.svg');

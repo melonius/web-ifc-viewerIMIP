@@ -1,0 +1,74 @@
+<?xml version="1.0"?>
+<svg xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://web.resource.org/cc/" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:svg="http://www.w3.org/2000/svg" id="svg1" height="128pt" width="128pt">
+  <defs id="defs3">
+    <linearGradient id="linearGradient836">
+      <stop id="stop837" stop-color="#fff" stop-opacity="0" offset="0"/>
+      <stop id="stop838" stop-color="#fff" offset="1"/>
+    </linearGradient>
+    <linearGradient id="linearGradient839" y2=".013744" xlink:href="#linearGradient836" y1=".3906" x2=".47235" x1=".47235"/>
+    <radialGradient id="radialGradient840" fx=".51299" fy=".092105">
+      <stop id="stop1398" stop-opacity=".53725" offset="0"/>
+      <stop id="stop1400" stop-color="#fff" stop-opacity=".26667" offset=".5"/>
+      <stop id="stop1401" stop-opacity=".13333" offset=".75"/>
+      <stop id="stop1399" stop-opacity="0" offset="1"/>
+    </radialGradient>
+    <linearGradient id="linearGradient860" y1=".74342" x2=".94079" x1=".21711" y2=".092105">
+      <stop id="stop833" stop-color="#323232" offset="0"/>
+      <stop id="stop1430" offset=".5"/>
+      <stop id="stop834" stop-color="#fff" offset="1"/>
+    </linearGradient>
+    <linearGradient id="linearGradient863" y2="-.041667" xlink:href="#linearGradient836" y1=".48611" x2=".65068" x1=".5274"/>
+    <radialGradient id="radialGradient1402" fx=".53289" fy=".013158" cy=".44079" cx=".48684" r=".76976">
+      <stop id="stop842" stop-color="#fff" offset="0"/>
+      <stop id="stop844" stop-color="#dadada" offset=".5038"/>
+      <stop id="stop845" stop-color="#bdbdbd" offset=".5138"/>
+      <stop id="stop846" stop-color="#dedede" offset=".64667"/>
+      <stop id="stop843" stop-color="#fff" offset="1"/>
+    </radialGradient>
+    <radialGradient id="radialGradient1415" fx=".52632" fy=".71711" cy=".46053" cx=".48684" r=".76976">
+      <stop id="stop1417" stop-opacity="0" offset="0"/>
+      <stop id="stop1419" stop-opacity="0" offset=".5"/>
+      <stop id="stop1418" offset="1"/>
+    </radialGradient>
+  </defs>
+  <path id="path1395" d="m127.4 483.73a27.352 27.352 0 1 0 -54.702 0 27.352 27.352 0 1 0 54.702 0z" fill="url(#radialGradient840)" transform="matrix(2.7306 0 0 1.4884 -191.09 -608.76)" fill-rule="evenodd"/>
+  <path id="path855" d="m127.4 483.73a27.352 27.352 0 1 0 -54.702 0 27.352 27.352 0 1 0 54.702 0z" fill="url(#radialGradient1402)" transform="matrix(1.7363 0 0 1.7363 -92.186 -774.4)" fill-rule="evenodd"/>
+  <path id="path1414" d="m127.4 483.73a27.352 27.352 0 1 0 -54.702 0 27.352 27.352 0 1 0 54.702 0z" fill="url(#radialGradient1415)" transform="matrix(1.7363 0 0 1.7363 -91.905 -774.47)" fill-rule="evenodd"/>
+  <path id="path856" d="m184.98 527.64a29.511 29.511 0 1 0 -59.02 0 29.511 29.511 0 1 0 59.02 0z" stroke-opacity=".3719" fill-rule="evenodd" transform="matrix(1.2917 0 0 1.5246 -118.66 -740.16)" stroke-width="1pt" fill="url(#linearGradient839)"/>
+  <path id="path862" d="m361.33 396.64c0 63.57-51.59 115.16-115.16 115.16-63.58 0-115.17-51.59-115.17-115.16s51.59-115.17 115.17-115.17c63.57 0 115.16 51.6 115.16 115.17z" fill="url(#linearGradient863)" fill-rule="evenodd"/>
+  <path id="path1429" stroke-linejoin="round" d="m56.424 61.374h18.855v-18.955h12.609v18.955h18.952v12.609h-18.952v18.855h-12.609v-18.855h-18.855v-12.609z" stroke-opacity=".14876" stroke="#000" stroke-linecap="round" stroke-width="6.2073" fill="url(#linearGradient860)"/>
+  <metadata>
+    <rdf:RDF>
+      <cc:Work>
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+        <cc:license rdf:resource="http://creativecommons.org/licenses/publicdomain/"/>
+        <dc:publisher>
+          <cc:Agent rdf:about="http://openclipart.org/">
+            <dc:title>Openclipart</dc:title>
+          </cc:Agent>
+        </dc:publisher>
+        <dc:title>Plus Button</dc:title>
+        <dc:date>2006-12-26T00:00:00</dc:date>
+        <dc:description>clip art, clipart, </dc:description>
+        <dc:source>http://openclipart.org/detail/24737/-by--24737</dc:source>
+        <dc:creator>
+          <cc:Agent>
+            <dc:title>Anonymous</dc:title>
+          </cc:Agent>
+        </dc:creator>
+        <dc:subject>
+          <rdf:Bag>
+            <rdf:li>clip art</rdf:li>
+            <rdf:li>clipart</rdf:li>
+          </rdf:Bag>
+        </dc:subject>
+      </cc:Work>
+      <cc:License rdf:about="http://creativecommons.org/licenses/publicdomain/">
+        <cc:permits rdf:resource="http://creativecommons.org/ns#Reproduction"/>
+        <cc:permits rdf:resource="http://creativecommons.org/ns#Distribution"/>
+        <cc:permits rdf:resource="http://creativecommons.org/ns#DerivativeWorks"/>
+      </cc:License>
+    </rdf:RDF>
+  </metadata>
+</svg>
