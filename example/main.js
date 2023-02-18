@@ -399,6 +399,29 @@ async function opendir() {
       divListaarchivos.style.position="fixed";		
       divListaarchivos.id="divColores";						document.getElementsByTagName('body')[0].appendChild(divListaarchivos);
       
+      //cabecera de tabla
+      const row = document.createElement('div');         divListaarchivos.appendChild(row);
+      row.className = 'row';
+        const cell = document.createElement('div');         row.appendChild(cell);
+        cell.className = 'cell colIni';
+        cell.innerHTML = "IFC";
+
+        const cell2 = document.createElement('div');         row.appendChild(cell2);
+        cell2.className = 'cell textPeque';
+        cell2.innerHTML = "";
+
+        const cell3 = document.createElement('div');         row.appendChild(cell3);
+        cell3.className = 'cell textPeque';
+        cell3.innerHTML = "";
+
+        const cell4 = document.createElement('div');         row.appendChild(cell4);
+        cell4.className = 'cell textPeque';
+        cell4.innerHTML = "(gb)XML";
+
+        const cell5 = document.createElement('div');         row.appendChild(cell5);
+        cell5.className = 'cell textPeque';
+        cell5.innerHTML = "";
+
       listaArchivos.forEach((archivo) => {
         const row = document.createElement('div');         divListaarchivos.appendChild(row);
         row.className = 'row';
@@ -415,6 +438,25 @@ async function opendir() {
           const cell3 = document.createElement('div');         row.appendChild(cell3);
           cell3.className = 'cell textPeque';
           cell3.innerHTML = archivo[2];
+
+          const cell4 = document.createElement('div');         row.appendChild(cell4);
+          cell4.className = 'cell textPeque';
+           if (typeof archivo[3] !== 'undefined') {
+            cell4.innerHTML = archivo[3];
+          } else {
+            cell4.innerHTML = "";
+          }
+  
+          const cell5 = document.createElement('div');         row.appendChild(cell5);
+          cell5.className = 'cell textPeque';
+           if (typeof archivo[4] !== 'undefined') {
+            cell5.innerHTML = archivo[4];
+          } else {
+            cell5.innerHTML = "";
+          }
+  
+
+
       });
       // divListaarchivos.style.visibility = "visible";
       // divListaarchivos.style.display = "block";
