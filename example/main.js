@@ -116,28 +116,70 @@ async function aCerma() {
 
   const propiedades = [];
   const propiedadesLimpio = [];
-  const wallsIDs = await manager.getAllItemsOfType(0, IFCWALLSTANDARDCASE, false);
-  console.log(wallsIDs);
+  const wallsIDs = await manager.getAllItemsOfType(0, IFCWALL, false);
+
   for (const wallID of wallsIDs) {
-    // console.log(viewer.IFC);
-    // console.log(wallID);
-    const properties = await viewer.IFC.loader.ifcManager.properties.getItemProperties(0, wallID);
-    // console.log(properties);
-
-    propiedades[wallID]=properties;
-    propiedadesLimpio[wallID]={nombre: properties.ObjectType.value, tag: properties.Tag.value};
-
     const psetsIDs = await viewer.IFC.loader.ifcManager.properties.getPropertySets(0, wallID);
+    let wallData = [];
     for (const psetsID of psetsIDs) {
-      // console.log(psetsID);
       const pset = await viewer.IFC.loader.ifcManager.properties.getItemProperties(0, psetsID.expressID);
-      // console.log(pset);
-      for (const propID of pset.HasProperties) {
-        const data = await viewer.IFC.loader.ifcManager.properties.getItemProperties(0, propID.value);
-        // console.log(data);
+
+      if(pset.Name.value == "PSET Wall Material Takeoff")
+      {
+        if(pset.HasProperties)
+        {
+          for (const propID of pset.HasProperties) {
+            const data = await viewer.IFC.loader.ifcManager.properties.getItemProperties(0, propID.value);
+            if(data.Name.value == "Heat Transfer Coefficient (U)")
+            {
+              wallData.push({nombre: "U", tag: data.NominalValue.value})
+            }
+            if(data.Name.value == "Area")
+            {
+              wallData.push({nombre: "Area", tag: data.NominalValue.value})
+            }
+          }
+        }
       }
     }
+    propiedades[wallID] = wallData;
+    propiedadesLimpio[wallID] = wallData;
+    console.log(wallData);
   }
+
+  const windowsIDs = await manager.getAllItemsOfType(0, IFCWINDOW, false);
+  for (const windowID of windowsIDs) {
+    const psetsIDs = await viewer.IFC.loader.ifcManager.properties.getPropertySets(0, windowID);
+    let windowData = [];
+    for (const psetsID of psetsIDs) {
+      const pset = await viewer.IFC.loader.ifcManager.properties.getItemProperties(0, psetsID.expressID);         
+      if(pset.Name.value == "Pset_WindowCommon" || pset.Name.value == "Cotas")
+      {
+        if(pset.HasProperties)
+        {
+          for (const propID of pset.HasProperties) {
+            const data = await viewer.IFC.loader.ifcManager.properties.getItemProperties(0, propID.value);
+            if(data.Name.value == "ThermalTransmittance")
+            {
+              windowData.push({nombre: "U", tag: data.NominalValue.value})
+            }
+            if(data.Name.value == "Altura")
+            {
+              windowData.push({nombre: "Altura", tag: data.NominalValue.value})
+            }
+            if(data.Name.value == "Anchura")
+            {
+              windowData.push({nombre: "Anchura", tag: data.NominalValue.value})
+            }
+          }
+        }
+      }
+    }
+    propiedades[windowID] = windowData;
+    propiedadesLimpio[windowID] = windowData;
+    console.log(windowData);
+  }
+
   for (const prop in propiedadesLimpio) {
     if (propiedadesLimpio.hasOwnProperty(prop)) {
       textoaCerma += propiedadesLimpio[prop]['nombre']+' '+propiedadesLimpio[prop].tag+"\n";
@@ -201,7 +243,26 @@ const loadIfc = async (event) => {
     [IFCOPENINGELEMENT]: false
   });
 
+  let url = event.target.files[0].name;
+  url = "models/" + url.replace(".ifc", ".xml");
+  console.log(url);
+  // AJAX request
+  var xhr = (window.XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP"));
+  xhr.onreadystatechange = XHRhandler;
+  xhr.open("GET", url, true);
+  xhr.send(null);
+  // handle response
+  function XHRhandler() {
+    if (xhr.readyState == 4) {
+      var obj = XML2jsobj(xhr.responseXML.documentElement);
+      xhr = null;
+      console.log('datos gbXml');
+      console.log(obj);
+    }
+  }
+
   model = await viewer.IFC.loadIfc(event.target.files[0], false);
+
   // model.material.forEach(mat => mat.side = 2);
 
   aCerma();
