@@ -1,7 +1,7 @@
 import { CameraProjections, IfcViewerAPI } from 'web-ifc-viewer';
 import { createSideMenuButton } from './utils/gui-creator';
 import {
-  IFCSPACE, IFCOPENINGELEMENT, IFCFURNISHINGELEMENT, IFCWALL, IFCWINDOW, IFCCURTAINWALL, IFCMEMBER, IFCPLATE, IFCWALLSTANDARDCASE
+  IFCSPACE, IFCOPENINGELEMENT, IFCFURNISHINGELEMENT, IFCWALL, IFCWINDOW, IFCCURTAINWALL, IFCMEMBER, IFCPLATE, IFCWALLSTANDARDCASE, IFCROOF, IFCSLAB
 } from 'web-ifc';
 import {
   MeshBasicMaterial,
@@ -163,6 +163,10 @@ async function aCerma() {
             {
               windowData.push({nombre: "U", tag: data.NominalValue.value})
             }
+            if(data.Name.value == "\\X\\C1rea")
+            {
+              windowData.push({nombre: "Area", tag: data.NominalValue.value})
+            }
             if(data.Name.value == "Altura")
             {
               windowData.push({nombre: "Altura", tag: data.NominalValue.value})
@@ -180,6 +184,68 @@ async function aCerma() {
     console.log(windowData);
   }
 
+  const roofsIDs = await manager.getAllItemsOfType(0, IFCROOF, false);
+
+  for (const roofID of roofsIDs) {
+    const psetsIDs = await viewer.IFC.loader.ifcManager.properties.getPropertySets(0, roofID);
+    let roofData = [];
+    for (const psetsID of psetsIDs) {
+      const pset = await viewer.IFC.loader.ifcManager.properties.getItemProperties(0, psetsID.expressID);
+
+      if(pset.Name.value == "PSET Roof Material Takeoff")
+      {
+        if(pset.HasProperties)
+        {
+          for (const propID of pset.HasProperties) {
+            const data = await viewer.IFC.loader.ifcManager.properties.getItemProperties(0, propID.value);
+            if(data.Name.value == "Heat Transfer Coefficient (U)")
+            {
+              roofData.push({nombre: "U", tag: data.NominalValue.value})
+            }
+            if(data.Name.value == "Area")
+            {
+              roofData.push({nombre: "Area", tag: data.NominalValue.value})
+            }
+          }
+        }
+      }
+    }
+    propiedades[roofID] = roofData;
+    propiedadesLimpio[roofID] = roofData;
+    console.log(roofData);
+  }
+
+  const slabsIDs = await manager.getAllItemsOfType(0, IFCSLAB, false);
+
+  for (const slabsID of slabsIDs) {
+    const psetsIDs = await viewer.IFC.loader.ifcManager.properties.getPropertySets(0, slabsID);
+    let slabData = [];
+    for (const psetsID of psetsIDs) {
+      const pset = await viewer.IFC.loader.ifcManager.properties.getItemProperties(0, psetsID.expressID);
+
+      if(pset.Name.value == "Pset_SlabCommon" || pset.Name.value == "Cotas")
+      {
+        if(pset.HasProperties)
+        {
+          for (const propID of pset.HasProperties) {
+            const data = await viewer.IFC.loader.ifcManager.properties.getItemProperties(0, propID.value);
+            if(data.Name.value == "ThermalTransmittance")
+            {
+              slabData.push({nombre: "U", tag: data.NominalValue.value})
+            }
+            if(data.Name.value == '\\X\\C1rea')
+            {
+              slabData.push({nombre: "Area", tag: data.NominalValue.value})
+            }
+          }
+        }
+      }
+    }
+    propiedades[slabsID] = slabData;
+    propiedadesLimpio[slabsID] = slabData;
+    console.log(slabData);
+  }
+  
   for (const prop in propiedadesLimpio) {
     if (propiedadesLimpio.hasOwnProperty(prop)) {
       textoaCerma += propiedadesLimpio[prop]['nombre']+' '+propiedadesLimpio[prop].tag+"\n";
