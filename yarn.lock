@@ -1884,6 +1884,11 @@
   "resolved" "https://registry.npmjs.org/dxf-writer/-/dxf-writer-1.15.1.tgz"
   "version" "1.15.1"
 
+"earcut@^2.2.4":
+  "integrity" "sha512-/pjZsA1b4RPHbeWZQn66SWS8nZZWLQQ23oE3Eam7aroEFGEvwKAsJfZ9ytiEMycfzXWpca4FA9QIOehf7PocBQ=="
+  "resolved" "https://registry.npmjs.org/earcut/-/earcut-2.2.4.tgz"
+  "version" "2.2.4"
+
 "electron-to-chromium@^1.3.723":
   "integrity" "sha512-4NhcsfZYlr1x4FehYkK+R9CNNTOZ8vLcIu8Y1uWehxYp5r/jlCGAfBqChIubEfdtX+rBQpXx4yJuX/dzILH/nw=="
   "resolved" "https://registry.npmjs.org/electron-to-chromium/-/electron-to-chromium-1.3.765.tgz"
@@ -5389,12 +5394,13 @@
   "version" "1.0.213"
   dependencies:
     "dxf-writer" "^1.15.1"
+    "earcut" "^2.2.4"
     "jspdf" "^2.4.0"
     "stats.js" "0.17.0"
     "three" "0.135"
     "three-mesh-bvh" "^0.5.11"
     "web-ifc" "^0.0.35"
-    "web-ifc-viewer" "1.0.206"
+    "web-ifc-viewer" "1.0.213"
 
 "web-ifc-viewer@1.0.213", "web-ifc-viewer@file:C:\\Users\\qmoya\\Desktop\\PROGRAMES\\VSCODE\\IMIP\\web-ifc-viewerIMIP\\viewer":
   "resolved" "file:viewer"
@@ -5405,7 +5411,7 @@
     "gsap" "^3.7.1"
     "three-mesh-bvh" "^0.5.11"
     "web-ifc" "^0.0.35"
-    "web-ifc-three" "^0.0.117"
+    "web-ifc-three" "^0.0.118"
 
 "web-ifc@^0.0.35":
   "integrity" "sha512-if/L9RiJAD+jJ1oWtHj44+o2NG6K6azK0otE9Pbppr5hNBnouYfJQNmnHZ+Ya+wZeaByo9KeU64D60Y6lFnT4w=="

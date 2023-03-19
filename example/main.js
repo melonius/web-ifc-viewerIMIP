@@ -13,6 +13,7 @@ import {
 } from 'three';
 import { ClippingEdges } from 'web-ifc-viewer/dist/components/display/clipping-planes/clipping-edges';
 import Stats from 'stats.js/src/Stats';
+import { Earcut } from 'three/src/extras/Earcut';
 
 const container = document.getElementById('viewer-container');
 const viewer = new IfcViewerAPI({ container, backgroundColor: new Color(255, 255, 255) });
@@ -99,6 +100,7 @@ async function getAllWallMeshes() {
 }
 
 
+let gbxmlData;
 
 // viewer.IFC.loader.ifcManager.useWebWorkers(true, 'files/IFCWorker.js');
 viewer.IFC.setWasmPath('files/');
@@ -144,7 +146,7 @@ async function aCerma() {
     }
     propiedades[wallID] = wallData;
     propiedadesLimpio[wallID] = wallData;
-    console.log(wallData);
+    //console.log(wallData);
   }
 
   const windowsIDs = await manager.getAllItemsOfType(0, IFCWINDOW, false);
@@ -181,7 +183,7 @@ async function aCerma() {
     }
     propiedades[windowID] = windowData;
     propiedadesLimpio[windowID] = windowData;
-    console.log(windowData);
+    //console.log(windowData);
   }
 
   const roofsIDs = await manager.getAllItemsOfType(0, IFCROOF, false);
@@ -212,7 +214,7 @@ async function aCerma() {
     }
     propiedades[roofID] = roofData;
     propiedadesLimpio[roofID] = roofData;
-    console.log(roofData);
+    //console.log(roofData);
   }
 
   const slabsIDs = await manager.getAllItemsOfType(0, IFCSLAB, false);
@@ -243,15 +245,50 @@ async function aCerma() {
     }
     propiedades[slabsID] = slabData;
     propiedadesLimpio[slabsID] = slabData;
-    console.log(slabData);
+    //console.log(slabData);
   }
   
+  for(const surf in gbxmlData.Campus.Surface)
+  {
+    const data = gbxmlData.Campus.Surface[surf].PlanarGeometry;
+    const coordsList = [];
+    for(const pt in data.PolyLoop.CartesianPoint)
+    {
+      const point = data.PolyLoop.CartesianPoint[pt];
+      coordsList.push(point.Coordinate[0]);
+      coordsList.push(point.Coordinate[1]);
+      coordsList.push(point.Coordinate[2]);
+    }
+    const triangles = Earcut.triangulate(coordsList, null, 3);
+    const scene = viewer.IFC.context.getScene();
+    const geometry = new BufferGeometry();
+    const vertices = new Float32Array(triangles.length * 3);
+    let id = 0;
+    for(const idx in triangles)
+    {
+      let pt = triangles[idx];
+      const point = data.PolyLoop.CartesianPoint[pt];
+      vertices[id] = point.Coordinate[0];
+      id++;
+      vertices[id] = point.Coordinate[1];
+      id++;
+      vertices[id] = point.Coordinate[2];
+      id++;
+    }
+    geometry.setAttribute( 'position', new BufferAttribute( vertices, 3 ) );
+    const material = new MeshBasicMaterial( { color: 0xff0000 } );
+    const mesh = new Mesh( geometry, material );
+    scene.add(mesh);
+  }
+
   for (const prop in propiedadesLimpio) {
     if (propiedadesLimpio.hasOwnProperty(prop)) {
       textoaCerma += propiedadesLimpio[prop]['nombre']+' '+propiedadesLimpio[prop].tag+"\n";
-      console.log(`${prop}: ${propiedadesLimpio[prop]['nombre']} tag ${propiedadesLimpio[prop].tag}`);
+      //console.log(`${prop}: ${propiedadesLimpio[prop]['nombre']} tag ${propiedadesLimpio[prop].tag}`);
     }
   }
+
+
 
   console.table (propiedades);
   console.table (propiedadesLimpio);
@@ -320,10 +357,10 @@ const loadIfc = async (event) => {
   // handle response
   function XHRhandler() {
     if (xhr.readyState == 4) {
-      var obj = XML2jsobj(xhr.responseXML.documentElement);
+      gbxmlData = XML2jsobj(xhr.responseXML.documentElement);
       xhr = null;
       console.log('datos gbXml');
-      console.log(obj);
+      console.log(gbxmlData);
     }
   }
 

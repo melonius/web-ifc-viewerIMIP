@@ -29,5 +29,8 @@
   "workspaces": [
     "viewer",
     "example"
-  ]
+  ],
+  "dependencies": {
+    "earcut": "^2.2.4"
+  }
 }
