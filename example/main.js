@@ -247,7 +247,7 @@ async function aCerma() {
     propiedadesLimpio[slabsID] = slabData;
     //console.log(slabData);
   }
-  
+
   for(const surf in gbxmlData.Campus.Surface)
   {
     const data = gbxmlData.Campus.Surface[surf].PlanarGeometry;
@@ -283,15 +283,15 @@ async function aCerma() {
 
   for (const prop in propiedadesLimpio) {
     if (propiedadesLimpio.hasOwnProperty(prop)) {
-      textoaCerma += propiedadesLimpio[prop]['nombre']+' '+propiedadesLimpio[prop].tag+"\n";
+      // textoaCerma += propiedadesLimpio[prop]['nombre']+' '+propiedadesLimpio[prop].tag+"\n";
       //console.log(`${prop}: ${propiedadesLimpio[prop]['nombre']} tag ${propiedadesLimpio[prop].tag}`);
     }
   }
 
 
 
-  console.table (propiedades);
-  console.table (propiedadesLimpio);
+  // console.table (propiedades);
+  // console.table (propiedadesLimpio);
 
   console.log('textoaCerma:');console.log(textoaCerma);
   console.log('textoaCermaDENTROdeLOAD:');console.log(textoaCerma);
@@ -366,11 +366,10 @@ const loadIfc = async (event) => {
 
   model = await viewer.IFC.loadIfc(event.target.files[0], false);
 
-  // model.material.forEach(mat => mat.side = 2);
-
   aCerma();
-  
-  if(first) first = false
+
+  model.material.forEach(mat => mat.side = 2);
+  if (first) first = false
   else {
     ClippingEdges.forceStyleUpdate = true;
   }
@@ -471,8 +470,6 @@ async function miload() {
     [IFCOPENINGELEMENT]: false
   });
 
-  model = await viewer.IFC.loadIfcUrl("models/"+query+".ifc", false);
-
 
 // adquisición de datos desde el fichero ...gb.xml
   var url = "models/" + query + ".xml";
@@ -484,14 +481,15 @@ async function miload() {
   // handle response
   function XHRhandler() {
     if (xhr.readyState == 4) {
-      var obj = XML2jsobj(xhr.responseXML.documentElement);
+      gbxmlData = XML2jsobj(xhr.responseXML.documentElement);
       xhr = null;
       console.log('datos gbXml');
-      console.log(obj);
+      console.log(gbxmlData);
     }
   }
+  model = await viewer.IFC.loadIfcUrl("models/"+query+".ifc", false);
 
-  // model.material.forEach(mat => mat.side = 2);
+  model.material.forEach(mat => mat.side = 2);
 
   aCerma();
 
@@ -547,44 +545,41 @@ async function opendir() {
   var hr = new XMLHttpRequest();
   hr.open("POST", "leedir.php", true);			////MIRAR BIEN LO DE TRUE AL FINAL
   hr.setRequestHeader("Content-type","application/json; charset=utf-8");
-  hr.onload = function(e) {
-    if (hr.response.lastIndexOf('ERROR', 0) === 0) {
+  hr.addEventListener('load', function(e) {
+      if (hr.response.lastIndexOf('ERROR', 0) === 0) {
       console.log (hr.response+".");
     } else {
       // console.log (hr.response+".");
 
-      let listaArchivos = JSON.parse(hr.response);
+      const listaArchivos = JSON.parse(hr.response);
       console.log (listaArchivos);
       // const dialogo = document.createElement('dialog');   
       const divListaarchivos = document.createElement('div');   
       // divListaarchivos.style.display="none";		
-      divListaarchivos.style.top="100px";		
-      divListaarchivos.style.left="100px";		
-      divListaarchivos.style.position="fixed";		
+      divListaarchivos.style.top="5%";		
+      divListaarchivos.style.left="5%";		
+      divListaarchivos.style.position="absolute";		
       divListaarchivos.id="divColores";						document.getElementsByTagName('body')[0].appendChild(divListaarchivos);
       
       //cabecera de tabla
       const row = document.createElement('div');         divListaarchivos.appendChild(row);
       row.className = 'row';
-        const cell = document.createElement('div');         row.appendChild(cell);
-        cell.className = 'cell colIni';
-        cell.innerHTML = "IFC";
 
-        const cell2 = document.createElement('div');         row.appendChild(cell2);
-        cell2.className = 'cell textPeque';
-        cell2.innerHTML = "";
+      const createCell = (className, innerHTML) => {
+        const cell = document.createElement('div');
+        cell.className = `cell ${className}`;
+        cell.innerHTML = innerHTML;
+        return cell;
+      };
+      
+      row.appendChild(createCell('colIni', 'IFC'));
+      row.appendChild(createCell('textPeque', ''));
+      row.appendChild(createCell('textPeque', ''));
+      row.appendChild(createCell('textPeque', '(gb)XML'));
+      row.appendChild(createCell('textPeque', ''));
 
-        const cell3 = document.createElement('div');         row.appendChild(cell3);
-        cell3.className = 'cell textPeque';
-        cell3.innerHTML = "";
 
-        const cell4 = document.createElement('div');         row.appendChild(cell4);
-        cell4.className = 'cell textPeque';
-        cell4.innerHTML = "(gb)XML";
 
-        const cell5 = document.createElement('div');         row.appendChild(cell5);
-        cell5.className = 'cell textPeque';
-        cell5.innerHTML = "";
 
       listaArchivos.forEach((archivo) => {
         const row = document.createElement('div');         divListaarchivos.appendChild(row);
@@ -618,14 +613,12 @@ async function opendir() {
           } else {
             cell5.innerHTML = "";
           }
-  
-
 
       });
       // divListaarchivos.style.visibility = "visible";
       // divListaarchivos.style.display = "block";
     }
-  };
+  });
   var enviaArray={};
   let pru = "PRU";
   // console.log ( 'tablaActual:',tablaActual,'variable:',variableCompleta, 'onoff:','off', 'servSQL:',servSQL);

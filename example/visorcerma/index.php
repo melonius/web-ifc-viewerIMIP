@@ -43,6 +43,10 @@
 			foreach(libxml_get_errors() as $error) {
 				echo "\t", $error->message;
 			}
+		} else {
+			echo "	<script>	var miXml		= '".json_encode ($xml)."';	</script>		";
+			echo "	<script>	var miXml2 = JSON.parse(miXml );	</script>		";
+			echo "	<script>	console.log (miXml2);	</script>		";
 		}
 		echo "archivo: $archivoGET";
 

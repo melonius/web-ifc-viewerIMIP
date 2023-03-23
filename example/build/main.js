@@ -38991,25 +38991,25 @@
 
     ImageBitmapLoader.prototype.isImageBitmapLoader = true;
 
-    let _context;
+    let _context$1;
 
     const AudioContext = {
 
     	getContext: function () {
 
-    		if ( _context === undefined ) {
+    		if ( _context$1 === undefined ) {
 
-    			_context = new ( window.AudioContext || window.webkitAudioContext )();
+    			_context$1 = new ( window.AudioContext || window.webkitAudioContext )();
 
     		}
 
-    		return _context;
+    		return _context$1;
 
     	},
 
     	setContext: function ( value ) {
 
-    		_context = value;
+    		_context$1 = value;
 
     	}
 
@@ -93144,10 +93144,13 @@
     function computeTriangleBounds( geo, fullBounds ) {
 
     	const posAttr = geo.attributes.position;
-    	const posArr = posAttr.array;
     	const index = geo.index.array;
     	const triCount = index.length / 3;
     	const triangleBounds = new Float32Array( triCount * 6 );
+    	const normalized = posAttr.normalized;
+
+    	// used for non-normalized positions
+    	const posArr = posAttr.array;
 
     	// support for an interleaved position buffer
     	const bufferOffset = posAttr.offset || 0;
@@ -93158,19 +93161,47 @@
 
     	}
 
+    	// used for normalized positions
+    	const getters = [ 'getX', 'getY', 'getZ' ];
+
     	for ( let tri = 0; tri < triCount; tri ++ ) {
 
     		const tri3 = tri * 3;
     		const tri6 = tri * 6;
-    		const ai = index[ tri3 + 0 ] * stride + bufferOffset;
-    		const bi = index[ tri3 + 1 ] * stride + bufferOffset;
-    		const ci = index[ tri3 + 2 ] * stride + bufferOffset;
+
+    		let ai, bi, ci;
+
+    		if ( normalized ) {
+
+    			ai = index[ tri3 + 0 ];
+    			bi = index[ tri3 + 1 ];
+    			ci = index[ tri3 + 2 ];
+
+    		} else {
+
+    			ai = index[ tri3 + 0 ] * stride + bufferOffset;
+    			bi = index[ tri3 + 1 ] * stride + bufferOffset;
+    			ci = index[ tri3 + 2 ] * stride + bufferOffset;
+
+    		}
 
     		for ( let el = 0; el < 3; el ++ ) {
 
-    			const a = posArr[ ai + el ];
-    			const b = posArr[ bi + el ];
-    			const c = posArr[ ci + el ];
+    			let a, b, c;
+
+    			if ( normalized ) {
+
+    				a = posAttr[ getters[ el ] ]( ai );
+    				b = posAttr[ getters[ el ] ]( bi );
+    				c = posAttr[ getters[ el ] ]( ci );
+
+    			} else {
+
+    				a = posArr[ ai + el ];
+    				b = posArr[ bi + el ];
+    				c = posArr[ ci + el ];
+
+    			}
 
     			let min = a;
     			if ( b < min ) min = b;
@@ -93566,7 +93597,7 @@
     		const v32 = dir2;
 
     		v02.subVectors( v0, v2 );
-    		dir1.subVectors( l1.end, l2.start );
+    		dir1.subVectors( l1.end, l1.start );
     		dir2.subVectors( l2.end, l2.start );
 
     		// float d0232 = v02.Dot(v32);
@@ -93754,6 +93785,13 @@
 
     } )();
 
+    const DIST_EPSILON = 1e-15;
+    function isNearZero( value ) {
+
+    	return Math.abs( value ) < DIST_EPSILON;
+
+    }
+
     class ExtendedTriangle extends Triangle {
 
     	constructor( ...args ) {
@@ -93766,7 +93804,7 @@
     		this.points = [ this.a, this.b, this.c ];
     		this.sphere = new Sphere();
     		this.plane = new Plane();
-    		this.needsUpdate = false;
+    		this.needsUpdate = true;
 
     	}
 
@@ -93981,20 +94019,27 @@
     			let count1 = 0;
     			for ( let i = 0; i < 3; i ++ ) {
 
-    				const p1 = points1[ i ];
-    				const p2 = points1[ ( i + 1 ) % 3 ];
+    				const p = points1[ i ];
+    				const pNext = points1[ ( i + 1 ) % 3 ];
 
-    				edge.start.copy( p1 );
-    				edge.end.copy( p2 );
+    				edge.start.copy( p );
+    				edge.end.copy( pNext );
     				edge.delta( dir1 );
-    				if ( plane2.normal.dot( dir1 ) === 0 && plane2.distanceToPoint( edge.start ) === 0 ) {
+
+    				const targetPoint = found1 ? edge1.start : edge1.end;
+    				const startIntersects = isNearZero( plane2.distanceToPoint( p ) );
+    				if ( isNearZero( plane2.normal.dot( dir1 ) ) && startIntersects ) {
 
     					// if the edge lies on the plane then take the line
     					edge1.copy( edge );
     					count1 = 2;
     					break;
 
-    				} else if ( plane2.intersectLine( edge, found1 ? edge1.start : edge1.end ) ) {
+    				}
+
+    				// check if the start point is near the plane because "intersectLine" is not robust to that case
+    				const doesIntersect = plane2.intersectLine( edge, targetPoint ) || startIntersects;
+    				if ( doesIntersect && ! isNearZero( targetPoint.distanceTo( pNext ) ) ) {
 
     					count1 ++;
     					if ( found1 ) {
@@ -94009,7 +94054,18 @@
 
     			}
 
-    			if ( count1 !== 2 ) {
+    			if ( count1 === 1 && other.containsPoint( edge1.end ) ) {
+
+    				if ( target ) {
+
+    					target.start.copy( edge1.end );
+    					target.end.copy( edge1.end );
+
+    				}
+
+    				return true;
+
+    			} else if ( count1 !== 2 ) {
 
     				return false;
 
@@ -94021,20 +94077,27 @@
     			let count2 = 0;
     			for ( let i = 0; i < 3; i ++ ) {
 
-    				const p1 = points2[ i ];
-    				const p2 = points2[ ( i + 1 ) % 3 ];
+    				const p = points2[ i ];
+    				const pNext = points2[ ( i + 1 ) % 3 ];
 
-    				edge.start.copy( p1 );
-    				edge.end.copy( p2 );
+    				edge.start.copy( p );
+    				edge.end.copy( pNext );
     				edge.delta( dir2 );
-    				if ( plane1.normal.dot( dir2 ) === 0 && plane1.distanceToPoint( edge.start ) === 0 ) {
+
+    				const targetPoint = found2 ? edge2.start : edge2.end;
+    				const startIntersects = isNearZero( plane1.distanceToPoint( p ) );
+    				if ( isNearZero( plane1.normal.dot( dir2 ) ) && startIntersects ) {
 
     					// if the edge lies on the plane then take the line
     					edge2.copy( edge );
     					count2 = 2;
     					break;
 
-    				} else if ( plane1.intersectLine( edge, found2 ? edge2.start : edge2.end ) ) {
+    				}
+
+    				// check if the start point is near the plane because "intersectLine" is not robust to that case
+    				const doesIntersect = plane1.intersectLine( edge, targetPoint ) || startIntersects;
+    				if ( doesIntersect && ! isNearZero( targetPoint.distanceTo( pNext ) ) ) {
 
     					count2 ++;
     					if ( found2 ) {
@@ -94049,7 +94112,18 @@
 
     			}
 
-    			if ( count2 !== 2 ) {
+    			if ( count2 === 1 && this.containsPoint( edge2.end ) ) {
+
+    				if ( target ) {
+
+    					target.start.copy( edge2.end );
+    					target.end.copy( edge2.end );
+
+    				}
+
+    				return true;
+
+    			} else if ( count2 !== 2 ) {
 
     				return false;
 
@@ -94074,6 +94148,7 @@
     			const e2 = edge2.end.dot( dir1 );
     			const separated1 = e1 < s2;
     			const separated2 = s1 < e2;
+
     			if ( s1 !== e2 && s2 !== e1 && separated1 === separated2 ) {
 
     				return false;
@@ -94221,13 +94296,13 @@
 
     } )();
 
-    class OrientedBox extends Box3 {
+    class OrientedBox {
 
-    	constructor( ...args ) {
-
-    		super( ...args );
+    	constructor( min, max, matrix ) {
 
     		this.isOrientedBox = true;
+    		this.min = new Vector3();
+    		this.max = new Vector3();
     		this.matrix = new Matrix4();
     		this.invMatrix = new Matrix4();
     		this.points = new Array( 8 ).fill().map( () => new Vector3() );
@@ -94236,11 +94311,16 @@
     		this.alignedSatBounds = new Array( 3 ).fill().map( () => new SeparatingAxisBounds() );
     		this.needsUpdate = false;
 
+    		if ( min ) this.min.copy( min );
+    		if ( max ) this.max.copy( max );
+    		if ( matrix ) this.matrix.copy( matrix );
+
     	}
 
     	set( min, max, matrix ) {
 
-    		super.set( min, max );
+    		this.min.copy( min );
+    		this.max.copy( max );
     		this.matrix.copy( matrix );
     		this.needsUpdate = true;
 
@@ -94248,7 +94328,8 @@
 
     	copy( other ) {
 
-    		super.copy( other );
+    		this.min.copy( other.min );
+    		this.max.copy( other.max );
     		this.matrix.copy( other.matrix );
     		this.needsUpdate = true;
 
@@ -95589,16 +95670,6 @@
     		const geometry = this.geometry;
     		const indexArr = geometry.index.array;
     		const posAttr = geometry.attributes.position;
-    		const posArr = posAttr.array;
-
-    		// support for an interleaved position buffer
-    		const bufferOffset = posAttr.offset || 0;
-    		let stride = 3;
-    		if ( posAttr.isInterleavedBufferAttribute ) {
-
-    			stride = posAttr.data.stride;
-
-    		}
 
     		let buffer, uint32Array, uint16Array, float32Array;
     		let byteOffset = 0;
@@ -95630,12 +95701,13 @@
     				let maxx = - Infinity;
     				let maxy = - Infinity;
     				let maxz = - Infinity;
+
     				for ( let i = 3 * offset, l = 3 * ( offset + count ); i < l; i ++ ) {
 
-    					const index = indexArr[ i ] * stride + bufferOffset;
-    					const x = posArr[ index + 0 ];
-    					const y = posArr[ index + 1 ];
-    					const z = posArr[ index + 2 ];
+    					const index = indexArr[ i ];
+    					const x = posAttr.getX( index );
+    					const y = posAttr.getY( index );
+    					const z = posAttr.getZ( index );
 
     					if ( x < minx ) minx = x;
     					if ( x > maxx ) maxx = x;
@@ -96060,7 +96132,7 @@
 
     		}
 
-    		this.getBoundingBox( aabb2 );
+    		otherBvh.getBoundingBox( aabb2 );
     		aabb2.applyMatrix4( matrixToLocal );
     		const result = this.shapecast( {
 
@@ -96413,180 +96485,6 @@
     	}
 
     }
-
-    // Deprecation
-    const originalRaycast = MeshBVH.prototype.raycast;
-    MeshBVH.prototype.raycast = function ( ...args ) {
-
-    	if ( args[ 0 ].isMesh ) {
-
-    		console.warn( 'MeshBVH: The function signature and results frame for "raycast" has changed. See docs for new signature.' );
-    		const [
-    			mesh, raycaster, ray, intersects,
-    		] = args;
-
-    		const results = originalRaycast.call( this, ray, mesh.material );
-    		results.forEach( hit => {
-
-    			hit = convertRaycastIntersect( hit, mesh, raycaster );
-    			if ( hit ) {
-
-    				intersects.push( hit );
-
-    			}
-
-    		} );
-
-    		return intersects;
-
-    	} else {
-
-    		return originalRaycast.apply( this, args );
-
-    	}
-
-    };
-
-    const originalRaycastFirst = MeshBVH.prototype.raycastFirst;
-    MeshBVH.prototype.raycastFirst = function ( ...args ) {
-
-    	if ( args[ 0 ].isMesh ) {
-
-    		console.warn( 'MeshBVH: The function signature and results frame for "raycastFirst" has changed. See docs for new signature.' );
-    		const [
-    			mesh, raycaster, ray,
-    		] = args;
-
-    		return convertRaycastIntersect( originalRaycastFirst.call( this, ray, mesh.material ), mesh, raycaster );
-
-    	} else {
-
-    		return originalRaycastFirst.apply( this, args );
-
-    	}
-
-    };
-
-    const originalClosestPointToPoint = MeshBVH.prototype.closestPointToPoint;
-    MeshBVH.prototype.closestPointToPoint = function ( ...args ) {
-
-
-    	if ( args[ 0 ].isMesh ) {
-
-    		console.warn( 'MeshBVH: The function signature and results frame for "closestPointToPoint" has changed. See docs for new signature.' );
-
-    		args.unshift();
-
-    		const target = args[ 1 ];
-    		const result = {};
-    		args[ 1 ] = result;
-
-    		originalClosestPointToPoint.apply( this, args );
-
-    		if ( target ) {
-
-    			target.copy( result.point );
-
-    		}
-
-    		return result.distance;
-
-    	} else {
-
-    		return originalClosestPointToPoint.apply( this, args );
-
-    	}
-
-    };
-
-    const originalClosestPointToGeometry = MeshBVH.prototype.closestPointToGeometry;
-    MeshBVH.prototype.closestPointToGeometry = function ( ...args ) {
-
-    	const target1 = args[ 2 ];
-    	const target2 = args[ 3 ];
-    	if ( target1 && target1.isVector3 || target2 && target2.isVector3 ) {
-
-    		console.warn( 'MeshBVH: The function signature and results frame for "closestPointToGeometry" has changed. See docs for new signature.' );
-
-    		const result1 = {};
-    		const result2 = {};
-    		const geometryToBvh = args[ 1 ];
-    		args[ 2 ] = result1;
-    		args[ 3 ] = result2;
-
-    		originalClosestPointToGeometry.apply( this, args );
-
-    		if ( target1 ) {
-
-    			target1.copy( result1.point );
-
-    		}
-
-    		if ( target2 ) {
-
-    			target2.copy( result2.point ).applyMatrix4( geometryToBvh );
-
-    		}
-
-    		return result1.distance;
-
-    	} else {
-
-    		return originalClosestPointToGeometry.apply( this, args );
-
-    	}
-
-    };
-
-    const originalRefit = MeshBVH.prototype.refit;
-    MeshBVH.prototype.refit = function ( ...args ) {
-
-    	const nodeIndices = args[ 0 ];
-    	const terminationIndices = args[ 1 ];
-    	if ( terminationIndices && ( terminationIndices instanceof Set || Array.isArray( terminationIndices ) ) ) {
-
-    		console.warn( 'MeshBVH: The function signature for "refit" has changed. See docs for new signature.' );
-
-    		const newNodeIndices = new Set();
-    		terminationIndices.forEach( v => newNodeIndices.add( v ) );
-    		if ( nodeIndices ) {
-
-    			nodeIndices.forEach( v => newNodeIndices.add( v ) );
-
-    		}
-
-    		originalRefit.call( this, newNodeIndices );
-
-    	} else {
-
-    		originalRefit.apply( this, args );
-
-    	}
-
-    };
-
-    [
-    	'intersectsGeometry',
-    	'shapecast',
-    	'intersectsBox',
-    	'intersectsSphere',
-    ].forEach( name => {
-
-    	const originalFunc = MeshBVH.prototype[ name ];
-    	MeshBVH.prototype[ name ] = function ( ...args ) {
-
-    		if ( args[ 0 ] === null || args[ 0 ].isMesh ) {
-
-    			args.shift();
-    			console.warn( `MeshBVH: The function signature for "${ name }" has changed and no longer takes Mesh. See docs for new signature.` );
-
-    		}
-
-    		return originalFunc.apply( this, args );
-
-    	};
-
-    } );
 
     const ray = /* @__PURE__ */ new Ray();
     const tmpInverseMatrix = /* @__PURE__ */ new Matrix4();
@@ -101014,55 +100912,31 @@
      * (c) 2017 @yomotsu
      * Released under the MIT License.
      */
-    /*! *****************************************************************************
-    Copyright (c) Microsoft Corporation.
-
-    Permission to use, copy, modify, and/or distribute this software for any
-    purpose with or without fee is hereby granted.
-
-    THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
-    REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY
-    AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
-    INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
-    LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
-    OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
-    PERFORMANCE OF THIS SOFTWARE.
-    ***************************************************************************** */
-    /* global Reflect, Promise */
-
-    var extendStatics = function(d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
-        return extendStatics(d, b);
+    // see https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/buttons#value
+    const MOUSE_BUTTON = {
+        LEFT: 1,
+        RIGHT: 2,
+        MIDDLE: 4,
     };
-
-    function __extends(d, b) {
-        if (typeof b !== "function" && b !== null)
-            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    }
-
-    var ACTION;
-    (function (ACTION) {
-        ACTION[ACTION["NONE"] = 0] = "NONE";
-        ACTION[ACTION["ROTATE"] = 1] = "ROTATE";
-        ACTION[ACTION["TRUCK"] = 2] = "TRUCK";
-        ACTION[ACTION["OFFSET"] = 3] = "OFFSET";
-        ACTION[ACTION["DOLLY"] = 4] = "DOLLY";
-        ACTION[ACTION["ZOOM"] = 5] = "ZOOM";
-        ACTION[ACTION["TOUCH_ROTATE"] = 6] = "TOUCH_ROTATE";
-        ACTION[ACTION["TOUCH_TRUCK"] = 7] = "TOUCH_TRUCK";
-        ACTION[ACTION["TOUCH_OFFSET"] = 8] = "TOUCH_OFFSET";
-        ACTION[ACTION["TOUCH_DOLLY"] = 9] = "TOUCH_DOLLY";
-        ACTION[ACTION["TOUCH_ZOOM"] = 10] = "TOUCH_ZOOM";
-        ACTION[ACTION["TOUCH_DOLLY_TRUCK"] = 11] = "TOUCH_DOLLY_TRUCK";
-        ACTION[ACTION["TOUCH_DOLLY_OFFSET"] = 12] = "TOUCH_DOLLY_OFFSET";
-        ACTION[ACTION["TOUCH_ZOOM_TRUCK"] = 13] = "TOUCH_ZOOM_TRUCK";
-        ACTION[ACTION["TOUCH_ZOOM_OFFSET"] = 14] = "TOUCH_ZOOM_OFFSET";
-    })(ACTION || (ACTION = {}));
+    const ACTION = Object.freeze({
+        NONE: 0,
+        ROTATE: 1,
+        TRUCK: 2,
+        OFFSET: 4,
+        DOLLY: 8,
+        ZOOM: 16,
+        TOUCH_ROTATE: 32,
+        TOUCH_TRUCK: 64,
+        TOUCH_OFFSET: 128,
+        TOUCH_DOLLY: 256,
+        TOUCH_ZOOM: 512,
+        TOUCH_DOLLY_TRUCK: 1024,
+        TOUCH_DOLLY_OFFSET: 2048,
+        TOUCH_DOLLY_ROTATE: 4096,
+        TOUCH_ZOOM_TRUCK: 8192,
+        TOUCH_ZOOM_OFFSET: 16384,
+        TOUCH_ZOOM_ROTATE: 32768,
+    });
     function isPerspectiveCamera(camera) {
         return camera.isPerspectiveCamera;
     }
@@ -101070,16 +100944,14 @@
         return camera.isOrthographicCamera;
     }
 
-    var PI_2 = Math.PI * 2;
-    var PI_HALF = Math.PI / 2;
+    const PI_2 = Math.PI * 2;
+    const PI_HALF = Math.PI / 2;
 
-    var EPSILON$1 = 1e-5;
-    function approxZero(number, error) {
-        if (error === void 0) { error = EPSILON$1; }
+    const EPSILON$1 = 1e-5;
+    function approxZero(number, error = EPSILON$1) {
         return Math.abs(number) < error;
     }
-    function approxEquals(a, b, error) {
-        if (error === void 0) { error = EPSILON$1; }
+    function approxEquals(a, b, error = EPSILON$1) {
         return approxZero(a - b, error);
     }
     function roundToStep(value, step) {
@@ -101100,7 +100972,7 @@
 
     function extractClientCoordFromEvent(pointers, out) {
         out.set(0, 0);
-        pointers.forEach(function (pointer) {
+        pointers.forEach((pointer) => {
             out.x += pointer.clientX;
             out.y += pointer.clientY;
         });
@@ -101110,12 +100982,18 @@
 
     function notSupportedInOrthographicCamera(camera, message) {
         if (isOrthographicCamera(camera)) {
-            console.warn(message + " is not supported in OrthographicCamera");
+            console.warn(`${message} is not supported in OrthographicCamera`);
             return true;
         }
         return false;
     }
 
+    /**
+     * A compat function for `Quaternion.invert()` / `Quaternion.inverse()`.
+     * `Quaternion.invert()` is introduced in r123 and `Quaternion.inverse()` emits a warning.
+     * We are going to use this compat for a while.
+     * @param target A target quaternion
+     */
     function quatInvertCompat(target) {
         if (target.invert) {
             target.invert();
@@ -101126,574 +101004,836 @@
         return target;
     }
 
-    var EventDispatcher = (function () {
-        function EventDispatcher() {
+    class EventDispatcher {
+        constructor() {
             this._listeners = {};
         }
-        EventDispatcher.prototype.addEventListener = function (type, listener) {
-            var listeners = this._listeners;
+        /**
+         * Adds the specified event listener.
+         * @param type event name
+         * @param listener handler function
+         * @category Methods
+         */
+        addEventListener(type, listener) {
+            const listeners = this._listeners;
             if (listeners[type] === undefined)
                 listeners[type] = [];
             if (listeners[type].indexOf(listener) === -1)
                 listeners[type].push(listener);
-        };
-        EventDispatcher.prototype.removeEventListener = function (type, listener) {
-            var listeners = this._listeners;
-            var listenerArray = listeners[type];
+        }
+        // hasEventListener( type: string, listener: Listener ): boolean {
+        // 	const listeners = this._listeners;
+        // 	return listeners[ type ] !== undefined && listeners[ type ].indexOf( listener ) !== - 1;
+        // }
+        /**
+         * Removes the specified event listener
+         * @param type event name
+         * @param listener handler function
+         * @category Methods
+         */
+        removeEventListener(type, listener) {
+            const listeners = this._listeners;
+            const listenerArray = listeners[type];
             if (listenerArray !== undefined) {
-                var index = listenerArray.indexOf(listener);
+                const index = listenerArray.indexOf(listener);
                 if (index !== -1)
                     listenerArray.splice(index, 1);
             }
-        };
-        EventDispatcher.prototype.removeAllEventListeners = function (type) {
+        }
+        /**
+         * Removes all event listeners
+         * @param type event name
+         * @category Methods
+         */
+        removeAllEventListeners(type) {
             if (!type) {
                 this._listeners = {};
                 return;
             }
             if (Array.isArray(this._listeners[type]))
                 this._listeners[type].length = 0;
-        };
-        EventDispatcher.prototype.dispatchEvent = function (event) {
-            var listeners = this._listeners;
-            var listenerArray = listeners[event.type];
+        }
+        /**
+         * Fire an event type.
+         * @param event DispatcherEvent
+         * @category Methods
+         */
+        dispatchEvent(event) {
+            const listeners = this._listeners;
+            const listenerArray = listeners[event.type];
             if (listenerArray !== undefined) {
                 event.target = this;
-                var array = listenerArray.slice(0);
-                for (var i = 0, l = array.length; i < l; i++) {
+                const array = listenerArray.slice(0);
+                for (let i = 0, l = array.length; i < l; i++) {
                     array[i].call(this, event);
                 }
             }
-        };
-        return EventDispatcher;
-    }());
+        }
+    }
 
-    var isBrowser = typeof window !== 'undefined';
-    var isMac = isBrowser && /Mac/.test(navigator.platform);
-    var isPointerEventsNotSupported = !(isBrowser && 'PointerEvent' in window);
-    var readonlyACTION = Object.freeze(ACTION);
-    var TOUCH_DOLLY_FACTOR = 1 / 8;
-    var THREE;
-    var _ORIGIN;
-    var _AXIS_Y;
-    var _AXIS_Z;
-    var _v2;
-    var _v3A;
-    var _v3B;
-    var _v3C;
-    var _xColumn;
-    var _yColumn;
-    var _zColumn;
-    var _sphericalA;
-    var _sphericalB;
-    var _box3A;
-    var _box3B;
-    var _sphere;
-    var _quaternionA;
-    var _quaternionB;
-    var _rotationMatrix;
-    var _raycaster;
-    var CameraControls = (function (_super) {
-        __extends(CameraControls, _super);
-        function CameraControls(camera, domElement) {
-            var _this = _super.call(this) || this;
-            _this.minPolarAngle = 0;
-            _this.maxPolarAngle = Math.PI;
-            _this.minAzimuthAngle = -Infinity;
-            _this.maxAzimuthAngle = Infinity;
-            _this.minDistance = 0;
-            _this.maxDistance = Infinity;
-            _this.infinityDolly = false;
-            _this.minZoom = 0.01;
-            _this.maxZoom = Infinity;
-            _this.dampingFactor = 0.05;
-            _this.draggingDampingFactor = 0.25;
-            _this.azimuthRotateSpeed = 1.0;
-            _this.polarRotateSpeed = 1.0;
-            _this.dollySpeed = 1.0;
-            _this.truckSpeed = 2.0;
-            _this.dollyToCursor = false;
-            _this.dragToOffset = false;
-            _this.verticalDragToForward = false;
-            _this.boundaryFriction = 0.0;
-            _this.restThreshold = 0.01;
-            _this.colliderMeshes = [];
-            _this.cancel = function () { };
-            _this._enabled = true;
-            _this._state = ACTION.NONE;
-            _this._viewport = null;
-            _this._dollyControlAmount = 0;
-            _this._hasRested = true;
-            _this._boundaryEnclosesCamera = false;
-            _this._needsUpdate = true;
-            _this._updatedLastTime = false;
-            _this._activePointers = [];
-            _this._truckInternal = function (deltaX, deltaY, dragToOffset) {
-                if (isPerspectiveCamera(_this._camera)) {
-                    var offset = _v3A.copy(_this._camera.position).sub(_this._target);
-                    var fov = _this._camera.getEffectiveFOV() * THREE.MathUtils.DEG2RAD;
-                    var targetDistance = offset.length() * Math.tan(fov * 0.5);
-                    var truckX = (_this.truckSpeed * deltaX * targetDistance / _this._elementRect.w);
-                    var pedestalY = (_this.truckSpeed * deltaY * targetDistance / _this._elementRect.w);
-                    if (_this.verticalDragToForward) {
+    const isBrowser = typeof window !== 'undefined';
+    const isMac = isBrowser && /Mac/.test(navigator.platform);
+    const isPointerEventsNotSupported = !(isBrowser && 'PointerEvent' in window); // Safari 12 does not support PointerEvents API
+    const TOUCH_DOLLY_FACTOR = 1 / 8;
+    let THREE;
+    let _ORIGIN;
+    let _AXIS_Y;
+    let _AXIS_Z;
+    let _v2;
+    let _v3A;
+    let _v3B;
+    let _v3C;
+    let _xColumn;
+    let _yColumn;
+    let _zColumn;
+    let _deltaTarget;
+    let _deltaOffset;
+    let _sphericalA;
+    let _sphericalB;
+    let _box3A;
+    let _box3B;
+    let _sphere;
+    let _quaternionA;
+    let _quaternionB;
+    let _rotationMatrix;
+    let _raycaster;
+    class CameraControls extends EventDispatcher {
+        /**
+         * Creates a `CameraControls` instance.
+         *
+         * Note:
+         * You **must install** three.js before using camera-controls. see [#install](#install)
+         * Not doing so will lead to runtime errors (`undefined` references to THREE).
+         *
+         * e.g.
+         * ```
+         * CameraControls.install( { THREE } );
+         * const cameraControls = new CameraControls( camera, domElement );
+         * ```
+         *
+         * @param camera A `THREE.PerspectiveCamera` or `THREE.OrthographicCamera` to be controlled.
+         * @param domElement A `HTMLElement` for the draggable area, usually `renderer.domElement`.
+         * @category Constructor
+         */
+        constructor(camera, domElement) {
+            super();
+            /**
+             * Minimum vertical angle in radians.
+             * The angle has to be between `0` and `.maxPolarAngle` inclusive.
+             * The default value is `0`.
+             *
+             * e.g.
+             * ```
+             * cameraControls.maxPolarAngle = 0;
+             * ```
+             * @category Properties
+             */
+            this.minPolarAngle = 0; // radians
+            /**
+             * Maximum vertical angle in radians.
+             * The angle has to be between `.maxPolarAngle` and `Math.PI` inclusive.
+             * The default value is `Math.PI`.
+             *
+             * e.g.
+             * ```
+             * cameraControls.maxPolarAngle = Math.PI;
+             * ```
+             * @category Properties
+             */
+            this.maxPolarAngle = Math.PI; // radians
+            /**
+             * Minimum horizontal angle in radians.
+             * The angle has to be less than `.maxAzimuthAngle`.
+             * The default value is `- Infinity`.
+             *
+             * e.g.
+             * ```
+             * cameraControls.minAzimuthAngle = - Infinity;
+             * ```
+             * @category Properties
+             */
+            this.minAzimuthAngle = -Infinity; // radians
+            /**
+             * Maximum horizontal angle in radians.
+             * The angle has to be greater than `.minAzimuthAngle`.
+             * The default value is `Infinity`.
+             *
+             * e.g.
+             * ```
+             * cameraControls.maxAzimuthAngle = Infinity;
+             * ```
+             * @category Properties
+             */
+            this.maxAzimuthAngle = Infinity; // radians
+            // How far you can dolly in and out ( PerspectiveCamera only )
+            /**
+             * Minimum distance for dolly. The value must be higher than `0`.
+             * PerspectiveCamera only.
+             * @category Properties
+             */
+            this.minDistance = 0;
+            /**
+             * Maximum distance for dolly. The value must be higher than `minDistance`.
+             * PerspectiveCamera only.
+             * @category Properties
+             */
+            this.maxDistance = Infinity;
+            /**
+             * `true` to enable Infinity Dolly.
+             * When the Dolly distance is less than the `minDistance`, radius of the sphere will be set `minDistance` automatically.
+             * @category Properties
+             */
+            this.infinityDolly = false;
+            /**
+             * Minimum camera zoom.
+             * @category Properties
+             */
+            this.minZoom = 0.01;
+            /**
+             * Maximum camera zoom.
+             * @category Properties
+             */
+            this.maxZoom = Infinity;
+            /**
+             * The damping inertia.
+             * The value must be between `Math.EPSILON` to `1` inclusive.
+             * Setting `1` to disable smooth transitions.
+             * @category Properties
+             */
+            this.dampingFactor = 0.05;
+            /**
+             * The damping inertia while dragging.
+             * The value must be between `Math.EPSILON` to `1` inclusive.
+             * Setting `1` to disable smooth transitions.
+             * @category Properties
+             */
+            this.draggingDampingFactor = 0.25;
+            /**
+             * Speed of azimuth (horizontal) rotation.
+             * @category Properties
+             */
+            this.azimuthRotateSpeed = 1.0;
+            /**
+             * Speed of polar (vertical) rotation.
+             * @category Properties
+             */
+            this.polarRotateSpeed = 1.0;
+            /**
+             * Speed of mouse-wheel dollying.
+             * @category Properties
+             */
+            this.dollySpeed = 1.0;
+            /**
+             * Speed of drag for truck and pedestal.
+             * @category Properties
+             */
+            this.truckSpeed = 2.0;
+            /**
+             * `true` to enable Dolly-in to the mouse cursor coords.
+             * @category Properties
+             */
+            this.dollyToCursor = false;
+            /**
+             * @category Properties
+             */
+            this.dragToOffset = false;
+            /**
+             * The same as `.screenSpacePanning` in three.js's OrbitControls.
+             * @category Properties
+             */
+            this.verticalDragToForward = false;
+            /**
+             * Friction ratio of the boundary.
+             * @category Properties
+             */
+            this.boundaryFriction = 0.0;
+            /**
+             * Controls how soon the `rest` event fires as the camera slows.
+             * @category Properties
+             */
+            this.restThreshold = 0.01;
+            /**
+             * An array of Meshes to collide with camera.
+             * Be aware colliderMeshes may decrease performance. The collision test uses 4 raycasters from the camera since the near plane has 4 corners.
+             * @category Properties
+             */
+            this.colliderMeshes = [];
+            /**
+             * Force cancel user dragging.
+             * @category Methods
+             */
+            // cancel will be overwritten in the constructor.
+            this.cancel = () => { };
+            this._enabled = true;
+            this._state = ACTION.NONE;
+            this._viewport = null;
+            this._dollyControlAmount = 0;
+            this._hasRested = true;
+            this._boundaryEnclosesCamera = false;
+            this._needsUpdate = true;
+            this._updatedLastTime = false;
+            this._elementRect = new DOMRect();
+            this._activePointers = [];
+            this._truckInternal = (deltaX, deltaY, dragToOffset) => {
+                if (isPerspectiveCamera(this._camera)) {
+                    const offset = _v3A.copy(this._camera.position).sub(this._target);
+                    // half of the fov is center to top of screen
+                    const fov = this._camera.getEffectiveFOV() * THREE.MathUtils.DEG2RAD;
+                    const targetDistance = offset.length() * Math.tan(fov * 0.5);
+                    const truckX = (this.truckSpeed * deltaX * targetDistance / this._elementRect.height);
+                    const pedestalY = (this.truckSpeed * deltaY * targetDistance / this._elementRect.height);
+                    if (this.verticalDragToForward) {
                         dragToOffset ?
-                            _this.setFocalOffset(_this._focalOffsetEnd.x + truckX, _this._focalOffsetEnd.y, _this._focalOffsetEnd.z, true) :
-                            _this.truck(truckX, 0, true);
-                        _this.forward(-pedestalY, true);
+                            this.setFocalOffset(this._focalOffsetEnd.x + truckX, this._focalOffsetEnd.y, this._focalOffsetEnd.z, true) :
+                            this.truck(truckX, 0, true);
+                        this.forward(-pedestalY, true);
                     }
                     else {
                         dragToOffset ?
-                            _this.setFocalOffset(_this._focalOffsetEnd.x + truckX, _this._focalOffsetEnd.y + pedestalY, _this._focalOffsetEnd.z, true) :
-                            _this.truck(truckX, pedestalY, true);
+                            this.setFocalOffset(this._focalOffsetEnd.x + truckX, this._focalOffsetEnd.y + pedestalY, this._focalOffsetEnd.z, true) :
+                            this.truck(truckX, pedestalY, true);
                     }
                 }
-                else if (isOrthographicCamera(_this._camera)) {
-                    var camera = _this._camera;
-                    var truckX = deltaX * (camera.right - camera.left) / camera.zoom / _this._elementRect.z;
-                    var pedestalY = deltaY * (camera.top - camera.bottom) / camera.zoom / _this._elementRect.w;
+                else if (isOrthographicCamera(this._camera)) {
+                    // orthographic
+                    const camera = this._camera;
+                    const truckX = deltaX * (camera.right - camera.left) / camera.zoom / this._elementRect.width;
+                    const pedestalY = deltaY * (camera.top - camera.bottom) / camera.zoom / this._elementRect.height;
                     dragToOffset ?
-                        _this.setFocalOffset(_this._focalOffsetEnd.x + truckX, _this._focalOffsetEnd.y + pedestalY, _this._focalOffsetEnd.z, true) :
-                        _this.truck(truckX, pedestalY, true);
+                        this.setFocalOffset(this._focalOffsetEnd.x + truckX, this._focalOffsetEnd.y + pedestalY, this._focalOffsetEnd.z, true) :
+                        this.truck(truckX, pedestalY, true);
                 }
             };
-            _this._rotateInternal = function (deltaX, deltaY) {
-                var theta = PI_2 * _this.azimuthRotateSpeed * deltaX / _this._elementRect.w;
-                var phi = PI_2 * _this.polarRotateSpeed * deltaY / _this._elementRect.w;
-                _this.rotate(theta, phi, true);
+            this._rotateInternal = (deltaX, deltaY) => {
+                const theta = PI_2 * this.azimuthRotateSpeed * deltaX / this._elementRect.height; // divide by *height* to refer the resolution
+                const phi = PI_2 * this.polarRotateSpeed * deltaY / this._elementRect.height;
+                this.rotate(theta, phi, true);
             };
-            _this._dollyInternal = function (delta, x, y) {
-                var dollyScale = Math.pow(0.95, -delta * _this.dollySpeed);
-                var distance = _this._sphericalEnd.radius * dollyScale;
-                var prevRadius = _this._sphericalEnd.radius;
-                var signedPrevRadius = prevRadius * (delta >= 0 ? -1 : 1);
-                _this.dollyTo(distance);
-                if (_this.infinityDolly && (distance < _this.minDistance || _this.maxDistance === _this.minDistance)) {
-                    _this._camera.getWorldDirection(_v3A);
-                    _this._targetEnd.add(_v3A.normalize().multiplyScalar(signedPrevRadius));
-                    _this._target.add(_v3A.normalize().multiplyScalar(signedPrevRadius));
+            this._dollyInternal = (delta, x, y) => {
+                const dollyScale = Math.pow(0.95, -delta * this.dollySpeed);
+                const distance = this._sphericalEnd.radius * dollyScale;
+                const prevRadius = this._sphericalEnd.radius;
+                const signedPrevRadius = prevRadius * (delta >= 0 ? -1 : 1);
+                this.dollyTo(distance);
+                if (this.infinityDolly && (distance < this.minDistance || this.maxDistance === this.minDistance)) {
+                    this._camera.getWorldDirection(_v3A);
+                    this._targetEnd.add(_v3A.normalize().multiplyScalar(signedPrevRadius));
+                    this._target.add(_v3A.normalize().multiplyScalar(signedPrevRadius));
                 }
-                if (_this.dollyToCursor) {
-                    _this._dollyControlAmount += _this._sphericalEnd.radius - prevRadius;
-                    if (_this.infinityDolly && (distance < _this.minDistance || _this.maxDistance === _this.minDistance)) {
-                        _this._dollyControlAmount -= signedPrevRadius;
+                if (this.dollyToCursor) {
+                    this._dollyControlAmount += this._sphericalEnd.radius - prevRadius;
+                    if (this.infinityDolly && (distance < this.minDistance || this.maxDistance === this.minDistance)) {
+                        this._dollyControlAmount -= signedPrevRadius;
                     }
-                    _this._dollyControlCoord.set(x, y);
+                    this._dollyControlCoord.set(x, y);
                 }
                 return;
             };
-            _this._zoomInternal = function (delta, x, y) {
-                var zoomScale = Math.pow(0.95, delta * _this.dollySpeed);
-                _this.zoomTo(_this._zoom * zoomScale);
-                if (_this.dollyToCursor) {
-                    _this._dollyControlAmount = _this._zoomEnd;
-                    _this._dollyControlCoord.set(x, y);
+            this._zoomInternal = (delta, x, y) => {
+                const zoomScale = Math.pow(0.95, delta * this.dollySpeed);
+                const prevZoom = this._zoomEnd;
+                // for both PerspectiveCamera and OrthographicCamera
+                this.zoomTo(this._zoom * zoomScale);
+                if (this.dollyToCursor) {
+                    this._dollyControlAmount += this._zoomEnd - prevZoom;
+                    this._dollyControlCoord.set(x, y);
                 }
                 return;
             };
+            // Check if the user has installed THREE
             if (typeof THREE === 'undefined') {
                 console.error('camera-controls: `THREE` is undefined. You must first run `CameraControls.install( { THREE: THREE } )`. Check the docs for further information.');
             }
-            _this._camera = camera;
-            _this._yAxisUpSpace = new THREE.Quaternion().setFromUnitVectors(_this._camera.up, _AXIS_Y);
-            _this._yAxisUpSpaceInverse = quatInvertCompat(_this._yAxisUpSpace.clone());
-            _this._state = ACTION.NONE;
-            _this._domElement = domElement;
-            _this._domElement.style.touchAction = 'none';
-            _this._target = new THREE.Vector3();
-            _this._targetEnd = _this._target.clone();
-            _this._focalOffset = new THREE.Vector3();
-            _this._focalOffsetEnd = _this._focalOffset.clone();
-            _this._spherical = new THREE.Spherical().setFromVector3(_v3A.copy(_this._camera.position).applyQuaternion(_this._yAxisUpSpace));
-            _this._sphericalEnd = _this._spherical.clone();
-            _this._zoom = _this._camera.zoom;
-            _this._zoomEnd = _this._zoom;
-            _this._nearPlaneCorners = [
+            this._camera = camera;
+            this._yAxisUpSpace = new THREE.Quaternion().setFromUnitVectors(this._camera.up, _AXIS_Y);
+            this._yAxisUpSpaceInverse = quatInvertCompat(this._yAxisUpSpace.clone());
+            this._state = ACTION.NONE;
+            this._domElement = domElement;
+            this._domElement.style.touchAction = 'none';
+            this._domElement.style.userSelect = 'none';
+            this._domElement.style.webkitUserSelect = 'none';
+            // the location
+            this._target = new THREE.Vector3();
+            this._targetEnd = this._target.clone();
+            this._focalOffset = new THREE.Vector3();
+            this._focalOffsetEnd = this._focalOffset.clone();
+            // rotation
+            this._spherical = new THREE.Spherical().setFromVector3(_v3A.copy(this._camera.position).applyQuaternion(this._yAxisUpSpace));
+            this._sphericalEnd = this._spherical.clone();
+            this._zoom = this._camera.zoom;
+            this._zoomEnd = this._zoom;
+            // collisionTest uses nearPlane.s
+            this._nearPlaneCorners = [
                 new THREE.Vector3(),
                 new THREE.Vector3(),
                 new THREE.Vector3(),
                 new THREE.Vector3(),
             ];
-            _this._updateNearPlaneCorners();
-            _this._boundary = new THREE.Box3(new THREE.Vector3(-Infinity, -Infinity, -Infinity), new THREE.Vector3(Infinity, Infinity, Infinity));
-            _this._target0 = _this._target.clone();
-            _this._position0 = _this._camera.position.clone();
-            _this._zoom0 = _this._zoom;
-            _this._focalOffset0 = _this._focalOffset.clone();
-            _this._dollyControlAmount = 0;
-            _this._dollyControlCoord = new THREE.Vector2();
-            _this.mouseButtons = {
+            this._updateNearPlaneCorners();
+            // Target cannot move outside of this box
+            this._boundary = new THREE.Box3(new THREE.Vector3(-Infinity, -Infinity, -Infinity), new THREE.Vector3(Infinity, Infinity, Infinity));
+            // reset
+            this._target0 = this._target.clone();
+            this._position0 = this._camera.position.clone();
+            this._zoom0 = this._zoom;
+            this._focalOffset0 = this._focalOffset.clone();
+            this._dollyControlAmount = 0;
+            this._dollyControlCoord = new THREE.Vector2();
+            // configs
+            this.mouseButtons = {
                 left: ACTION.ROTATE,
                 middle: ACTION.DOLLY,
                 right: ACTION.TRUCK,
-                wheel: isPerspectiveCamera(_this._camera) ? ACTION.DOLLY :
-                    isOrthographicCamera(_this._camera) ? ACTION.ZOOM :
+                wheel: isPerspectiveCamera(this._camera) ? ACTION.DOLLY :
+                    isOrthographicCamera(this._camera) ? ACTION.ZOOM :
                         ACTION.NONE,
-                shiftLeft: ACTION.NONE,
             };
-            _this.touches = {
+            this.touches = {
                 one: ACTION.TOUCH_ROTATE,
-                two: isPerspectiveCamera(_this._camera) ? ACTION.TOUCH_DOLLY_TRUCK :
-                    isOrthographicCamera(_this._camera) ? ACTION.TOUCH_ZOOM_TRUCK :
+                two: isPerspectiveCamera(this._camera) ? ACTION.TOUCH_DOLLY_TRUCK :
+                    isOrthographicCamera(this._camera) ? ACTION.TOUCH_ZOOM_TRUCK :
                         ACTION.NONE,
                 three: ACTION.TOUCH_TRUCK,
             };
-            _this._elementRect = new THREE.Vector4();
-            if (_this._domElement) {
-                var dragStartPosition_1 = new THREE.Vector2();
-                var lastDragPosition_1 = new THREE.Vector2();
-                var dollyStart_1 = new THREE.Vector2();
-                var cancelDragging_1 = function () {
-                    _this._state = ACTION.NONE;
-                    _this._activePointers.length = 0;
-                    endDragging_1();
-                };
-                var onPointerDown_1 = function (event) {
-                    if (!_this._enabled)
+            if (this._domElement) {
+                const dragStartPosition = new THREE.Vector2();
+                const lastDragPosition = new THREE.Vector2();
+                const dollyStart = new THREE.Vector2();
+                const onPointerDown = (event) => {
+                    if (!this._enabled)
                         return;
-                    var pointer = {
+                    // Don't call `event.preventDefault()` on the pointerdown event
+                    // to keep receiving pointermove evens outside dragging iframe
+                    // https://taye.me/blog/tips/2015/11/16/mouse-drag-outside-iframe/
+                    const pointer = {
                         pointerId: event.pointerId,
                         clientX: event.clientX,
                         clientY: event.clientY,
+                        deltaX: 0,
+                        deltaY: 0,
                     };
-                    _this._activePointers.push(pointer);
-                    switch (event.button) {
-                        case THREE.MOUSE.LEFT:
-                            _this._state = event.shiftKey ? _this.mouseButtons.shiftLeft : _this.mouseButtons.left;
-                            break;
-                        case THREE.MOUSE.MIDDLE:
-                            _this._state = _this.mouseButtons.middle;
-                            break;
-                        case THREE.MOUSE.RIGHT:
-                            _this._state = _this.mouseButtons.right;
-                            break;
-                    }
-                    if (event.pointerType === 'touch') {
-                        switch (_this._activePointers.length) {
-                            case 1:
-                                _this._state = _this.touches.one;
-                                break;
-                            case 2:
-                                _this._state = _this.touches.two;
-                                break;
-                            case 3:
-                                _this._state = _this.touches.three;
-                                break;
-                        }
-                    }
-                    _this._domElement.ownerDocument.removeEventListener('pointermove', onPointerMove_1, { passive: false });
-                    _this._domElement.ownerDocument.removeEventListener('pointerup', onPointerUp_1);
-                    _this._domElement.ownerDocument.addEventListener('pointermove', onPointerMove_1, { passive: false });
-                    _this._domElement.ownerDocument.addEventListener('pointerup', onPointerUp_1);
-                    startDragging_1();
+                    this._activePointers.push(pointer);
+                    // eslint-disable-next-line no-undef
+                    this._domElement.ownerDocument.removeEventListener('pointermove', onPointerMove, { passive: false });
+                    this._domElement.ownerDocument.removeEventListener('pointerup', onPointerUp);
+                    this._domElement.ownerDocument.addEventListener('pointermove', onPointerMove, { passive: false });
+                    this._domElement.ownerDocument.addEventListener('pointerup', onPointerUp);
+                    startDragging(event);
                 };
-                var onMouseDown_1 = function (event) {
-                    if (!_this._enabled)
+                const onMouseDown = (event) => {
+                    if (!this._enabled)
                         return;
-                    var pointer = {
+                    const pointer = {
                         pointerId: 0,
                         clientX: event.clientX,
                         clientY: event.clientY,
+                        deltaX: 0,
+                        deltaY: 0,
                     };
-                    _this._activePointers.push(pointer);
-                    switch (event.button) {
-                        case THREE.MOUSE.LEFT:
-                            _this._state = event.shiftKey ? _this.mouseButtons.shiftLeft : _this.mouseButtons.left;
-                            break;
-                        case THREE.MOUSE.MIDDLE:
-                            _this._state = _this.mouseButtons.middle;
-                            break;
-                        case THREE.MOUSE.RIGHT:
-                            _this._state = _this.mouseButtons.right;
-                            break;
-                    }
-                    _this._domElement.ownerDocument.removeEventListener('mousemove', onMouseMove_1);
-                    _this._domElement.ownerDocument.removeEventListener('mouseup', onMouseUp_1);
-                    _this._domElement.ownerDocument.addEventListener('mousemove', onMouseMove_1);
-                    _this._domElement.ownerDocument.addEventListener('mouseup', onMouseUp_1);
-                    startDragging_1();
+                    this._activePointers.push(pointer);
+                    // see https://github.com/microsoft/TypeScript/issues/32912#issuecomment-522142969
+                    // eslint-disable-next-line no-undef
+                    this._domElement.ownerDocument.removeEventListener('mousemove', onMouseMove);
+                    this._domElement.ownerDocument.removeEventListener('mouseup', onMouseUp);
+                    this._domElement.ownerDocument.addEventListener('mousemove', onMouseMove);
+                    this._domElement.ownerDocument.addEventListener('mouseup', onMouseUp);
+                    startDragging(event);
                 };
-                var onTouchStart_1 = function (event) {
-                    if (!_this._enabled)
+                const onTouchStart = (event) => {
+                    if (!this._enabled)
                         return;
                     event.preventDefault();
-                    Array.prototype.forEach.call(event.changedTouches, function (touch) {
-                        var pointer = {
+                    Array.prototype.forEach.call(event.changedTouches, (touch) => {
+                        const pointer = {
                             pointerId: touch.identifier,
                             clientX: touch.clientX,
                             clientY: touch.clientY,
+                            deltaX: 0,
+                            deltaY: 0,
                         };
-                        _this._activePointers.push(pointer);
+                        this._activePointers.push(pointer);
                     });
-                    switch (_this._activePointers.length) {
-                        case 1:
-                            _this._state = _this.touches.one;
-                            break;
-                        case 2:
-                            _this._state = _this.touches.two;
-                            break;
-                        case 3:
-                            _this._state = _this.touches.three;
-                            break;
-                    }
-                    _this._domElement.ownerDocument.removeEventListener('touchmove', onTouchMove_1, { passive: false });
-                    _this._domElement.ownerDocument.removeEventListener('touchend', onTouchEnd_1);
-                    _this._domElement.ownerDocument.addEventListener('touchmove', onTouchMove_1, { passive: false });
-                    _this._domElement.ownerDocument.addEventListener('touchend', onTouchEnd_1);
-                    startDragging_1();
+                    // eslint-disable-next-line no-undef
+                    this._domElement.ownerDocument.removeEventListener('touchmove', onTouchMove, { passive: false });
+                    this._domElement.ownerDocument.removeEventListener('touchend', onTouchEnd);
+                    this._domElement.ownerDocument.addEventListener('touchmove', onTouchMove, { passive: false });
+                    this._domElement.ownerDocument.addEventListener('touchend', onTouchEnd);
+                    startDragging(event);
                 };
-                var onPointerMove_1 = function (event) {
+                const onPointerMove = (event) => {
                     if (event.cancelable)
                         event.preventDefault();
-                    var pointerId = event.pointerId;
-                    var pointer = _this._findPointerById(pointerId);
+                    const pointerId = event.pointerId;
+                    const pointer = this._findPointerById(pointerId);
                     if (!pointer)
                         return;
                     pointer.clientX = event.clientX;
                     pointer.clientY = event.clientY;
-                    dragging_1();
-                };
-                var onMouseMove_1 = function (event) {
-                    var pointer = _this._findPointerById(0);
-                    if (!pointer)
-                        return;
-                    pointer.clientX = event.clientX;
-                    pointer.clientY = event.clientY;
-                    dragging_1();
-                };
-                var onTouchMove_1 = function (event) {
-                    if (event.cancelable)
-                        event.preventDefault();
-                    Array.prototype.forEach.call(event.changedTouches, function (touch) {
-                        var pointerId = touch.identifier;
-                        var pointer = _this._findPointerById(pointerId);
-                        if (!pointer)
-                            return;
-                        pointer.clientX = touch.clientX;
-                        pointer.clientY = touch.clientY;
-                    });
-                    dragging_1();
-                };
-                var onPointerUp_1 = function (event) {
-                    var pointerId = event.pointerId;
-                    var pointer = _this._findPointerById(pointerId);
-                    pointer && _this._activePointers.splice(_this._activePointers.indexOf(pointer), 1);
+                    pointer.deltaX = event.movementX;
+                    pointer.deltaY = event.movementY;
                     if (event.pointerType === 'touch') {
-                        switch (_this._activePointers.length) {
-                            case 0:
-                                _this._state = ACTION.NONE;
-                                break;
+                        switch (this._activePointers.length) {
                             case 1:
-                                _this._state = _this.touches.one;
+                                this._state = this.touches.one;
                                 break;
                             case 2:
-                                _this._state = _this.touches.two;
+                                this._state = this.touches.two;
                                 break;
                             case 3:
-                                _this._state = _this.touches.three;
+                                this._state = this.touches.three;
                                 break;
                         }
                     }
                     else {
-                        _this._state = ACTION.NONE;
+                        this._state = 0;
+                        if ((event.buttons & MOUSE_BUTTON.LEFT) === MOUSE_BUTTON.LEFT) {
+                            this._state = this._state | this.mouseButtons.left;
+                        }
+                        if ((event.buttons & MOUSE_BUTTON.MIDDLE) === MOUSE_BUTTON.MIDDLE) {
+                            this._state = this._state | this.mouseButtons.middle;
+                        }
+                        if ((event.buttons & MOUSE_BUTTON.RIGHT) === MOUSE_BUTTON.RIGHT) {
+                            this._state = this._state | this.mouseButtons.right;
+                        }
                     }
-                    endDragging_1();
+                    dragging();
                 };
-                var onMouseUp_1 = function () {
-                    var pointer = _this._findPointerById(0);
-                    pointer && _this._activePointers.splice(_this._activePointers.indexOf(pointer), 1);
-                    _this._state = ACTION.NONE;
-                    endDragging_1();
+                const onMouseMove = (event) => {
+                    const pointer = this._findPointerById(0);
+                    if (!pointer)
+                        return;
+                    pointer.clientX = event.clientX;
+                    pointer.clientY = event.clientY;
+                    pointer.deltaX = event.movementX;
+                    pointer.deltaY = event.movementY;
+                    this._state = 0;
+                    if ((event.buttons & MOUSE_BUTTON.LEFT) === MOUSE_BUTTON.LEFT) {
+                        this._state = this._state | this.mouseButtons.left;
+                    }
+                    if ((event.buttons & MOUSE_BUTTON.MIDDLE) === MOUSE_BUTTON.MIDDLE) {
+                        this._state = this._state | this.mouseButtons.middle;
+                    }
+                    if ((event.buttons & MOUSE_BUTTON.RIGHT) === MOUSE_BUTTON.RIGHT) {
+                        this._state = this._state | this.mouseButtons.right;
+                    }
+                    dragging();
                 };
-                var onTouchEnd_1 = function (event) {
-                    Array.prototype.forEach.call(event.changedTouches, function (touch) {
-                        var pointerId = touch.identifier;
-                        var pointer = _this._findPointerById(pointerId);
-                        pointer && _this._activePointers.splice(_this._activePointers.indexOf(pointer), 1);
+                const onTouchMove = (event) => {
+                    if (event.cancelable)
+                        event.preventDefault();
+                    Array.prototype.forEach.call(event.changedTouches, (touch) => {
+                        const pointerId = touch.identifier;
+                        const pointer = this._findPointerById(pointerId);
+                        if (!pointer)
+                            return;
+                        pointer.clientX = touch.clientX;
+                        pointer.clientY = touch.clientY;
+                        // touch event does not have movementX and movementY.
                     });
-                    switch (_this._activePointers.length) {
+                    dragging();
+                };
+                const onPointerUp = (event) => {
+                    const pointerId = event.pointerId;
+                    const pointer = this._findPointerById(pointerId);
+                    pointer && this._activePointers.splice(this._activePointers.indexOf(pointer), 1);
+                    if (event.pointerType === 'touch') {
+                        switch (this._activePointers.length) {
+                            case 0:
+                                this._state = ACTION.NONE;
+                                break;
+                            case 1:
+                                this._state = this.touches.one;
+                                break;
+                            case 2:
+                                this._state = this.touches.two;
+                                break;
+                            case 3:
+                                this._state = this.touches.three;
+                                break;
+                        }
+                    }
+                    else {
+                        this._state = ACTION.NONE;
+                    }
+                    endDragging();
+                };
+                const onMouseUp = () => {
+                    const pointer = this._findPointerById(0);
+                    pointer && this._activePointers.splice(this._activePointers.indexOf(pointer), 1);
+                    this._state = ACTION.NONE;
+                    endDragging();
+                };
+                const onTouchEnd = (event) => {
+                    Array.prototype.forEach.call(event.changedTouches, (touch) => {
+                        const pointerId = touch.identifier;
+                        const pointer = this._findPointerById(pointerId);
+                        pointer && this._activePointers.splice(this._activePointers.indexOf(pointer), 1);
+                    });
+                    switch (this._activePointers.length) {
                         case 0:
-                            _this._state = ACTION.NONE;
+                            this._state = ACTION.NONE;
                             break;
                         case 1:
-                            _this._state = _this.touches.one;
+                            this._state = this.touches.one;
                             break;
                         case 2:
-                            _this._state = _this.touches.two;
+                            this._state = this.touches.two;
                             break;
                         case 3:
-                            _this._state = _this.touches.three;
+                            this._state = this.touches.three;
                             break;
                     }
-                    endDragging_1();
+                    endDragging();
                 };
-                var lastScrollTimeStamp_1 = -1;
-                var onMouseWheel_1 = function (event) {
-                    if (!_this._enabled || _this.mouseButtons.wheel === ACTION.NONE)
+                let lastScrollTimeStamp = -1;
+                const onMouseWheel = (event) => {
+                    if (!this._enabled || this.mouseButtons.wheel === ACTION.NONE)
                         return;
                     event.preventDefault();
-                    if (_this.dollyToCursor ||
-                        _this.mouseButtons.wheel === ACTION.ROTATE ||
-                        _this.mouseButtons.wheel === ACTION.TRUCK) {
-                        var now = performance.now();
-                        if (lastScrollTimeStamp_1 - now < 1000)
-                            _this._getClientRect(_this._elementRect);
-                        lastScrollTimeStamp_1 = now;
+                    if (this.dollyToCursor ||
+                        this.mouseButtons.wheel === ACTION.ROTATE ||
+                        this.mouseButtons.wheel === ACTION.TRUCK) {
+                        const now = performance.now();
+                        // only need to fire this at scroll start.
+                        if (lastScrollTimeStamp - now < 1000)
+                            this._getClientRect(this._elementRect);
+                        lastScrollTimeStamp = now;
                     }
-                    var deltaYFactor = isMac ? -1 : -3;
-                    var delta = (event.deltaMode === 1) ? event.deltaY / deltaYFactor : event.deltaY / (deltaYFactor * 10);
-                    var x = _this.dollyToCursor ? (event.clientX - _this._elementRect.x) / _this._elementRect.z * 2 - 1 : 0;
-                    var y = _this.dollyToCursor ? (event.clientY - _this._elementRect.y) / _this._elementRect.w * -2 + 1 : 0;
-                    switch (_this.mouseButtons.wheel) {
+                    // Ref: https://github.com/cedricpinson/osgjs/blob/00e5a7e9d9206c06fdde0436e1d62ab7cb5ce853/sources/osgViewer/input/source/InputSourceMouse.js#L89-L103
+                    const deltaYFactor = isMac ? -1 : -3;
+                    const delta = (event.deltaMode === 1) ? event.deltaY / deltaYFactor : event.deltaY / (deltaYFactor * 10);
+                    const x = this.dollyToCursor ? (event.clientX - this._elementRect.x) / this._elementRect.width * 2 - 1 : 0;
+                    const y = this.dollyToCursor ? (event.clientY - this._elementRect.y) / this._elementRect.height * -2 + 1 : 0;
+                    switch (this.mouseButtons.wheel) {
                         case ACTION.ROTATE: {
-                            _this._rotateInternal(event.deltaX, event.deltaY);
+                            this._rotateInternal(event.deltaX, event.deltaY);
                             break;
                         }
                         case ACTION.TRUCK: {
-                            _this._truckInternal(event.deltaX, event.deltaY, false);
+                            this._truckInternal(event.deltaX, event.deltaY, false);
                             break;
                         }
                         case ACTION.OFFSET: {
-                            _this._truckInternal(event.deltaX, event.deltaY, true);
+                            this._truckInternal(event.deltaX, event.deltaY, true);
                             break;
                         }
                         case ACTION.DOLLY: {
-                            _this._dollyInternal(-delta, x, y);
+                            this._dollyInternal(-delta, x, y);
                             break;
                         }
                         case ACTION.ZOOM: {
-                            _this._zoomInternal(-delta, x, y);
+                            this._zoomInternal(-delta, x, y);
                             break;
                         }
                     }
-                    _this.dispatchEvent({ type: 'control' });
+                    this.dispatchEvent({ type: 'control' });
                 };
-                var onContextMenu_1 = function (event) {
-                    if (!_this._enabled)
+                const onContextMenu = (event) => {
+                    if (!this._enabled)
                         return;
                     event.preventDefault();
                 };
-                var startDragging_1 = function () {
-                    if (!_this._enabled)
+                const startDragging = (event) => {
+                    if (!this._enabled)
                         return;
-                    extractClientCoordFromEvent(_this._activePointers, _v2);
-                    _this._getClientRect(_this._elementRect);
-                    dragStartPosition_1.copy(_v2);
-                    lastDragPosition_1.copy(_v2);
-                    var isMultiTouch = _this._activePointers.length >= 2;
+                    extractClientCoordFromEvent(this._activePointers, _v2);
+                    this._getClientRect(this._elementRect);
+                    dragStartPosition.copy(_v2);
+                    lastDragPosition.copy(_v2);
+                    const isMultiTouch = this._activePointers.length >= 2;
                     if (isMultiTouch) {
-                        var dx = _v2.x - _this._activePointers[1].clientX;
-                        var dy = _v2.y - _this._activePointers[1].clientY;
-                        var distance = Math.sqrt(dx * dx + dy * dy);
-                        dollyStart_1.set(0, distance);
-                        var x = (_this._activePointers[0].clientX + _this._activePointers[1].clientX) * 0.5;
-                        var y = (_this._activePointers[0].clientY + _this._activePointers[1].clientY) * 0.5;
-                        lastDragPosition_1.set(x, y);
+                        // 2 finger pinch
+                        const dx = _v2.x - this._activePointers[1].clientX;
+                        const dy = _v2.y - this._activePointers[1].clientY;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+                        dollyStart.set(0, distance);
+                        // center coords of 2 finger truck
+                        const x = (this._activePointers[0].clientX + this._activePointers[1].clientX) * 0.5;
+                        const y = (this._activePointers[0].clientY + this._activePointers[1].clientY) * 0.5;
+                        lastDragPosition.set(x, y);
                     }
-                    _this.dispatchEvent({ type: 'controlstart' });
+                    if ('touches' in event ||
+                        'pointerType' in event && event.pointerType === 'touch') {
+                        switch (this._activePointers.length) {
+                            case 1:
+                                this._state = this.touches.one;
+                                break;
+                            case 2:
+                                this._state = this.touches.two;
+                                break;
+                            case 3:
+                                this._state = this.touches.three;
+                                break;
+                        }
+                    }
+                    else {
+                        this._state = 0;
+                        if ((event.buttons & MOUSE_BUTTON.LEFT) === MOUSE_BUTTON.LEFT) {
+                            this._state = this._state | this.mouseButtons.left;
+                        }
+                        if ((event.buttons & MOUSE_BUTTON.MIDDLE) === MOUSE_BUTTON.MIDDLE) {
+                            this._state = this._state | this.mouseButtons.middle;
+                        }
+                        if ((event.buttons & MOUSE_BUTTON.RIGHT) === MOUSE_BUTTON.RIGHT) {
+                            this._state = this._state | this.mouseButtons.right;
+                        }
+                    }
+                    this.dispatchEvent({ type: 'controlstart' });
                 };
-                var dragging_1 = function () {
-                    if (!_this._enabled)
+                const dragging = () => {
+                    if (!this._enabled)
                         return;
-                    extractClientCoordFromEvent(_this._activePointers, _v2);
-                    var deltaX = lastDragPosition_1.x - _v2.x;
-                    var deltaY = lastDragPosition_1.y - _v2.y;
-                    lastDragPosition_1.copy(_v2);
-                    switch (_this._state) {
-                        case ACTION.ROTATE:
-                        case ACTION.TOUCH_ROTATE: {
-                            _this._rotateInternal(deltaX, deltaY);
-                            break;
-                        }
-                        case ACTION.DOLLY:
-                        case ACTION.ZOOM: {
-                            var dollyX = _this.dollyToCursor ? (dragStartPosition_1.x - _this._elementRect.x) / _this._elementRect.z * 2 - 1 : 0;
-                            var dollyY = _this.dollyToCursor ? (dragStartPosition_1.y - _this._elementRect.y) / _this._elementRect.w * -2 + 1 : 0;
-                            _this._state === ACTION.DOLLY ?
-                                _this._dollyInternal(deltaY * TOUCH_DOLLY_FACTOR, dollyX, dollyY) :
-                                _this._zoomInternal(deltaY * TOUCH_DOLLY_FACTOR, dollyX, dollyY);
-                            break;
-                        }
-                        case ACTION.TOUCH_DOLLY:
-                        case ACTION.TOUCH_ZOOM:
-                        case ACTION.TOUCH_DOLLY_TRUCK:
-                        case ACTION.TOUCH_ZOOM_TRUCK:
-                        case ACTION.TOUCH_DOLLY_OFFSET:
-                        case ACTION.TOUCH_ZOOM_OFFSET: {
-                            var dx = _v2.x - _this._activePointers[1].clientX;
-                            var dy = _v2.y - _this._activePointers[1].clientY;
-                            var distance = Math.sqrt(dx * dx + dy * dy);
-                            var dollyDelta = dollyStart_1.y - distance;
-                            dollyStart_1.set(0, distance);
-                            var dollyX = _this.dollyToCursor ? (lastDragPosition_1.x - _this._elementRect.x) / _this._elementRect.z * 2 - 1 : 0;
-                            var dollyY = _this.dollyToCursor ? (lastDragPosition_1.y - _this._elementRect.y) / _this._elementRect.w * -2 + 1 : 0;
-                            _this._state === ACTION.TOUCH_DOLLY ||
-                                _this._state === ACTION.TOUCH_DOLLY_TRUCK ||
-                                _this._state === ACTION.TOUCH_DOLLY_OFFSET ?
-                                _this._dollyInternal(dollyDelta * TOUCH_DOLLY_FACTOR, dollyX, dollyY) :
-                                _this._zoomInternal(dollyDelta * TOUCH_DOLLY_FACTOR, dollyX, dollyY);
-                            if (_this._state === ACTION.TOUCH_DOLLY_TRUCK ||
-                                _this._state === ACTION.TOUCH_ZOOM_TRUCK) {
-                                _this._truckInternal(deltaX, deltaY, false);
-                            }
-                            else if (_this._state === ACTION.TOUCH_DOLLY_OFFSET ||
-                                _this._state === ACTION.TOUCH_ZOOM_OFFSET) {
-                                _this._truckInternal(deltaX, deltaY, true);
-                            }
-                            break;
-                        }
-                        case ACTION.TRUCK:
-                        case ACTION.TOUCH_TRUCK: {
-                            _this._truckInternal(deltaX, deltaY, false);
-                            break;
-                        }
-                        case ACTION.OFFSET:
-                        case ACTION.TOUCH_OFFSET: {
-                            _this._truckInternal(deltaX, deltaY, true);
-                            break;
-                        }
+                    extractClientCoordFromEvent(this._activePointers, _v2);
+                    // When pointer lock is enabled clientX, clientY, screenX, and screenY remain 0.
+                    // If pointer lock is enabled, use the Delta directory, and assume active-pointer is not multiple.
+                    const isPointerLockActive = this._domElement && document.pointerLockElement === this._domElement;
+                    const deltaX = isPointerLockActive ? -this._activePointers[0].deltaX : lastDragPosition.x - _v2.x;
+                    const deltaY = isPointerLockActive ? -this._activePointers[0].deltaY : lastDragPosition.y - _v2.y;
+                    lastDragPosition.copy(_v2);
+                    if ((this._state & ACTION.ROTATE) === ACTION.ROTATE ||
+                        (this._state & ACTION.TOUCH_ROTATE) === ACTION.TOUCH_ROTATE ||
+                        (this._state & ACTION.TOUCH_DOLLY_ROTATE) === ACTION.TOUCH_DOLLY_ROTATE ||
+                        (this._state & ACTION.TOUCH_ZOOM_ROTATE) === ACTION.TOUCH_ZOOM_ROTATE) {
+                        this._rotateInternal(deltaX, deltaY);
                     }
-                    _this.dispatchEvent({ type: 'control' });
-                };
-                var endDragging_1 = function () {
-                    extractClientCoordFromEvent(_this._activePointers, _v2);
-                    lastDragPosition_1.copy(_v2);
-                    if (_this._activePointers.length === 0) {
-                        _this._domElement.ownerDocument.removeEventListener('pointermove', onPointerMove_1, { passive: false });
-                        _this._domElement.ownerDocument.removeEventListener('pointerup', onPointerUp_1);
-                        _this._domElement.ownerDocument.removeEventListener('touchmove', onTouchMove_1, { passive: false });
-                        _this._domElement.ownerDocument.removeEventListener('touchend', onTouchEnd_1);
+                    if ((this._state & ACTION.DOLLY) === ACTION.DOLLY ||
+                        (this._state & ACTION.ZOOM) === ACTION.ZOOM) {
+                        const dollyX = this.dollyToCursor ? (dragStartPosition.x - this._elementRect.x) / this._elementRect.width * 2 - 1 : 0;
+                        const dollyY = this.dollyToCursor ? (dragStartPosition.y - this._elementRect.y) / this._elementRect.height * -2 + 1 : 0;
+                        this._state === ACTION.DOLLY ?
+                            this._dollyInternal(deltaY * TOUCH_DOLLY_FACTOR, dollyX, dollyY) :
+                            this._zoomInternal(deltaY * TOUCH_DOLLY_FACTOR, dollyX, dollyY);
                     }
-                    _this.dispatchEvent({ type: 'controlend' });
+                    if ((this._state & ACTION.TOUCH_DOLLY) === ACTION.TOUCH_DOLLY ||
+                        (this._state & ACTION.TOUCH_ZOOM) === ACTION.TOUCH_ZOOM ||
+                        (this._state & ACTION.TOUCH_DOLLY_TRUCK) === ACTION.TOUCH_DOLLY_TRUCK ||
+                        (this._state & ACTION.TOUCH_ZOOM_TRUCK) === ACTION.TOUCH_ZOOM_TRUCK ||
+                        (this._state & ACTION.TOUCH_DOLLY_OFFSET) === ACTION.TOUCH_DOLLY_OFFSET ||
+                        (this._state & ACTION.TOUCH_ZOOM_OFFSET) === ACTION.TOUCH_ZOOM_OFFSET ||
+                        (this._state & ACTION.TOUCH_DOLLY_ROTATE) === ACTION.TOUCH_DOLLY_ROTATE ||
+                        (this._state & ACTION.TOUCH_ZOOM_ROTATE) === ACTION.TOUCH_ZOOM_ROTATE) {
+                        const dx = _v2.x - this._activePointers[1].clientX;
+                        const dy = _v2.y - this._activePointers[1].clientY;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+                        const dollyDelta = dollyStart.y - distance;
+                        dollyStart.set(0, distance);
+                        const dollyX = this.dollyToCursor ? (lastDragPosition.x - this._elementRect.x) / this._elementRect.width * 2 - 1 : 0;
+                        const dollyY = this.dollyToCursor ? (lastDragPosition.y - this._elementRect.y) / this._elementRect.height * -2 + 1 : 0;
+                        this._state === ACTION.TOUCH_DOLLY ||
+                            this._state === ACTION.TOUCH_DOLLY_ROTATE ||
+                            this._state === ACTION.TOUCH_DOLLY_TRUCK ||
+                            this._state === ACTION.TOUCH_DOLLY_OFFSET ?
+                            this._dollyInternal(dollyDelta * TOUCH_DOLLY_FACTOR, dollyX, dollyY) :
+                            this._zoomInternal(dollyDelta * TOUCH_DOLLY_FACTOR, dollyX, dollyY);
+                    }
+                    if ((this._state & ACTION.TRUCK) === ACTION.TRUCK ||
+                        (this._state & ACTION.TOUCH_TRUCK) === ACTION.TOUCH_TRUCK ||
+                        (this._state & ACTION.TOUCH_DOLLY_TRUCK) === ACTION.TOUCH_DOLLY_TRUCK ||
+                        (this._state & ACTION.TOUCH_ZOOM_TRUCK) === ACTION.TOUCH_ZOOM_TRUCK) {
+                        this._truckInternal(deltaX, deltaY, false);
+                    }
+                    if ((this._state & ACTION.OFFSET) === ACTION.OFFSET ||
+                        (this._state & ACTION.TOUCH_OFFSET) === ACTION.TOUCH_OFFSET ||
+                        (this._state & ACTION.TOUCH_DOLLY_OFFSET) === ACTION.TOUCH_DOLLY_OFFSET ||
+                        (this._state & ACTION.TOUCH_ZOOM_OFFSET) === ACTION.TOUCH_ZOOM_OFFSET) {
+                        this._truckInternal(deltaX, deltaY, true);
+                    }
+                    this.dispatchEvent({ type: 'control' });
                 };
-                _this._domElement.addEventListener('pointerdown', onPointerDown_1);
-                isPointerEventsNotSupported && _this._domElement.addEventListener('mousedown', onMouseDown_1);
-                isPointerEventsNotSupported && _this._domElement.addEventListener('touchstart', onTouchStart_1);
-                _this._domElement.addEventListener('pointercancel', onPointerUp_1);
-                _this._domElement.addEventListener('wheel', onMouseWheel_1, { passive: false });
-                _this._domElement.addEventListener('contextmenu', onContextMenu_1);
-                _this._removeAllEventListeners = function () {
-                    _this._domElement.removeEventListener('pointerdown', onPointerDown_1);
-                    _this._domElement.removeEventListener('mousedown', onMouseDown_1);
-                    _this._domElement.removeEventListener('touchstart', onTouchStart_1);
-                    _this._domElement.removeEventListener('pointercancel', onPointerUp_1);
-                    _this._domElement.removeEventListener('wheel', onMouseWheel_1, { passive: false });
-                    _this._domElement.removeEventListener('contextmenu', onContextMenu_1);
-                    _this._domElement.ownerDocument.removeEventListener('pointermove', onPointerMove_1, { passive: false });
-                    _this._domElement.ownerDocument.removeEventListener('mousemove', onMouseMove_1);
-                    _this._domElement.ownerDocument.removeEventListener('touchmove', onTouchMove_1, { passive: false });
-                    _this._domElement.ownerDocument.removeEventListener('pointerup', onPointerUp_1);
-                    _this._domElement.ownerDocument.removeEventListener('mouseup', onMouseUp_1);
-                    _this._domElement.ownerDocument.removeEventListener('touchend', onTouchEnd_1);
+                const endDragging = () => {
+                    extractClientCoordFromEvent(this._activePointers, _v2);
+                    lastDragPosition.copy(_v2);
+                    if (this._activePointers.length === 0) {
+                        // eslint-disable-next-line no-undef
+                        this._domElement.ownerDocument.removeEventListener('pointermove', onPointerMove, { passive: false });
+                        this._domElement.ownerDocument.removeEventListener('pointerup', onPointerUp);
+                        // eslint-disable-next-line no-undef
+                        this._domElement.ownerDocument.removeEventListener('touchmove', onTouchMove, { passive: false });
+                        this._domElement.ownerDocument.removeEventListener('touchend', onTouchEnd);
+                        this.dispatchEvent({ type: 'controlend' });
+                    }
                 };
-                _this.cancel = function () {
-                    cancelDragging_1();
-                    _this.dispatchEvent({ type: 'controlend' });
+                this._domElement.addEventListener('pointerdown', onPointerDown);
+                isPointerEventsNotSupported && this._domElement.addEventListener('mousedown', onMouseDown);
+                isPointerEventsNotSupported && this._domElement.addEventListener('touchstart', onTouchStart);
+                this._domElement.addEventListener('pointercancel', onPointerUp);
+                this._domElement.addEventListener('wheel', onMouseWheel, { passive: false });
+                this._domElement.addEventListener('contextmenu', onContextMenu);
+                this._removeAllEventListeners = () => {
+                    this._domElement.removeEventListener('pointerdown', onPointerDown);
+                    this._domElement.removeEventListener('mousedown', onMouseDown);
+                    this._domElement.removeEventListener('touchstart', onTouchStart);
+                    this._domElement.removeEventListener('pointercancel', onPointerUp);
+                    // https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/removeEventListener#matching_event_listeners_for_removal
+                    // > it's probably wise to use the same values used for the call to `addEventListener()` when calling `removeEventListener()`
+                    // see https://github.com/microsoft/TypeScript/issues/32912#issuecomment-522142969
+                    // eslint-disable-next-line no-undef
+                    this._domElement.removeEventListener('wheel', onMouseWheel, { passive: false });
+                    this._domElement.removeEventListener('contextmenu', onContextMenu);
+                    // eslint-disable-next-line no-undef
+                    this._domElement.ownerDocument.removeEventListener('pointermove', onPointerMove, { passive: false });
+                    this._domElement.ownerDocument.removeEventListener('mousemove', onMouseMove);
+                    // eslint-disable-next-line no-undef
+                    this._domElement.ownerDocument.removeEventListener('touchmove', onTouchMove, { passive: false });
+                    this._domElement.ownerDocument.removeEventListener('pointerup', onPointerUp);
+                    this._domElement.ownerDocument.removeEventListener('mouseup', onMouseUp);
+                    this._domElement.ownerDocument.removeEventListener('touchend', onTouchEnd);
+                };
+                this.cancel = () => {
+                    if (this._state === ACTION.NONE)
+                        return;
+                    this._state = ACTION.NONE;
+                    this._activePointers.length = 0;
+                    endDragging();
                 };
             }
-            _this.update(0);
-            return _this;
+            this.update(0);
         }
-        CameraControls.install = function (libs) {
+        /**
+         * Injects THREE as the dependency. You can then proceed to use CameraControls.
+         *
+         * e.g
+         * ```javascript
+         * CameraControls.install( { THREE: THREE } );
+         * ```
+         *
+         * Note: If you do not wish to use enter three.js to reduce file size(tree-shaking for example), make a subset to install.
+         *
+         * ```js
+         * import {
+         * 	Vector2,
+         * 	Vector3,
+         * 	Vector4,
+         * 	Quaternion,
+         * 	Matrix4,
+         * 	Spherical,
+         * 	Box3,
+         * 	Sphere,
+         * 	Raycaster,
+         * 	MathUtils,
+         * } from 'three';
+         *
+         * const subsetOfTHREE = {
+         * 	Vector2   : Vector2,
+         * 	Vector3   : Vector3,
+         * 	Vector4   : Vector4,
+         * 	Quaternion: Quaternion,
+         * 	Matrix4   : Matrix4,
+         * 	Spherical : Spherical,
+         * 	Box3      : Box3,
+         * 	Sphere    : Sphere,
+         * 	Raycaster : Raycaster,
+         * 	MathUtils : {
+         * 		DEG2RAD: MathUtils.DEG2RAD,
+         * 		clamp: MathUtils.clamp,
+         * 	},
+         * };
+
+         * CameraControls.install( { THREE: subsetOfTHREE } );
+         * ```
+         * @category Statics
+         */
+        static install(libs) {
             THREE = libs.THREE;
             _ORIGIN = Object.freeze(new THREE.Vector3(0, 0, 0));
             _AXIS_Y = Object.freeze(new THREE.Vector3(0, 1, 0));
@@ -101705,6 +101845,8 @@
             _xColumn = new THREE.Vector3();
             _yColumn = new THREE.Vector3();
             _zColumn = new THREE.Vector3();
+            _deltaTarget = new THREE.Vector3();
+            _deltaOffset = new THREE.Vector3();
             _sphericalA = new THREE.Spherical();
             _sphericalB = new THREE.Spherical();
             _box3A = new THREE.Box3();
@@ -101714,132 +101856,246 @@
             _quaternionB = new THREE.Quaternion();
             _rotationMatrix = new THREE.Matrix4();
             _raycaster = new THREE.Raycaster();
-        };
-        Object.defineProperty(CameraControls, "ACTION", {
-            get: function () {
-                return readonlyACTION;
-            },
-            enumerable: false,
-            configurable: true
-        });
-        Object.defineProperty(CameraControls.prototype, "camera", {
-            get: function () {
-                return this._camera;
-            },
-            set: function (camera) {
-                this._camera = camera;
-                this.updateCameraUp();
-                this._camera.updateProjectionMatrix();
-                this._updateNearPlaneCorners();
-                this._needsUpdate = true;
-            },
-            enumerable: false,
-            configurable: true
-        });
-        Object.defineProperty(CameraControls.prototype, "enabled", {
-            get: function () {
-                return this._enabled;
-            },
-            set: function (enabled) {
-                this._enabled = enabled;
-                if (!enabled)
-                    this.cancel();
-            },
-            enumerable: false,
-            configurable: true
-        });
-        Object.defineProperty(CameraControls.prototype, "active", {
-            get: function () {
-                return !this._hasRested;
-            },
-            enumerable: false,
-            configurable: true
-        });
-        Object.defineProperty(CameraControls.prototype, "currentAction", {
-            get: function () {
-                return this._state;
-            },
-            enumerable: false,
-            configurable: true
-        });
-        Object.defineProperty(CameraControls.prototype, "distance", {
-            get: function () {
-                return this._spherical.radius;
-            },
-            set: function (distance) {
-                if (this._spherical.radius === distance &&
-                    this._sphericalEnd.radius === distance)
-                    return;
-                this._spherical.radius = distance;
-                this._sphericalEnd.radius = distance;
-                this._needsUpdate = true;
-            },
-            enumerable: false,
-            configurable: true
-        });
-        Object.defineProperty(CameraControls.prototype, "azimuthAngle", {
-            get: function () {
-                return this._spherical.theta;
-            },
-            set: function (azimuthAngle) {
-                if (this._spherical.theta === azimuthAngle &&
-                    this._sphericalEnd.theta === azimuthAngle)
-                    return;
-                this._spherical.theta = azimuthAngle;
-                this._sphericalEnd.theta = azimuthAngle;
-                this._needsUpdate = true;
-            },
-            enumerable: false,
-            configurable: true
-        });
-        Object.defineProperty(CameraControls.prototype, "polarAngle", {
-            get: function () {
-                return this._spherical.phi;
-            },
-            set: function (polarAngle) {
-                if (this._spherical.phi === polarAngle &&
-                    this._sphericalEnd.phi === polarAngle)
-                    return;
-                this._spherical.phi = polarAngle;
-                this._sphericalEnd.phi = polarAngle;
-                this._needsUpdate = true;
-            },
-            enumerable: false,
-            configurable: true
-        });
-        Object.defineProperty(CameraControls.prototype, "boundaryEnclosesCamera", {
-            get: function () {
-                return this._boundaryEnclosesCamera;
-            },
-            set: function (boundaryEnclosesCamera) {
-                this._boundaryEnclosesCamera = boundaryEnclosesCamera;
-                this._needsUpdate = true;
-            },
-            enumerable: false,
-            configurable: true
-        });
-        CameraControls.prototype.addEventListener = function (type, listener) {
-            _super.prototype.addEventListener.call(this, type, listener);
-        };
-        CameraControls.prototype.removeEventListener = function (type, listener) {
-            _super.prototype.removeEventListener.call(this, type, listener);
-        };
-        CameraControls.prototype.rotate = function (azimuthAngle, polarAngle, enableTransition) {
-            if (enableTransition === void 0) { enableTransition = false; }
+        }
+        /**
+         * list all ACTIONs
+         * @category Statics
+         */
+        static get ACTION() {
+            return ACTION;
+        }
+        /**
+         * The camera to be controlled
+         * @category Properties
+         */
+        get camera() {
+            return this._camera;
+        }
+        set camera(camera) {
+            this._camera = camera;
+            this.updateCameraUp();
+            this._camera.updateProjectionMatrix();
+            this._updateNearPlaneCorners();
+            this._needsUpdate = true;
+        }
+        /**
+         * Whether or not the controls are enabled.
+         * `false` to disable user dragging/touch-move, but all methods works.
+         * @category Properties
+         */
+        get enabled() {
+            return this._enabled;
+        }
+        set enabled(enabled) {
+            this._enabled = enabled;
+            if (enabled) {
+                this._domElement.style.touchAction = 'none';
+                this._domElement.style.userSelect = 'none';
+                this._domElement.style.webkitUserSelect = 'none';
+            }
+            else {
+                this.cancel();
+                this._domElement.style.touchAction = '';
+                this._domElement.style.userSelect = '';
+                this._domElement.style.webkitUserSelect = '';
+            }
+        }
+        /**
+         * Returns `true` if the controls are active updating.
+         * readonly value.
+         * @category Properties
+         */
+        get active() {
+            return !this._hasRested;
+        }
+        /**
+         * Getter for the current `ACTION`.
+         * readonly value.
+         * @category Properties
+         */
+        get currentAction() {
+            return this._state;
+        }
+        /**
+         * get/set Current distance.
+         * @category Properties
+         */
+        get distance() {
+            return this._spherical.radius;
+        }
+        set distance(distance) {
+            if (this._spherical.radius === distance &&
+                this._sphericalEnd.radius === distance)
+                return;
+            this._spherical.radius = distance;
+            this._sphericalEnd.radius = distance;
+            this._needsUpdate = true;
+        }
+        // horizontal angle
+        /**
+         * get/set the azimuth angle (horizontal) in radians.
+         * Every 360 degrees turn is added to `.azimuthAngle` value, which is accumulative.
+         * @category Properties
+         */
+        get azimuthAngle() {
+            return this._spherical.theta;
+        }
+        set azimuthAngle(azimuthAngle) {
+            if (this._spherical.theta === azimuthAngle &&
+                this._sphericalEnd.theta === azimuthAngle)
+                return;
+            this._spherical.theta = azimuthAngle;
+            this._sphericalEnd.theta = azimuthAngle;
+            this._needsUpdate = true;
+        }
+        // vertical angle
+        /**
+         * get/set the polar angle (vertical) in radians.
+         * @category Properties
+         */
+        get polarAngle() {
+            return this._spherical.phi;
+        }
+        set polarAngle(polarAngle) {
+            if (this._spherical.phi === polarAngle &&
+                this._sphericalEnd.phi === polarAngle)
+                return;
+            this._spherical.phi = polarAngle;
+            this._sphericalEnd.phi = polarAngle;
+            this._needsUpdate = true;
+        }
+        /**
+         * Whether camera position should be enclosed in the boundary or not.
+         * @category Properties
+         */
+        get boundaryEnclosesCamera() {
+            return this._boundaryEnclosesCamera;
+        }
+        set boundaryEnclosesCamera(boundaryEnclosesCamera) {
+            this._boundaryEnclosesCamera = boundaryEnclosesCamera;
+            this._needsUpdate = true;
+        }
+        /**
+         * Adds the specified event listener.
+         * Applicable event types (which is `K`) are:
+         * | Event name          | Timing |
+         * | ------------------- | ------ |
+         * | `'controlstart'`    | When the user starts to control the camera via mouse / touches. ¹ |
+         * | `'control'`         | When the user controls the camera (dragging). |
+         * | `'controlend'`      | When the user ends to control the camera. ¹ |
+         * | `'transitionstart'` | When any kind of transition starts, either user control or using a method with `enableTransition = true` |
+         * | `'update'`          | When the camera position is updated. |
+         * | `'wake'`            | When the camera starts moving. |
+         * | `'rest'`            | When the camera movement is below `.restThreshold` ². |
+         * | `'sleep'`           | When the camera end moving. |
+         *
+         * 1. `mouseButtons.wheel` (Mouse wheel control) does not emit `'controlstart'` and `'controlend'`. `mouseButtons.wheel` uses scroll-event internally, and scroll-event happens intermittently. That means "start" and "end" cannot be detected.
+         * 2. Due to damping, `sleep` will usually fire a few seconds after the camera _appears_ to have stopped moving. If you want to do something (e.g. enable UI, perform another transition) at the point when the camera has stopped, you probably want the `rest` event. This can be fine tuned using the `.restThreshold` parameter. See the [Rest and Sleep Example](https://yomotsu.github.io/camera-controls/examples/rest-and-sleep.html).
+         *
+         * e.g.
+         * ```
+         * cameraControl.addEventListener( 'controlstart', myCallbackFunction );
+         * ```
+         * @param type event name
+         * @param listener handler function
+         * @category Methods
+         */
+        addEventListener(type, listener) {
+            super.addEventListener(type, listener);
+        }
+        /**
+         * Removes the specified event listener
+         * e.g.
+         * ```
+         * cameraControl.addEventListener( 'controlstart', myCallbackFunction );
+         * ```
+         * @param type event name
+         * @param listener handler function
+         * @category Methods
+         */
+        removeEventListener(type, listener) {
+            super.removeEventListener(type, listener);
+        }
+        /**
+         * Rotate azimuthal angle(horizontal) and polar angle(vertical).
+         * Every value is added to the current value.
+         * @param azimuthAngle Azimuth rotate angle. In radian.
+         * @param polarAngle Polar rotate angle. In radian.
+         * @param enableTransition Whether to move smoothly or immediately
+         * @category Methods
+         */
+        rotate(azimuthAngle, polarAngle, enableTransition = false) {
             return this.rotateTo(this._sphericalEnd.theta + azimuthAngle, this._sphericalEnd.phi + polarAngle, enableTransition);
-        };
-        CameraControls.prototype.rotateAzimuthTo = function (azimuthAngle, enableTransition) {
-            if (enableTransition === void 0) { enableTransition = false; }
-            return this.rotateTo(this._sphericalEnd.theta + azimuthAngle, this._sphericalEnd.phi, enableTransition);
-        };
-        CameraControls.prototype.rotatePolarTo = function (polarAngle, enableTransition) {
-            if (enableTransition === void 0) { enableTransition = false; }
-            return this.rotateTo(this._sphericalEnd.theta, this._sphericalEnd.phi + polarAngle, enableTransition);
-        };
-        CameraControls.prototype.rotateTo = function (azimuthAngle, polarAngle, enableTransition) {
-            if (enableTransition === void 0) { enableTransition = false; }
-            var theta = THREE.MathUtils.clamp(azimuthAngle, this.minAzimuthAngle, this.maxAzimuthAngle);
-            var phi = THREE.MathUtils.clamp(polarAngle, this.minPolarAngle, this.maxPolarAngle);
+        }
+        /**
+         * Rotate azimuthal angle(horizontal) to the given angle and keep the same polar angle(vertical) target.
+         *
+         * e.g.
+         * ```
+         * cameraControls.rotateAzimuthTo( 30 * THREE.MathUtils.DEG2RAD, true );
+         * ```
+         * @param azimuthAngle Azimuth rotate angle. In radian.
+         * @param enableTransition Whether to move smoothly or immediately
+         * @category Methods
+         */
+        rotateAzimuthTo(azimuthAngle, enableTransition = false) {
+            return this.rotateTo(azimuthAngle, this._sphericalEnd.phi, enableTransition);
+        }
+        /**
+         * Rotate polar angle(vertical) to the given angle and keep the same azimuthal angle(horizontal) target.
+         *
+         * e.g.
+         * ```
+         * cameraControls.rotatePolarTo( 30 * THREE.MathUtils.DEG2RAD, true );
+         * ```
+         * @param polarAngle Polar rotate angle. In radian.
+         * @param enableTransition Whether to move smoothly or immediately
+         * @category Methods
+         */
+        rotatePolarTo(polarAngle, enableTransition = false) {
+            return this.rotateTo(this._sphericalEnd.theta, polarAngle, enableTransition);
+        }
+        /**
+         * Rotate azimuthal angle(horizontal) and polar angle(vertical) to the given angle.
+         * Camera view will rotate over the orbit pivot absolutely:
+         *
+         * azimuthAngle
+         * ```
+         *       0º
+         *         \
+         * 90º -----+----- -90º
+         *           \
+         *           180º
+         * ```
+         * | direction | angle                  |
+         * | --------- | ---------------------- |
+         * | front     | 0º                     |
+         * | left      | 90º (`Math.PI / 2`)    |
+         * | right     | -90º (`- Math.PI / 2`) |
+         * | back      | 180º (`Math.PI`)       |
+         *
+         * polarAngle
+         * ```
+         *     180º
+         *      |
+         *      90º
+         *      |
+         *      0º
+         * ```
+         * | direction            | angle                  |
+         * | -------------------- | ---------------------- |
+         * | top/sky              | 180º (`Math.PI`)       |
+         * | horizontal from view | 90º (`Math.PI / 2`)    |
+         * | bottom/floor         | 0º                     |
+         *
+         * @param azimuthAngle Azimuth rotate angle to. In radian.
+         * @param polarAngle Polar rotate angle to. In radian.
+         * @param enableTransition  Whether to move smoothly or immediately
+         * @category Methods
+         */
+        rotateTo(azimuthAngle, polarAngle, enableTransition = false) {
+            const theta = THREE.MathUtils.clamp(azimuthAngle, this.minAzimuthAngle, this.maxAzimuthAngle);
+            const phi = THREE.MathUtils.clamp(polarAngle, this.minPolarAngle, this.maxPolarAngle);
             this._sphericalEnd.theta = theta;
             this._sphericalEnd.phi = phi;
             this._sphericalEnd.makeSafe();
@@ -101848,24 +102104,34 @@
                 this._spherical.theta = this._sphericalEnd.theta;
                 this._spherical.phi = this._sphericalEnd.phi;
             }
-            var resolveImmediately = !enableTransition ||
+            const resolveImmediately = !enableTransition ||
                 approxEquals(this._spherical.theta, this._sphericalEnd.theta, this.restThreshold) &&
                     approxEquals(this._spherical.phi, this._sphericalEnd.phi, this.restThreshold);
             return this._createOnRestPromise(resolveImmediately);
-        };
-        CameraControls.prototype.dolly = function (distance, enableTransition) {
-            if (enableTransition === void 0) { enableTransition = false; }
+        }
+        /**
+         * Dolly in/out camera position.
+         * @param distance Distance of dollyIn. Negative number for dollyOut.
+         * @param enableTransition Whether to move smoothly or immediately.
+         * @category Methods
+         */
+        dolly(distance, enableTransition = false) {
             return this.dollyTo(this._sphericalEnd.radius - distance, enableTransition);
-        };
-        CameraControls.prototype.dollyTo = function (distance, enableTransition) {
-            if (enableTransition === void 0) { enableTransition = false; }
-            var lastRadius = this._sphericalEnd.radius;
-            var newRadius = THREE.MathUtils.clamp(distance, this.minDistance, this.maxDistance);
-            var hasCollider = this.colliderMeshes.length >= 1;
+        }
+        /**
+         * Dolly in/out camera position to given distance.
+         * @param distance Distance of dolly.
+         * @param enableTransition Whether to move smoothly or immediately.
+         * @category Methods
+         */
+        dollyTo(distance, enableTransition = false) {
+            const lastRadius = this._sphericalEnd.radius;
+            const newRadius = THREE.MathUtils.clamp(distance, this.minDistance, this.maxDistance);
+            const hasCollider = this.colliderMeshes.length >= 1;
             if (hasCollider) {
-                var maxDistanceByCollisionTest = this._collisionTest();
-                var isCollided = approxEquals(maxDistanceByCollisionTest, this._spherical.radius);
-                var isDollyIn = lastRadius > newRadius;
+                const maxDistanceByCollisionTest = this._collisionTest();
+                const isCollided = approxEquals(maxDistanceByCollisionTest, this._spherical.radius);
+                const isDollyIn = lastRadius > newRadius;
                 if (!isDollyIn && isCollided)
                     return Promise.resolve();
                 this._sphericalEnd.radius = Math.min(newRadius, maxDistanceByCollisionTest);
@@ -101877,151 +102143,223 @@
             if (!enableTransition) {
                 this._spherical.radius = this._sphericalEnd.radius;
             }
-            var resolveImmediately = !enableTransition || approxEquals(this._spherical.radius, this._sphericalEnd.radius, this.restThreshold);
+            const resolveImmediately = !enableTransition || approxEquals(this._spherical.radius, this._sphericalEnd.radius, this.restThreshold);
             return this._createOnRestPromise(resolveImmediately);
-        };
-        CameraControls.prototype.zoom = function (zoomStep, enableTransition) {
-            if (enableTransition === void 0) { enableTransition = false; }
+        }
+        /**
+         * Zoom in/out camera. The value is added to camera zoom.
+         * Limits set with `.minZoom` and `.maxZoom`
+         * @param zoomStep zoom scale
+         * @param enableTransition Whether to move smoothly or immediately
+         * @category Methods
+         */
+        zoom(zoomStep, enableTransition = false) {
             return this.zoomTo(this._zoomEnd + zoomStep, enableTransition);
-        };
-        CameraControls.prototype.zoomTo = function (zoom, enableTransition) {
-            if (enableTransition === void 0) { enableTransition = false; }
+        }
+        /**
+         * Zoom in/out camera to given scale. The value overwrites camera zoom.
+         * Limits set with .minZoom and .maxZoom
+         * @param zoom
+         * @param enableTransition
+         * @category Methods
+         */
+        zoomTo(zoom, enableTransition = false) {
             this._zoomEnd = THREE.MathUtils.clamp(zoom, this.minZoom, this.maxZoom);
             this._needsUpdate = true;
             if (!enableTransition) {
                 this._zoom = this._zoomEnd;
             }
-            var resolveImmediately = !enableTransition || approxEquals(this._zoom, this._zoomEnd, this.restThreshold);
+            const resolveImmediately = !enableTransition || approxEquals(this._zoom, this._zoomEnd, this.restThreshold);
             return this._createOnRestPromise(resolveImmediately);
-        };
-        CameraControls.prototype.pan = function (x, y, enableTransition) {
-            if (enableTransition === void 0) { enableTransition = false; }
+        }
+        /**
+         * @deprecated `pan()` has been renamed to `truck()`
+         * @category Methods
+         */
+        pan(x, y, enableTransition = false) {
             console.warn('`pan` has been renamed to `truck`');
             return this.truck(x, y, enableTransition);
-        };
-        CameraControls.prototype.truck = function (x, y, enableTransition) {
-            if (enableTransition === void 0) { enableTransition = false; }
+        }
+        /**
+         * Truck and pedestal camera using current azimuthal angle
+         * @param x Horizontal translate amount
+         * @param y Vertical translate amount
+         * @param enableTransition Whether to move smoothly or immediately
+         * @category Methods
+         */
+        truck(x, y, enableTransition = false) {
             this._camera.updateMatrix();
             _xColumn.setFromMatrixColumn(this._camera.matrix, 0);
             _yColumn.setFromMatrixColumn(this._camera.matrix, 1);
             _xColumn.multiplyScalar(x);
             _yColumn.multiplyScalar(-y);
-            var offset = _v3A.copy(_xColumn).add(_yColumn);
-            var to = _v3B.copy(this._targetEnd).add(offset);
+            const offset = _v3A.copy(_xColumn).add(_yColumn);
+            const to = _v3B.copy(this._targetEnd).add(offset);
             return this.moveTo(to.x, to.y, to.z, enableTransition);
-        };
-        CameraControls.prototype.forward = function (distance, enableTransition) {
-            if (enableTransition === void 0) { enableTransition = false; }
+        }
+        /**
+         * Move forward / backward.
+         * @param distance Amount to move forward / backward. Negative value to move backward
+         * @param enableTransition Whether to move smoothly or immediately
+         * @category Methods
+         */
+        forward(distance, enableTransition = false) {
             _v3A.setFromMatrixColumn(this._camera.matrix, 0);
             _v3A.crossVectors(this._camera.up, _v3A);
             _v3A.multiplyScalar(distance);
-            var to = _v3B.copy(this._targetEnd).add(_v3A);
+            const to = _v3B.copy(this._targetEnd).add(_v3A);
             return this.moveTo(to.x, to.y, to.z, enableTransition);
-        };
-        CameraControls.prototype.moveTo = function (x, y, z, enableTransition) {
-            if (enableTransition === void 0) { enableTransition = false; }
-            var offset = _v3A.set(x, y, z).sub(this._targetEnd);
+        }
+        /**
+         * Move target position to given point.
+         * @param x x coord to move center position
+         * @param y y coord to move center position
+         * @param z z coord to move center position
+         * @param enableTransition Whether to move smoothly or immediately
+         * @category Methods
+         */
+        moveTo(x, y, z, enableTransition = false) {
+            const offset = _v3A.set(x, y, z).sub(this._targetEnd);
             this._encloseToBoundary(this._targetEnd, offset, this.boundaryFriction);
             this._needsUpdate = true;
             if (!enableTransition) {
                 this._target.copy(this._targetEnd);
             }
-            var resolveImmediately = !enableTransition ||
+            const resolveImmediately = !enableTransition ||
                 approxEquals(this._target.x, this._targetEnd.x, this.restThreshold) &&
                     approxEquals(this._target.y, this._targetEnd.y, this.restThreshold) &&
                     approxEquals(this._target.z, this._targetEnd.z, this.restThreshold);
             return this._createOnRestPromise(resolveImmediately);
-        };
-        CameraControls.prototype.fitToBox = function (box3OrObject, enableTransition, _a) {
-            var _b = _a === void 0 ? {} : _a, _c = _b.paddingLeft, paddingLeft = _c === void 0 ? 0 : _c, _d = _b.paddingRight, paddingRight = _d === void 0 ? 0 : _d, _e = _b.paddingBottom, paddingBottom = _e === void 0 ? 0 : _e, _f = _b.paddingTop, paddingTop = _f === void 0 ? 0 : _f;
-            var promises = [];
-            var aabb = box3OrObject.isBox3
+        }
+        /**
+         * Fit the viewport to the box or the bounding box of the object, using the nearest axis. paddings are in unit.
+         * set `cover: true` to fill enter screen.
+         * e.g.
+         * ```
+         * cameraControls.fitToBox( myMesh );
+         * ```
+         * @param box3OrObject Axis aligned bounding box to fit the view.
+         * @param enableTransition Whether to move smoothly or immediately.
+         * @param options | `<object>` { cover: boolean, paddingTop: number, paddingLeft: number, paddingBottom: number, paddingRight: number }
+         * @returns Transition end promise
+         * @category Methods
+         */
+        fitToBox(box3OrObject, enableTransition, { cover = false, paddingLeft = 0, paddingRight = 0, paddingBottom = 0, paddingTop = 0 } = {}) {
+            const promises = [];
+            const aabb = box3OrObject.isBox3
                 ? _box3A.copy(box3OrObject)
                 : _box3A.setFromObject(box3OrObject);
             if (aabb.isEmpty()) {
                 console.warn('camera-controls: fitTo() cannot be used with an empty box. Aborting');
                 Promise.resolve();
             }
-            var theta = roundToStep(this._sphericalEnd.theta, PI_HALF);
-            var phi = roundToStep(this._sphericalEnd.phi, PI_HALF);
+            // round to closest axis ( forward | backward | right | left | top | bottom )
+            const theta = roundToStep(this._sphericalEnd.theta, PI_HALF);
+            const phi = roundToStep(this._sphericalEnd.phi, PI_HALF);
             promises.push(this.rotateTo(theta, phi, enableTransition));
-            var normal = _v3A.setFromSpherical(this._sphericalEnd).normalize();
-            var rotation = _quaternionA.setFromUnitVectors(normal, _AXIS_Z);
-            var viewFromPolar = approxEquals(Math.abs(normal.y), 1);
+            const normal = _v3A.setFromSpherical(this._sphericalEnd).normalize();
+            const rotation = _quaternionA.setFromUnitVectors(normal, _AXIS_Z);
+            const viewFromPolar = approxEquals(Math.abs(normal.y), 1);
             if (viewFromPolar) {
                 rotation.multiply(_quaternionB.setFromAxisAngle(_AXIS_Y, theta));
             }
-            var bb = _box3B.makeEmpty();
+            rotation.multiply(this._yAxisUpSpaceInverse);
+            // make oriented bounding box
+            const bb = _box3B.makeEmpty();
+            // left bottom back corner
             _v3B.copy(aabb.min).applyQuaternion(rotation);
             bb.expandByPoint(_v3B);
+            // right bottom back corner
             _v3B.copy(aabb.min).setX(aabb.max.x).applyQuaternion(rotation);
             bb.expandByPoint(_v3B);
+            // left top back corner
             _v3B.copy(aabb.min).setY(aabb.max.y).applyQuaternion(rotation);
             bb.expandByPoint(_v3B);
+            // right top back corner
             _v3B.copy(aabb.max).setZ(aabb.min.z).applyQuaternion(rotation);
             bb.expandByPoint(_v3B);
+            // left bottom front corner
             _v3B.copy(aabb.min).setZ(aabb.max.z).applyQuaternion(rotation);
             bb.expandByPoint(_v3B);
+            // right bottom front corner
             _v3B.copy(aabb.max).setY(aabb.min.y).applyQuaternion(rotation);
             bb.expandByPoint(_v3B);
+            // left top front corner
             _v3B.copy(aabb.max).setX(aabb.min.x).applyQuaternion(rotation);
             bb.expandByPoint(_v3B);
+            // right top front corner
             _v3B.copy(aabb.max).applyQuaternion(rotation);
             bb.expandByPoint(_v3B);
-            rotation.setFromUnitVectors(_AXIS_Z, normal);
+            // add padding
             bb.min.x -= paddingLeft;
             bb.min.y -= paddingBottom;
             bb.max.x += paddingRight;
             bb.max.y += paddingTop;
-            var bbSize = bb.getSize(_v3A);
-            var center = bb.getCenter(_v3B).applyQuaternion(rotation);
+            rotation.setFromUnitVectors(_AXIS_Z, normal);
+            if (viewFromPolar) {
+                rotation.premultiply(_quaternionB.invert());
+            }
+            rotation.premultiply(this._yAxisUpSpace);
+            const bbSize = bb.getSize(_v3A);
+            const center = bb.getCenter(_v3B).applyQuaternion(rotation);
             if (isPerspectiveCamera(this._camera)) {
-                var distance = this.getDistanceToFitBox(bbSize.x, bbSize.y, bbSize.z);
+                const distance = this.getDistanceToFitBox(bbSize.x, bbSize.y, bbSize.z, cover);
                 promises.push(this.moveTo(center.x, center.y, center.z, enableTransition));
                 promises.push(this.dollyTo(distance, enableTransition));
                 promises.push(this.setFocalOffset(0, 0, 0, enableTransition));
             }
             else if (isOrthographicCamera(this._camera)) {
-                var camera = this._camera;
-                var width = camera.right - camera.left;
-                var height = camera.top - camera.bottom;
-                var zoom = Math.min(width / bbSize.x, height / bbSize.y);
+                const camera = this._camera;
+                const width = camera.right - camera.left;
+                const height = camera.top - camera.bottom;
+                const zoom = cover ? Math.max(width / bbSize.x, height / bbSize.y) : Math.min(width / bbSize.x, height / bbSize.y);
                 promises.push(this.moveTo(center.x, center.y, center.z, enableTransition));
                 promises.push(this.zoomTo(zoom, enableTransition));
                 promises.push(this.setFocalOffset(0, 0, 0, enableTransition));
             }
             return Promise.all(promises);
-        };
-        CameraControls.prototype.fitTo = function (box3OrObject, enableTransition, fitToOptions) {
-            if (fitToOptions === void 0) { fitToOptions = {}; }
-            console.warn('camera-controls: fitTo() has been renamed to fitToBox()');
-            return this.fitToBox(box3OrObject, enableTransition, fitToOptions);
-        };
-        CameraControls.prototype.fitToSphere = function (sphereOrMesh, enableTransition) {
-            var promises = [];
-            var isSphere = sphereOrMesh instanceof THREE.Sphere;
-            var boundingSphere = isSphere ?
+        }
+        /**
+         * Fit the viewport to the sphere or the bounding sphere of the object.
+         * @param sphereOrMesh
+         * @param enableTransition
+         * @category Methods
+         */
+        fitToSphere(sphereOrMesh, enableTransition) {
+            const promises = [];
+            const isSphere = sphereOrMesh instanceof THREE.Sphere;
+            const boundingSphere = isSphere ?
                 _sphere.copy(sphereOrMesh) :
                 createBoundingSphere(sphereOrMesh, _sphere);
             promises.push(this.moveTo(boundingSphere.center.x, boundingSphere.center.y, boundingSphere.center.z, enableTransition));
             if (isPerspectiveCamera(this._camera)) {
-                var distanceToFit = this.getDistanceToFitSphere(boundingSphere.radius);
+                const distanceToFit = this.getDistanceToFitSphere(boundingSphere.radius);
                 promises.push(this.dollyTo(distanceToFit, enableTransition));
             }
             else if (isOrthographicCamera(this._camera)) {
-                var width = this._camera.right - this._camera.left;
-                var height = this._camera.top - this._camera.bottom;
-                var diameter = 2 * boundingSphere.radius;
-                var zoom = Math.min(width / diameter, height / diameter);
+                const width = this._camera.right - this._camera.left;
+                const height = this._camera.top - this._camera.bottom;
+                const diameter = 2 * boundingSphere.radius;
+                const zoom = Math.min(width / diameter, height / diameter);
                 promises.push(this.zoomTo(zoom, enableTransition));
             }
             promises.push(this.setFocalOffset(0, 0, 0, enableTransition));
             return Promise.all(promises);
-        };
-        CameraControls.prototype.setLookAt = function (positionX, positionY, positionZ, targetX, targetY, targetZ, enableTransition) {
-            if (enableTransition === void 0) { enableTransition = false; }
-            var target = _v3B.set(targetX, targetY, targetZ);
-            var position = _v3A.set(positionX, positionY, positionZ);
+        }
+        /**
+         * Make an orbit with given points.
+         * @param positionX
+         * @param positionY
+         * @param positionZ
+         * @param targetX
+         * @param targetY
+         * @param targetZ
+         * @param enableTransition
+         * @category Methods
+         */
+        setLookAt(positionX, positionY, positionZ, targetX, targetY, targetZ, enableTransition = false) {
+            const target = _v3B.set(targetX, targetY, targetZ);
+            const position = _v3A.set(positionX, positionY, positionZ);
             this._targetEnd.copy(target);
             this._sphericalEnd.setFromVector3(position.sub(target).applyQuaternion(this._yAxisUpSpace));
             this.normalizeRotations();
@@ -102030,7 +102368,7 @@
                 this._target.copy(this._targetEnd);
                 this._spherical.copy(this._sphericalEnd);
             }
-            var resolveImmediately = !enableTransition ||
+            const resolveImmediately = !enableTransition ||
                 approxEquals(this._target.x, this._targetEnd.x, this.restThreshold) &&
                     approxEquals(this._target.y, this._targetEnd.y, this.restThreshold) &&
                     approxEquals(this._target.z, this._targetEnd.z, this.restThreshold) &&
@@ -102038,19 +102376,36 @@
                     approxEquals(this._spherical.phi, this._sphericalEnd.phi, this.restThreshold) &&
                     approxEquals(this._spherical.radius, this._sphericalEnd.radius, this.restThreshold);
             return this._createOnRestPromise(resolveImmediately);
-        };
-        CameraControls.prototype.lerpLookAt = function (positionAX, positionAY, positionAZ, targetAX, targetAY, targetAZ, positionBX, positionBY, positionBZ, targetBX, targetBY, targetBZ, t, enableTransition) {
-            if (enableTransition === void 0) { enableTransition = false; }
-            var targetA = _v3A.set(targetAX, targetAY, targetAZ);
-            var positionA = _v3B.set(positionAX, positionAY, positionAZ);
+        }
+        /**
+         * Similar to setLookAt, but it interpolates between two states.
+         * @param positionAX
+         * @param positionAY
+         * @param positionAZ
+         * @param targetAX
+         * @param targetAY
+         * @param targetAZ
+         * @param positionBX
+         * @param positionBY
+         * @param positionBZ
+         * @param targetBX
+         * @param targetBY
+         * @param targetBZ
+         * @param t
+         * @param enableTransition
+         * @category Methods
+         */
+        lerpLookAt(positionAX, positionAY, positionAZ, targetAX, targetAY, targetAZ, positionBX, positionBY, positionBZ, targetBX, targetBY, targetBZ, t, enableTransition = false) {
+            const targetA = _v3A.set(targetAX, targetAY, targetAZ);
+            const positionA = _v3B.set(positionAX, positionAY, positionAZ);
             _sphericalA.setFromVector3(positionA.sub(targetA).applyQuaternion(this._yAxisUpSpace));
-            var targetB = _v3C.set(targetBX, targetBY, targetBZ);
-            var positionB = _v3B.set(positionBX, positionBY, positionBZ);
+            const targetB = _v3C.set(targetBX, targetBY, targetBZ);
+            const positionB = _v3B.set(positionBX, positionBY, positionBZ);
             _sphericalB.setFromVector3(positionB.sub(targetB).applyQuaternion(this._yAxisUpSpace));
-            this._targetEnd.copy(targetA.lerp(targetB, t));
-            var deltaTheta = _sphericalB.theta - _sphericalA.theta;
-            var deltaPhi = _sphericalB.phi - _sphericalA.phi;
-            var deltaRadius = _sphericalB.radius - _sphericalA.radius;
+            this._targetEnd.copy(targetA.lerp(targetB, t)); // tricky
+            const deltaTheta = _sphericalB.theta - _sphericalA.theta;
+            const deltaPhi = _sphericalB.phi - _sphericalA.phi;
+            const deltaRadius = _sphericalB.radius - _sphericalA.radius;
             this._sphericalEnd.set(_sphericalA.radius + deltaRadius * t, _sphericalA.phi + deltaPhi * t, _sphericalA.theta + deltaTheta * t);
             this.normalizeRotations();
             this._needsUpdate = true;
@@ -102058,7 +102413,7 @@
                 this._target.copy(this._targetEnd);
                 this._spherical.copy(this._sphericalEnd);
             }
-            var resolveImmediately = !enableTransition ||
+            const resolveImmediately = !enableTransition ||
                 approxEquals(this._target.x, this._targetEnd.x, this.restThreshold) &&
                     approxEquals(this._target.y, this._targetEnd.y, this.restThreshold) &&
                     approxEquals(this._target.z, this._targetEnd.z, this.restThreshold) &&
@@ -102066,36 +102421,66 @@
                     approxEquals(this._spherical.phi, this._sphericalEnd.phi, this.restThreshold) &&
                     approxEquals(this._spherical.radius, this._sphericalEnd.radius, this.restThreshold);
             return this._createOnRestPromise(resolveImmediately);
-        };
-        CameraControls.prototype.setPosition = function (positionX, positionY, positionZ, enableTransition) {
-            if (enableTransition === void 0) { enableTransition = false; }
+        }
+        /**
+         * setLookAt without target, keep gazing at the current target
+         * @param positionX
+         * @param positionY
+         * @param positionZ
+         * @param enableTransition
+         * @category Methods
+         */
+        setPosition(positionX, positionY, positionZ, enableTransition = false) {
             return this.setLookAt(positionX, positionY, positionZ, this._targetEnd.x, this._targetEnd.y, this._targetEnd.z, enableTransition);
-        };
-        CameraControls.prototype.setTarget = function (targetX, targetY, targetZ, enableTransition) {
-            if (enableTransition === void 0) { enableTransition = false; }
-            var pos = this.getPosition(_v3A);
+        }
+        /**
+         * setLookAt without position, Stay still at the position.
+         * @param targetX
+         * @param targetY
+         * @param targetZ
+         * @param enableTransition
+         * @category Methods
+         */
+        setTarget(targetX, targetY, targetZ, enableTransition = false) {
+            const pos = this.getPosition(_v3A);
             return this.setLookAt(pos.x, pos.y, pos.z, targetX, targetY, targetZ, enableTransition);
-        };
-        CameraControls.prototype.setFocalOffset = function (x, y, z, enableTransition) {
-            if (enableTransition === void 0) { enableTransition = false; }
+        }
+        /**
+         * Set focal offset using the screen parallel coordinates. z doesn't affect in Orthographic as with Dolly.
+         * @param x
+         * @param y
+         * @param z
+         * @param enableTransition
+         * @category Methods
+         */
+        setFocalOffset(x, y, z, enableTransition = false) {
             this._focalOffsetEnd.set(x, y, z);
             this._needsUpdate = true;
             if (!enableTransition) {
                 this._focalOffset.copy(this._focalOffsetEnd);
             }
-            var resolveImmediately = !enableTransition ||
+            const resolveImmediately = !enableTransition ||
                 approxEquals(this._focalOffset.x, this._focalOffsetEnd.x, this.restThreshold) &&
                     approxEquals(this._focalOffset.y, this._focalOffsetEnd.y, this.restThreshold) &&
                     approxEquals(this._focalOffset.z, this._focalOffsetEnd.z, this.restThreshold);
             return this._createOnRestPromise(resolveImmediately);
-        };
-        CameraControls.prototype.setOrbitPoint = function (targetX, targetY, targetZ) {
+        }
+        /**
+         * Set orbit point without moving the camera.
+         * SHOULD NOT RUN DURING ANIMATIONS. `setOrbitPoint()` will immediately fix the positions.
+         * @param targetX
+         * @param targetY
+         * @param targetZ
+         * @category Methods
+         */
+        setOrbitPoint(targetX, targetY, targetZ) {
+            this._camera.updateMatrixWorld();
             _xColumn.setFromMatrixColumn(this._camera.matrixWorldInverse, 0);
             _yColumn.setFromMatrixColumn(this._camera.matrixWorldInverse, 1);
             _zColumn.setFromMatrixColumn(this._camera.matrixWorldInverse, 2);
-            var position = _v3A.set(targetX, targetY, targetZ);
-            var distance = position.distanceTo(this._camera.position);
-            var cameraToPoint = position.sub(this._camera.position);
+            const position = _v3A.set(targetX, targetY, targetZ);
+            const distance = position.distanceTo(this._camera.position);
+            const cameraToPoint = position.sub(this._camera.position);
             _xColumn.multiplyScalar(cameraToPoint.x);
             _yColumn.multiplyScalar(cameraToPoint.y);
             _zColumn.multiplyScalar(cameraToPoint.z);
@@ -102104,8 +102489,13 @@
             this.dollyTo(distance, false);
             this.setFocalOffset(-_v3A.x, _v3A.y, -_v3A.z, false);
             this.moveTo(targetX, targetY, targetZ, false);
-        };
-        CameraControls.prototype.setBoundary = function (box3) {
+        }
+        /**
+         * Set the boundary box that encloses the target of the camera. box3 is in THREE.Box3
+         * @param box3
+         * @category Methods
+         */
+        setBoundary(box3) {
             if (!box3) {
                 this._boundary.min.set(-Infinity, -Infinity, -Infinity);
                 this._boundary.max.set(Infinity, Infinity, Infinity);
@@ -102115,85 +102505,149 @@
             this._boundary.copy(box3);
             this._boundary.clampPoint(this._targetEnd, this._targetEnd);
             this._needsUpdate = true;
-        };
-        CameraControls.prototype.setViewport = function (viewportOrX, y, width, height) {
-            if (viewportOrX === null) {
+        }
+        /**
+         * Set (or unset) the current viewport.
+         * Set this when you want to use renderer viewport and .dollyToCursor feature at the same time.
+         * @param viewportOrX
+         * @param y
+         * @param width
+         * @param height
+         * @category Methods
+         */
+        setViewport(viewportOrX, y, width, height) {
+            if (viewportOrX === null) { // null
                 this._viewport = null;
                 return;
             }
             this._viewport = this._viewport || new THREE.Vector4();
-            if (typeof viewportOrX === 'number') {
+            if (typeof viewportOrX === 'number') { // number
                 this._viewport.set(viewportOrX, y, width, height);
             }
-            else {
+            else { // Vector4
                 this._viewport.copy(viewportOrX);
             }
-        };
-        CameraControls.prototype.getDistanceToFitBox = function (width, height, depth) {
+        }
+        /**
+         * Calculate the distance to fit the box.
+         * @param width box width
+         * @param height box height
+         * @param depth box depth
+         * @returns distance
+         * @category Methods
+         */
+        getDistanceToFitBox(width, height, depth, cover = false) {
             if (notSupportedInOrthographicCamera(this._camera, 'getDistanceToFitBox'))
                 return this._spherical.radius;
-            var boundingRectAspect = width / height;
-            var fov = this._camera.getEffectiveFOV() * THREE.MathUtils.DEG2RAD;
-            var aspect = this._camera.aspect;
-            var heightToFit = boundingRectAspect < aspect ? height : width / aspect;
+            const boundingRectAspect = width / height;
+            const fov = this._camera.getEffectiveFOV() * THREE.MathUtils.DEG2RAD;
+            const aspect = this._camera.aspect;
+            const heightToFit = (cover ? boundingRectAspect > aspect : boundingRectAspect < aspect) ? height : width / aspect;
             return heightToFit * 0.5 / Math.tan(fov * 0.5) + depth * 0.5;
-        };
-        CameraControls.prototype.getDistanceToFit = function (width, height, depth) {
-            console.warn('camera-controls: getDistanceToFit() has been renamed to getDistanceToFitBox()');
-            return this.getDistanceToFitBox(width, height, depth);
-        };
-        CameraControls.prototype.getDistanceToFitSphere = function (radius) {
+        }
+        /**
+         * Calculate the distance to fit the sphere.
+         * @param radius sphere radius
+         * @returns distance
+         * @category Methods
+         */
+        getDistanceToFitSphere(radius) {
             if (notSupportedInOrthographicCamera(this._camera, 'getDistanceToFitSphere'))
                 return this._spherical.radius;
-            var vFOV = this._camera.getEffectiveFOV() * THREE.MathUtils.DEG2RAD;
-            var hFOV = Math.atan(Math.tan(vFOV * 0.5) * this._camera.aspect) * 2;
-            var fov = 1 < this._camera.aspect ? vFOV : hFOV;
+            // https://stackoverflow.com/a/44849975
+            const vFOV = this._camera.getEffectiveFOV() * THREE.MathUtils.DEG2RAD;
+            const hFOV = Math.atan(Math.tan(vFOV * 0.5) * this._camera.aspect) * 2;
+            const fov = 1 < this._camera.aspect ? vFOV : hFOV;
             return radius / (Math.sin(fov * 0.5));
-        };
-        CameraControls.prototype.getTarget = function (out) {
-            var _out = !!out && out.isVector3 ? out : new THREE.Vector3();
+        }
+        /**
+         * Returns its current gazing target, which is the center position of the orbit.
+         * @param out current gazing target
+         * @category Methods
+         */
+        getTarget(out) {
+            const _out = !!out && out.isVector3 ? out : new THREE.Vector3();
             return _out.copy(this._targetEnd);
-        };
-        CameraControls.prototype.getPosition = function (out) {
-            var _out = !!out && out.isVector3 ? out : new THREE.Vector3();
+        }
+        /**
+         * Returns its current position.
+         * @param out current position
+         * @category Methods
+         */
+        getPosition(out) {
+            const _out = !!out && out.isVector3 ? out : new THREE.Vector3();
             return _out.setFromSpherical(this._sphericalEnd).applyQuaternion(this._yAxisUpSpaceInverse).add(this._targetEnd);
-        };
-        CameraControls.prototype.getFocalOffset = function (out) {
-            var _out = !!out && out.isVector3 ? out : new THREE.Vector3();
+        }
+        /**
+         * Returns its current focal offset, which is how much the camera appears to be translated in screen parallel coordinates.
+         * @param out current focal offset
+         * @category Methods
+         */
+        getFocalOffset(out) {
+            const _out = !!out && out.isVector3 ? out : new THREE.Vector3();
             return _out.copy(this._focalOffsetEnd);
-        };
-        CameraControls.prototype.normalizeRotations = function () {
+        }
+        /**
+         * Normalize camera azimuth angle rotation between 0 and 360 degrees.
+         * @category Methods
+         */
+        normalizeRotations() {
             this._sphericalEnd.theta = this._sphericalEnd.theta % PI_2;
             if (this._sphericalEnd.theta < 0)
                 this._sphericalEnd.theta += PI_2;
             this._spherical.theta += PI_2 * Math.round((this._sphericalEnd.theta - this._spherical.theta) / PI_2);
-        };
-        CameraControls.prototype.reset = function (enableTransition) {
-            if (enableTransition === void 0) { enableTransition = false; }
-            var promises = [
+        }
+        /**
+         * Reset all rotation and position to defaults.
+         * @param enableTransition
+         * @category Methods
+         */
+        reset(enableTransition = false) {
+            const promises = [
                 this.setLookAt(this._position0.x, this._position0.y, this._position0.z, this._target0.x, this._target0.y, this._target0.z, enableTransition),
                 this.setFocalOffset(this._focalOffset0.x, this._focalOffset0.y, this._focalOffset0.z, enableTransition),
                 this.zoomTo(this._zoom0, enableTransition),
             ];
             return Promise.all(promises);
-        };
-        CameraControls.prototype.saveState = function () {
-            this._target0.copy(this._target);
-            this._position0.copy(this._camera.position);
+        }
+        /**
+         * Set current camera position as the default position.
+         * @category Methods
+         */
+        saveState() {
+            this.getTarget(this._target0);
+            this.getPosition(this._position0);
             this._zoom0 = this._zoom;
-        };
-        CameraControls.prototype.updateCameraUp = function () {
+            this._focalOffset0.copy(this._focalOffset);
+        }
+        /**
+         * Sync camera-up direction.
+         * When camera-up vector is changed, `.updateCameraUp()` must be called.
+         * @category Methods
+         */
+        updateCameraUp() {
             this._yAxisUpSpace.setFromUnitVectors(this._camera.up, _AXIS_Y);
             quatInvertCompat(this._yAxisUpSpaceInverse.copy(this._yAxisUpSpace));
-        };
-        CameraControls.prototype.update = function (delta) {
-            var dampingFactor = this._state === ACTION.NONE ? this.dampingFactor : this.draggingDampingFactor;
-            var lerpRatio = Math.min(dampingFactor * delta * 60, 1);
-            var deltaTheta = this._sphericalEnd.theta - this._spherical.theta;
-            var deltaPhi = this._sphericalEnd.phi - this._spherical.phi;
-            var deltaRadius = this._sphericalEnd.radius - this._spherical.radius;
-            var deltaTarget = _v3A.subVectors(this._targetEnd, this._target);
-            var deltaOffset = _v3B.subVectors(this._focalOffsetEnd, this._focalOffset);
+        }
+        /**
+         * Update camera position and directions.
+         * This should be called in your tick loop every time, and returns true if re-rendering is needed.
+         * @param delta
+         * @returns updated
+         * @category Methods
+         */
+        update(delta) {
+            const dampingFactor = this._state === ACTION.NONE ? this.dampingFactor : this.draggingDampingFactor;
+            // The original THREE.OrbitControls assume 60 FPS fixed and does NOT rely on delta time.
+            // (that must be a problem of the original one though)
+            // To to emulate the speed of the original one under 60 FPS, multiply `60` to delta,
+            // but ours are more flexible to any FPS unlike the original.
+            const lerpRatio = Math.min(dampingFactor * delta * 60, 1);
+            const deltaTheta = this._sphericalEnd.theta - this._spherical.theta;
+            const deltaPhi = this._sphericalEnd.phi - this._spherical.phi;
+            const deltaRadius = this._sphericalEnd.radius - this._spherical.radius;
+            const deltaTarget = _deltaTarget.subVectors(this._targetEnd, this._target);
+            const deltaOffset = _deltaOffset.subVectors(this._focalOffsetEnd, this._focalOffset);
             if (!approxZero(deltaTheta) ||
                 !approxZero(deltaPhi) ||
                 !approxZero(deltaRadius) ||
@@ -102215,39 +102669,54 @@
             }
             if (this._dollyControlAmount !== 0) {
                 if (isPerspectiveCamera(this._camera)) {
-                    var camera = this._camera;
-                    var direction = _v3A.setFromSpherical(this._sphericalEnd).applyQuaternion(this._yAxisUpSpaceInverse).normalize().negate();
-                    var planeX = _v3B.copy(direction).cross(camera.up).normalize();
+                    const camera = this._camera;
+                    const direction = _v3A.setFromSpherical(this._sphericalEnd).applyQuaternion(this._yAxisUpSpaceInverse).normalize().negate();
+                    const planeX = _v3B.copy(direction).cross(camera.up).normalize();
                     if (planeX.lengthSq() === 0)
                         planeX.x = 1.0;
-                    var planeY = _v3C.crossVectors(planeX, direction);
-                    var worldToScreen = this._sphericalEnd.radius * Math.tan(camera.getEffectiveFOV() * THREE.MathUtils.DEG2RAD * 0.5);
-                    var prevRadius = this._sphericalEnd.radius - this._dollyControlAmount;
-                    var lerpRatio_1 = (prevRadius - this._sphericalEnd.radius) / this._sphericalEnd.radius;
-                    var cursor = _v3A.copy(this._targetEnd)
+                    const planeY = _v3C.crossVectors(planeX, direction);
+                    const worldToScreen = this._sphericalEnd.radius * Math.tan(camera.getEffectiveFOV() * THREE.MathUtils.DEG2RAD * 0.5);
+                    const prevRadius = this._sphericalEnd.radius - this._dollyControlAmount;
+                    const lerpRatio = (prevRadius - this._sphericalEnd.radius) / this._sphericalEnd.radius;
+                    const cursor = _v3A.copy(this._targetEnd)
                         .add(planeX.multiplyScalar(this._dollyControlCoord.x * worldToScreen * camera.aspect))
                         .add(planeY.multiplyScalar(this._dollyControlCoord.y * worldToScreen));
-                    this._targetEnd.lerp(cursor, lerpRatio_1);
-                    this._target.copy(this._targetEnd);
+                    this._targetEnd.lerp(cursor, lerpRatio);
                 }
                 else if (isOrthographicCamera(this._camera)) {
-                    var camera = this._camera;
-                    var worldPosition = _v3A.set(this._dollyControlCoord.x, this._dollyControlCoord.y, (camera.near + camera.far) / (camera.near - camera.far)).unproject(camera);
-                    var quaternion = _v3B.set(0, 0, -1).applyQuaternion(camera.quaternion);
-                    var divisor = quaternion.dot(camera.up);
-                    var distance = approxZero(divisor) ? -worldPosition.dot(camera.up) : -worldPosition.dot(camera.up) / divisor;
-                    var cursor = _v3C.copy(worldPosition).add(quaternion.multiplyScalar(distance));
-                    this._targetEnd.lerp(cursor, 1 - camera.zoom / this._dollyControlAmount);
-                    this._target.copy(this._targetEnd);
+                    const camera = this._camera;
+                    // calc the "distance" of Plane given a point and normal vector
+                    // https://www.maplesoft.com/support/help/maple/view.aspx?path=MathApps%2FEquationOfAPlaneNormal#bkmrk0
+                    const cameraDirection = camera.getWorldDirection(_v3A.clone());
+                    const prevPlaneConstant = (this._targetEnd.x * cameraDirection.x +
+                        this._targetEnd.y * cameraDirection.y +
+                        this._targetEnd.z * cameraDirection.z);
+                    const worldPosition = _v3A.set(this._dollyControlCoord.x, this._dollyControlCoord.y, (camera.near + camera.far) / (camera.near - camera.far)).unproject(camera);
+                    const quaternion = _v3B.set(0, 0, -1).applyQuaternion(camera.quaternion);
+                    const cursor = _v3C.copy(worldPosition).add(quaternion.multiplyScalar(-worldPosition.dot(camera.up)));
+                    const prevZoom = this._zoom - this._dollyControlAmount;
+                    const lerpRatio = -(prevZoom - this._zoomEnd) / this._zoom;
+                    this._targetEnd.lerp(cursor, lerpRatio);
+                    const newPlaneConstant = (this._targetEnd.x * cameraDirection.x +
+                        this._targetEnd.y * cameraDirection.y +
+                        this._targetEnd.z * cameraDirection.z);
+                    // Pull back the camera depth that has moved. the camera is stationary as zoom
+                    const pullBack = cameraDirection.multiplyScalar(newPlaneConstant - prevPlaneConstant);
+                    this._targetEnd.sub(pullBack);
                 }
+                this._target.copy(this._targetEnd);
+                // target position may be moved beyond boundary.
+                this._boundary.clampPoint(this._targetEnd, this._targetEnd);
                 this._dollyControlAmount = 0;
             }
-            var maxDistance = this._collisionTest();
+            const maxDistance = this._collisionTest();
             this._spherical.radius = Math.min(this._spherical.radius, maxDistance);
+            // decompose spherical to the camera position
             this._spherical.makeSafe();
             this._camera.position.setFromSpherical(this._spherical).applyQuaternion(this._yAxisUpSpaceInverse).add(this._target);
             this._camera.lookAt(this._target);
-            var affectOffset = !approxZero(this._focalOffset.x) ||
+            // set offset after the orbit movement
+            const affectOffset = !approxZero(this._focalOffset.x) ||
                 !approxZero(this._focalOffset.y) ||
                 !approxZero(this._focalOffset.z);
             if (affectOffset) {
@@ -102257,24 +102726,25 @@
                 _zColumn.setFromMatrixColumn(this._camera.matrix, 2);
                 _xColumn.multiplyScalar(this._focalOffset.x);
                 _yColumn.multiplyScalar(-this._focalOffset.y);
-                _zColumn.multiplyScalar(this._focalOffset.z);
+                _zColumn.multiplyScalar(this._focalOffset.z); // notice: z-offset will not affect in Orthographic.
                 _v3A.copy(_xColumn).add(_yColumn).add(_zColumn);
                 this._camera.position.add(_v3A);
             }
             if (this._boundaryEnclosesCamera) {
                 this._encloseToBoundary(this._camera.position.copy(this._target), _v3A.setFromSpherical(this._spherical).applyQuaternion(this._yAxisUpSpaceInverse), 1.0);
             }
-            var zoomDelta = this._zoomEnd - this._zoom;
-            this._zoom += zoomDelta * lerpRatio;
+            // zoom
+            const deltaZoom = this._zoomEnd - this._zoom;
+            this._zoom += deltaZoom * lerpRatio;
             if (this._camera.zoom !== this._zoom) {
-                if (approxZero(zoomDelta))
+                if (approxZero(deltaZoom))
                     this._zoom = this._zoomEnd;
                 this._camera.zoom = this._zoom;
                 this._camera.updateProjectionMatrix();
                 this._updateNearPlaneCorners();
                 this._needsUpdate = true;
             }
-            var updated = this._needsUpdate;
+            const updated = this._needsUpdate;
             if (updated && !this._updatedLastTime) {
                 this._hasRested = false;
                 this.dispatchEvent({ type: 'wake' });
@@ -102291,6 +102761,7 @@
                     approxZero(deltaOffset.x, this.restThreshold) &&
                     approxZero(deltaOffset.y, this.restThreshold) &&
                     approxZero(deltaOffset.z, this.restThreshold) &&
+                    approxZero(deltaZoom, this.restThreshold) &&
                     !this._hasRested) {
                     this._hasRested = true;
                     this.dispatchEvent({ type: 'rest' });
@@ -102302,8 +102773,12 @@
             this._updatedLastTime = updated;
             this._needsUpdate = false;
             return updated;
-        };
-        CameraControls.prototype.toJSON = function () {
+        }
+        /**
+         * Get all state in JSON string
+         * @category Methods
+         */
+        toJSON() {
             return JSON.stringify({
                 enabled: this._enabled,
                 minDistance: this.minDistance,
@@ -102329,11 +102804,16 @@
                 zoom0: this._zoom0,
                 focalOffset0: this._focalOffset0.toArray(),
             });
-        };
-        CameraControls.prototype.fromJSON = function (json, enableTransition) {
-            if (enableTransition === void 0) { enableTransition = false; }
-            var obj = JSON.parse(json);
-            var position = _v3A.fromArray(obj.position);
+        }
+        /**
+         * Reproduce the control state with JSON. enableTransition is where anim or not in a boolean.
+         * @param json
+         * @param enableTransition
+         * @category Methods
+         */
+        fromJSON(json, enableTransition = false) {
+            const obj = JSON.parse(json);
+            const position = _v3A.fromArray(obj.position);
             this.enabled = obj.enabled;
             this.minDistance = obj.minDistance;
             this.maxDistance = maxNumberToInfinity(obj.maxDistance);
@@ -102359,13 +102839,18 @@
             this.zoomTo(obj.zoom, enableTransition);
             this.setFocalOffset(obj.focalOffset[0], obj.focalOffset[1], obj.focalOffset[2], enableTransition);
             this._needsUpdate = true;
-        };
-        CameraControls.prototype.dispose = function () {
+        }
+        /**
+         * Dispose the cameraControls instance itself, remove all eventListeners.
+         * @category Methods
+         */
+        dispose() {
             this._removeAllEventListeners();
-        };
-        CameraControls.prototype._findPointerById = function (pointerId) {
-            var pointer = null;
-            this._activePointers.some(function (activePointer) {
+        }
+        _findPointerById(pointerId) {
+            // to support IE11 use some instead of Array#find (will be removed when IE11 is deprecated)
+            let pointer = null;
+            this._activePointers.some((activePointer) => {
                 if (activePointer.pointerId === pointerId) {
                     pointer = activePointer;
                     return true;
@@ -102373,140 +102858,149 @@
                 return false;
             });
             return pointer;
-        };
-        CameraControls.prototype._encloseToBoundary = function (position, offset, friction) {
-            var offsetLength2 = offset.lengthSq();
-            if (offsetLength2 === 0.0) {
+        }
+        _encloseToBoundary(position, offset, friction) {
+            const offsetLength2 = offset.lengthSq();
+            if (offsetLength2 === 0.0) { // sanity check
                 return position;
             }
-            var newTarget = _v3B.copy(offset).add(position);
-            var clampedTarget = this._boundary.clampPoint(newTarget, _v3C);
-            var deltaClampedTarget = clampedTarget.sub(newTarget);
-            var deltaClampedTargetLength2 = deltaClampedTarget.lengthSq();
-            if (deltaClampedTargetLength2 === 0.0) {
+            // See: https://twitter.com/FMS_Cat/status/1106508958640988161
+            const newTarget = _v3B.copy(offset).add(position); // target
+            const clampedTarget = this._boundary.clampPoint(newTarget, _v3C); // clamped target
+            const deltaClampedTarget = clampedTarget.sub(newTarget); // newTarget -> clampedTarget
+            const deltaClampedTargetLength2 = deltaClampedTarget.lengthSq(); // squared length of deltaClampedTarget
+            if (deltaClampedTargetLength2 === 0.0) { // when the position doesn't have to be clamped
                 return position.add(offset);
             }
-            else if (deltaClampedTargetLength2 === offsetLength2) {
+            else if (deltaClampedTargetLength2 === offsetLength2) { // when the position is completely stuck
                 return position;
             }
             else if (friction === 0.0) {
                 return position.add(offset).add(deltaClampedTarget);
             }
             else {
-                var offsetFactor = 1.0 + friction * deltaClampedTargetLength2 / offset.dot(deltaClampedTarget);
+                const offsetFactor = 1.0 + friction * deltaClampedTargetLength2 / offset.dot(deltaClampedTarget);
                 return position
                     .add(_v3B.copy(offset).multiplyScalar(offsetFactor))
                     .add(deltaClampedTarget.multiplyScalar(1.0 - friction));
             }
-        };
-        CameraControls.prototype._updateNearPlaneCorners = function () {
+        }
+        _updateNearPlaneCorners() {
             if (isPerspectiveCamera(this._camera)) {
-                var camera = this._camera;
-                var near = camera.near;
-                var fov = camera.getEffectiveFOV() * THREE.MathUtils.DEG2RAD;
-                var heightHalf = Math.tan(fov * 0.5) * near;
-                var widthHalf = heightHalf * camera.aspect;
+                const camera = this._camera;
+                const near = camera.near;
+                const fov = camera.getEffectiveFOV() * THREE.MathUtils.DEG2RAD;
+                const heightHalf = Math.tan(fov * 0.5) * near; // near plain half height
+                const widthHalf = heightHalf * camera.aspect; // near plain half width
                 this._nearPlaneCorners[0].set(-widthHalf, -heightHalf, 0);
                 this._nearPlaneCorners[1].set(widthHalf, -heightHalf, 0);
                 this._nearPlaneCorners[2].set(widthHalf, heightHalf, 0);
                 this._nearPlaneCorners[3].set(-widthHalf, heightHalf, 0);
             }
             else if (isOrthographicCamera(this._camera)) {
-                var camera = this._camera;
-                var zoomInv = 1 / camera.zoom;
-                var left = camera.left * zoomInv;
-                var right = camera.right * zoomInv;
-                var top_1 = camera.top * zoomInv;
-                var bottom = camera.bottom * zoomInv;
-                this._nearPlaneCorners[0].set(left, top_1, 0);
-                this._nearPlaneCorners[1].set(right, top_1, 0);
+                const camera = this._camera;
+                const zoomInv = 1 / camera.zoom;
+                const left = camera.left * zoomInv;
+                const right = camera.right * zoomInv;
+                const top = camera.top * zoomInv;
+                const bottom = camera.bottom * zoomInv;
+                this._nearPlaneCorners[0].set(left, top, 0);
+                this._nearPlaneCorners[1].set(right, top, 0);
                 this._nearPlaneCorners[2].set(right, bottom, 0);
                 this._nearPlaneCorners[3].set(left, bottom, 0);
             }
-        };
-        CameraControls.prototype._collisionTest = function () {
-            var distance = Infinity;
-            var hasCollider = this.colliderMeshes.length >= 1;
+        }
+        // lateUpdate
+        _collisionTest() {
+            let distance = Infinity;
+            const hasCollider = this.colliderMeshes.length >= 1;
             if (!hasCollider)
                 return distance;
             if (notSupportedInOrthographicCamera(this._camera, '_collisionTest'))
                 return distance;
-            var direction = _v3A.setFromSpherical(this._spherical).divideScalar(this._spherical.radius);
+            // divide by distance to normalize, lighter than `Vector3.prototype.normalize()`
+            const direction = _v3A.setFromSpherical(this._spherical).divideScalar(this._spherical.radius);
             _rotationMatrix.lookAt(_ORIGIN, direction, this._camera.up);
-            for (var i = 0; i < 4; i++) {
-                var nearPlaneCorner = _v3B.copy(this._nearPlaneCorners[i]);
+            for (let i = 0; i < 4; i++) {
+                const nearPlaneCorner = _v3B.copy(this._nearPlaneCorners[i]);
                 nearPlaneCorner.applyMatrix4(_rotationMatrix);
-                var origin_1 = _v3C.addVectors(this._target, nearPlaneCorner);
-                _raycaster.set(origin_1, direction);
+                const origin = _v3C.addVectors(this._target, nearPlaneCorner);
+                _raycaster.set(origin, direction);
                 _raycaster.far = this._spherical.radius + 1;
-                var intersects = _raycaster.intersectObjects(this.colliderMeshes);
+                const intersects = _raycaster.intersectObjects(this.colliderMeshes);
                 if (intersects.length !== 0 && intersects[0].distance < distance) {
                     distance = intersects[0].distance;
                 }
             }
             return distance;
-        };
-        CameraControls.prototype._getClientRect = function (target) {
-            var rect = this._domElement.getBoundingClientRect();
+        }
+        /**
+         * Get its client rect and package into given `DOMRect` .
+         */
+        _getClientRect(target) {
+            const rect = this._domElement.getBoundingClientRect();
             target.x = rect.left;
             target.y = rect.top;
             if (this._viewport) {
                 target.x += this._viewport.x;
                 target.y += rect.height - this._viewport.w - this._viewport.y;
-                target.z = this._viewport.z;
-                target.w = this._viewport.w;
+                target.width = this._viewport.z;
+                target.height = this._viewport.w;
             }
             else {
-                target.z = rect.width;
-                target.w = rect.height;
+                target.width = rect.width;
+                target.height = rect.height;
             }
             return target;
-        };
-        CameraControls.prototype._createOnRestPromise = function (resolveImmediately) {
-            var _this = this;
+        }
+        _createOnRestPromise(resolveImmediately) {
             if (resolveImmediately)
                 return Promise.resolve();
             this._hasRested = false;
             this.dispatchEvent({ type: 'transitionstart' });
-            return new Promise(function (resolve) {
-                var onResolve = function () {
-                    _this.removeEventListener('rest', onResolve);
+            return new Promise((resolve) => {
+                const onResolve = () => {
+                    this.removeEventListener('rest', onResolve);
                     resolve();
                 };
-                _this.addEventListener('rest', onResolve);
+                this.addEventListener('rest', onResolve);
             });
-        };
-        CameraControls.prototype._removeAllEventListeners = function () { };
-        return CameraControls;
-    }(EventDispatcher));
+        }
+        _removeAllEventListeners() { }
+    }
     function createBoundingSphere(object3d, out) {
-        var boundingSphere = out;
-        var center = boundingSphere.center;
-        object3d.traverse(function (object) {
+        const boundingSphere = out;
+        const center = boundingSphere.center;
+        _box3A.makeEmpty();
+        // find the center
+        object3d.traverseVisible((object) => {
             if (!object.isMesh)
                 return;
             _box3A.expandByObject(object);
         });
         _box3A.getCenter(center);
-        var maxRadiusSq = 0;
-        object3d.traverse(function (object) {
+        // find the radius
+        let maxRadiusSq = 0;
+        object3d.traverseVisible((object) => {
             if (!object.isMesh)
                 return;
-            var mesh = object;
-            var geometry = mesh.geometry.clone();
+            const mesh = object;
+            const geometry = mesh.geometry.clone();
             geometry.applyMatrix4(mesh.matrixWorld);
             if (geometry.isBufferGeometry) {
-                var bufferGeometry = geometry;
-                var position = bufferGeometry.attributes.position;
-                for (var i = 0, l = position.count; i < l; i++) {
+                const bufferGeometry = geometry;
+                const position = bufferGeometry.attributes.position;
+                for (let i = 0, l = position.count; i < l; i++) {
                     _v3A.fromBufferAttribute(position, i);
                     maxRadiusSq = Math.max(maxRadiusSq, center.distanceToSquared(_v3A));
                 }
             }
             else {
-                var position = geometry.attributes.position;
-                var vector = new THREE.Vector3();
-                for (var i = 0, l = position.count; i < l; i++) {
+                // for old three.js, which supports both BufferGeometry and Geometry
+                // this condition block will be removed in the near future.
+                const position = geometry.attributes.position;
+                const vector = new THREE.Vector3();
+                for (let i = 0, l = position.count; i < l; i++) {
                     vector.fromBufferAttribute(position, i);
                     maxRadiusSq = Math.max(maxRadiusSq, center.distanceToSquared(vector));
                 }
@@ -105989,10 +106483,10 @@
     function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
 
     /*!
-     * GSAP 3.7.1
+     * GSAP 3.11.3
      * https://greensock.com
      *
-     * @license Copyright 2008-2021, GreenSock. All rights reserved.
+     * @license Copyright 2008-2022, GreenSock. All rights reserved.
      * Subject to the terms at https://greensock.com/standard-license or for
      * Club GreenSock members, the agreement issued with that membership.
      * @author: Jack Doyle, jack@greensock.com
@@ -106013,6 +106507,8 @@
       delay: 0
     },
         _suppressOverwrites,
+        _reverting$1,
+        _context,
         _bigNum$1 = 1e8,
         _tinyNum = 1 / _bigNum$1,
         _2PI = Math.PI * 2,
@@ -106058,7 +106554,7 @@
     _relExp = /[+-]=-?[.\d]+/,
         _delimitedValueExp = /[^,'"\[\]\s]+/gi,
         // previously /[#\-+.]*\b[a-z\d\-=+%.]+/gi but didn't catch special characters.
-    _unitExp = /[\d.+\-=]+(?:e[-+]\d*)*/i,
+    _unitExp = /^[+\-=e\s\d]*\d+[.\d]*([a-z]*|%)\s*$/i,
         _globalTimeline,
         _win$1,
         _coreInitted,
@@ -106080,6 +106576,18 @@
     },
         _emptyFunc = function _emptyFunc() {
       return 0;
+    },
+        _startAtRevertConfig = {
+      suppressEvents: true,
+      isStart: true,
+      kill: false
+    },
+        _revertConfigNoKill = {
+      suppressEvents: true,
+      kill: false
+    },
+        _revertConfig = {
+      suppressEvents: true
     },
         _reservedProps = {},
         _lazyTweens = [],
@@ -106126,6 +106634,16 @@
     _round = function _round(value) {
       return Math.round(value * 100000) / 100000 || 0;
     },
+        _roundPrecise = function _roundPrecise(value) {
+      return Math.round(value * 10000000) / 10000000 || 0;
+    },
+        // increased precision mostly for timing values.
+    _parseRelative = function _parseRelative(start, value) {
+      var operator = value.charAt(0),
+          end = parseFloat(value.substr(2));
+      start = parseFloat(start);
+      return operator === "+" ? start + end : operator === "-" ? start - end : operator === "*" ? start * end : start / end;
+    },
         _arrayContainsAny = function _arrayContainsAny(toSearch, toFind) {
       //searches one array to find matches for any of the items in the toFind array. As soon as one is found, it returns true. It does NOT return all the matches; it's simply a boolean search.
       var l = toFind.length,
@@ -106151,7 +106669,7 @@
     },
         _lazySafeRender = function _lazySafeRender(animation, time, suppressEvents, force) {
       _lazyTweens.length && _lazyRender();
-      animation.render(time, suppressEvents, force);
+      animation.render(time, suppressEvents, force || _reverting$1 && time < 0 && (animation._initted || animation._startAt));
       _lazyTweens.length && _lazyRender(); //in case rendering caused any tweens to lazy-init, we should render them because typically when someone calls seek() or time() or progress(), they expect an immediate render.
     },
         _numericIfPossible = function _numericIfPossible(value) {
@@ -106168,10 +106686,12 @@
 
       return obj;
     },
-        _setKeyframeDefaults = function _setKeyframeDefaults(obj, defaults) {
-      for (var p in defaults) {
-        p in obj || p === "duration" || p === "ease" || (obj[p] = defaults[p]);
-      }
+        _setKeyframeDefaults = function _setKeyframeDefaults(excludeDuration) {
+      return function (obj, defaults) {
+        for (var p in defaults) {
+          p in obj || p === "duration" && excludeDuration || p === "ease" || (obj[p] = defaults[p]);
+        }
+      };
     },
         _merge = function _merge(base, toMerge) {
       for (var p in toMerge) {
@@ -106199,7 +106719,7 @@
     },
         _inheritDefaults = function _inheritDefaults(vars) {
       var parent = vars.parent || _globalTimeline,
-          func = vars.keyframes ? _setKeyframeDefaults : _setDefaults;
+          func = vars.keyframes ? _setKeyframeDefaults(_isArray(vars.keyframes)) : _setDefaults;
 
       if (_isNotFalse(vars.inherit)) {
         while (parent) {
@@ -106311,6 +106831,9 @@
 
       return animation;
     },
+        _rewindStartAt = function _rewindStartAt(tween, totalTime, suppressEvents, force) {
+      return tween._startAt && (_reverting$1 ? tween._startAt.revert(_revertConfigNoKill) : tween.vars.immediateRender && !tween.vars.autoRevert || tween._startAt.render(totalTime, true, force));
+    },
         _hasNoPausedAncestors = function _hasNoPausedAncestors(animation) {
       return !animation || animation._ts && _hasNoPausedAncestors(animation.parent);
     },
@@ -106326,14 +106849,14 @@
       return (parentTime - child._start) * child._ts + (child._ts >= 0 ? 0 : child._dirty ? child.totalDuration() : child._tDur);
     },
         _setEnd = function _setEnd(animation) {
-      return animation._end = _round(animation._start + (animation._tDur / Math.abs(animation._ts || animation._rts || _tinyNum) || 0));
+      return animation._end = _roundPrecise(animation._start + (animation._tDur / Math.abs(animation._ts || animation._rts || _tinyNum) || 0));
     },
         _alignPlayhead = function _alignPlayhead(animation, totalTime) {
       // adjusts the animation's _start and _end according to the provided totalTime (only if the parent's smoothChildTiming is true and the animation isn't paused). It doesn't do any rendering or forcing things back into parent timelines, etc. - that's what totalTime() is for.
       var parent = animation._dp;
 
       if (parent && parent.smoothChildTiming && animation._ts) {
-        animation._start = _round(parent._time - (animation._ts > 0 ? totalTime / animation._ts : ((animation._dirty ? animation.totalDuration() : animation._tDur) - totalTime) / -animation._ts));
+        animation._start = _roundPrecise(parent._time - (animation._ts > 0 ? totalTime / animation._ts : ((animation._dirty ? animation.totalDuration() : animation._tDur) - totalTime) / -animation._ts));
 
         _setEnd(animation);
 
@@ -106383,29 +106906,31 @@
     },
         _addToTimeline = function _addToTimeline(timeline, child, position, skipChecks) {
       child.parent && _removeFromParent(child);
-      child._start = _round((_isNumber(position) ? position : position || timeline !== _globalTimeline ? _parsePosition(timeline, position, child) : timeline._time) + child._delay);
-      child._end = _round(child._start + (child.totalDuration() / Math.abs(child.timeScale()) || 0));
+      child._start = _roundPrecise((_isNumber(position) ? position : position || timeline !== _globalTimeline ? _parsePosition(timeline, position, child) : timeline._time) + child._delay);
+      child._end = _roundPrecise(child._start + (child.totalDuration() / Math.abs(child.timeScale()) || 0));
 
       _addLinkedListItem(timeline, child, "_first", "_last", timeline._sort ? "_start" : 0);
 
       _isFromOrFromStart(child) || (timeline._recent = child);
       skipChecks || _postAddChecks(timeline, child);
+      timeline._ts < 0 && _alignPlayhead(timeline, timeline._tTime); // if the timeline is reversed and the new child makes it longer, we may need to adjust the parent's _start (push it back)
+
       return timeline;
     },
         _scrollTrigger = function _scrollTrigger(animation, trigger) {
       return (_globals.ScrollTrigger || _missingPlugin("scrollTrigger", trigger)) && _globals.ScrollTrigger.create(trigger, animation);
     },
-        _attemptInitTween = function _attemptInitTween(tween, totalTime, force, suppressEvents) {
-      _initTween(tween, totalTime);
+        _attemptInitTween = function _attemptInitTween(tween, time, force, suppressEvents, tTime) {
+      _initTween(tween, time, tTime);
 
       if (!tween._initted) {
         return 1;
       }
 
-      if (!force && tween._pt && (tween._dur && tween.vars.lazy !== false || !tween._dur && tween.vars.lazy) && _lastRenderedFrame !== _ticker.frame) {
+      if (!force && tween._pt && !_reverting$1 && (tween._dur && tween.vars.lazy !== false || !tween._dur && tween.vars.lazy) && _lastRenderedFrame !== _ticker.frame) {
         _lazyTweens.push(tween);
 
-        tween._lazy = [totalTime, suppressEvents];
+        tween._lazy = [tTime, suppressEvents];
         return 1;
       }
     },
@@ -106432,17 +106957,17 @@
         // in case there's a zero-duration tween that has a repeat with a repeatDelay
         tTime = _clamp(0, tween._tDur, totalTime);
         iteration = _animationCycle(tTime, repeatDelay);
-        prevIteration = _animationCycle(tween._tTime, repeatDelay);
         tween._yoyo && iteration & 1 && (ratio = 1 - ratio);
 
-        if (iteration !== prevIteration) {
+        if (iteration !== _animationCycle(tween._tTime, repeatDelay)) {
+          // if iteration changed
           prevRatio = 1 - ratio;
           tween.vars.repeatRefresh && tween._initted && tween.invalidate();
         }
       }
 
-      if (ratio !== prevRatio || force || tween._zTime === _tinyNum || !totalTime && tween._zTime) {
-        if (!tween._initted && _attemptInitTween(tween, totalTime, force, suppressEvents)) {
+      if (ratio !== prevRatio || _reverting$1 || force || tween._zTime === _tinyNum || !totalTime && tween._zTime) {
+        if (!tween._initted && _attemptInitTween(tween, totalTime, force, suppressEvents, tTime)) {
           // if we render the very beginning (time == 0) of a fromTo(), we must force the render (normal tweens wouldn't need to render at a time of 0 when the prevTime was also 0). This is also mandatory to make sure overwriting kicks in immediately.
           return;
         }
@@ -106463,14 +106988,14 @@
           pt = pt._next;
         }
 
-        tween._startAt && totalTime < 0 && tween._startAt.render(totalTime, true, true);
+        totalTime < 0 && _rewindStartAt(tween, totalTime, suppressEvents, true);
         tween._onUpdate && !suppressEvents && _callback(tween, "onUpdate");
         tTime && tween._repeat && !suppressEvents && tween.parent && _callback(tween, "onRepeat");
 
         if ((totalTime >= tween._tDur || totalTime < 0) && tween.ratio === ratio) {
           ratio && _removeFromParent(tween, 1);
 
-          if (!suppressEvents) {
+          if (!suppressEvents && !_reverting$1) {
             _callback(tween, ratio ? "onComplete" : "onReverseComplete", true);
 
             tween._prom && tween._prom();
@@ -106487,7 +107012,7 @@
         child = animation._first;
 
         while (child && child._start <= time) {
-          if (!child._dur && child.data === "isPause" && child._start > prevTime) {
+          if (child.data === "isPause" && child._start > prevTime) {
             return child;
           }
 
@@ -106497,7 +107022,7 @@
         child = animation._last;
 
         while (child && child._start >= time) {
-          if (!child._dur && child.data === "isPause" && child._start < prevTime) {
+          if (child.data === "isPause" && child._start < prevTime) {
             return child;
           }
 
@@ -106507,12 +107032,13 @@
     },
         _setDuration = function _setDuration(animation, duration, skipUncache, leavePlayhead) {
       var repeat = animation._repeat,
-          dur = _round(duration) || 0,
+          dur = _roundPrecise(duration) || 0,
           totalProgress = animation._tTime / animation._tDur;
       totalProgress && !leavePlayhead && (animation._time *= dur / animation._dur);
       animation._dur = dur;
-      animation._tDur = !repeat ? dur : repeat < 0 ? 1e10 : _round(dur * (repeat + 1) + animation._rDelay * repeat);
-      totalProgress && !leavePlayhead ? _alignPlayhead(animation, animation._tTime = animation._tDur * totalProgress) : animation.parent && _setEnd(animation);
+      animation._tDur = !repeat ? dur : repeat < 0 ? 1e10 : _roundPrecise(dur * (repeat + 1) + animation._rDelay * repeat);
+      totalProgress > 0 && !leavePlayhead && _alignPlayhead(animation, animation._tTime = animation._tDur * totalProgress);
+      animation.parent && _setEnd(animation);
       skipUncache || _uncache(animation.parent, animation);
       return animation;
     },
@@ -106592,14 +107118,8 @@
         _clamp = function _clamp(min, max, value) {
       return value < min ? min : value > max ? max : value;
     },
-        getUnit = function getUnit(value) {
-      if (typeof value !== "string") {
-        return "";
-      }
-
-      var v = _unitExp.exec(value);
-
-      return v ? value.substr(v.index + v[0].length) : "";
+        getUnit = function getUnit(value, v) {
+      return !_isString(value) || !(v = _unitExp.exec(value)) ? "" : v[1];
     },
         // note: protect against padded numbers as strings, like "100.100". That shouldn't return "00" as the unit. If it's numeric, return no unit.
     clamp = function clamp(min, max, value) {
@@ -106624,7 +107144,7 @@
     },
         //takes any value and returns an array. If it's a string (and leaveStrings isn't true), it'll use document.querySelectorAll() and convert that to an array. It'll also accept iterables like jQuery objects.
     toArray = function toArray(value, scope, leaveStrings) {
-      return _isString(value) && !leaveStrings && (_coreInitted || !_wake()) ? _slice.call((scope || _doc$1).querySelectorAll(value), 0) : _isArray(value) ? _flatten(value, leaveStrings) : _isArrayLike(value) ? _slice.call(value, 0) : value ? [value] : [];
+      return _context && !scope && _context.selector ? _context.selector(value) : _isString(value) && !leaveStrings && (_coreInitted || !_wake()) ? _slice.call((scope || _doc$1).querySelectorAll(value), 0) : _isArray(value) ? _flatten(value, leaveStrings) : _isArrayLike(value) ? _slice.call(value, 0) : value ? [value] : [];
     },
         selector = function selector(value) {
       value = toArray(value)[0] || _warn("Invalid scope") || {};
@@ -106696,7 +107216,7 @@
 
           distances = cache[l] = [];
           originX = ratios ? Math.min(wrapAt, l) * ratioX - .5 : from % wrapAt;
-          originY = ratios ? l * ratioY / wrapAt - .5 : from / wrapAt | 0;
+          originY = wrapAt === _bigNum$1 ? 0 : ratios ? l * ratioY / wrapAt - .5 : from / wrapAt | 0;
           max = 0;
           min = _bigNum$1;
 
@@ -106719,15 +107239,16 @@
         }
 
         l = (distances[i] - distances.min) / distances.max || 0;
-        return _round(distances.b + (ease ? ease(l) : l) * distances.v) + distances.u; //round in order to work around floating point errors
+        return _roundPrecise(distances.b + (ease ? ease(l) : l) * distances.v) + distances.u; //round in order to work around floating point errors
       };
     },
         _roundModifier = function _roundModifier(v) {
       //pass in 0.1 get a function that'll round to the nearest tenth, or 5 to round to the closest 5, or 0.001 to the closest 1000th, etc.
-      var p = v < 1 ? Math.pow(10, (v + "").length - 2) : 1; //to avoid floating point math errors (like 24 * 0.1 == 2.4000000000000004), we chop off at a specific number of decimal places (much faster than toFixed()
+      var p = Math.pow(10, ((v + "").split(".")[1] || "").length); //to avoid floating point math errors (like 24 * 0.1 == 2.4000000000000004), we chop off at a specific number of decimal places (much faster than toFixed())
 
       return function (raw) {
-        var n = Math.round(parseFloat(raw) / v) * v * p;
+        var n = _roundPrecise(Math.round(parseFloat(raw) / v) * v * p);
+
         return (n - n % 1) / p + (_isNumber(raw) ? 0 : getUnit(raw)); // n - n % 1 replaces Math.floor() in order to handle negative values properly. For example, Math.floor(-150.00000000000003) is 151!
       };
     },
@@ -106931,8 +107452,11 @@
         _callback = function _callback(animation, type, executeLazyFirst) {
       var v = animation.vars,
           callback = v[type],
+          prevContext = _context,
+          context = animation._ctx,
           params,
-          scope;
+          scope,
+          result;
 
       if (!callback) {
         return;
@@ -106942,12 +107466,15 @@
       scope = v.callbackScope || animation;
       executeLazyFirst && _lazyTweens.length && _lazyRender(); //in case rendering caused any tweens to lazy-init, we should render them because typically when a timeline finishes, users expect things to have rendered fully. Imagine an onUpdate on a timeline that reports/checks tweened values.
 
-      return params ? callback.apply(scope, params) : callback.call(scope);
+      context && (_context = context);
+      result = params ? callback.apply(scope, params) : callback.call(scope);
+      _context = prevContext;
+      return result;
     },
         _interrupt = function _interrupt(animation) {
       _removeFromParent(animation);
 
-      animation.scrollTrigger && animation.scrollTrigger.kill(false);
+      animation.scrollTrigger && animation.scrollTrigger.kill(!!_reverting$1);
       animation.progress() < 1 && _callback(animation, "onInterrupt");
       return animation;
     },
@@ -107033,8 +107560,11 @@
       cyan: [0, _255, _255],
       transparent: [_255, _255, _255, 0]
     },
-        _hue = function _hue(h, m1, m2) {
-      h = h < 0 ? h + 1 : h > 1 ? h - 1 : h;
+        // possible future idea to replace the hard-coded color name values - put this in the ticker.wake() where we set the _doc:
+    // let ctx = _doc.createElement("canvas").getContext("2d");
+    // _forEachName("aqua,lime,silver,black,maroon,teal,blue,navy,white,olive,yellow,orange,gray,purple,green,red,pink,cyan", color => {ctx.fillStyle = color; _colorLookup[color] = splitColor(ctx.fillStyle)});
+    _hue = function _hue(h, m1, m2) {
+      h += h < 0 ? 1 : h > 1 ? -1 : 0;
       return (h * 6 < 1 ? m1 + (m2 - m1) * h * 6 : h < .5 ? m2 : h * 3 < 2 ? m1 + (m2 - m1) * (2 / 3 - h) * 6 : m1) * _255 + .5 | 0;
     },
         splitColor = function splitColor(v, toHSL, forceAlpha) {
@@ -107308,13 +107838,22 @@
           _gap = 1000 / (_fps || 240);
           _nextTime = _self.time * 1000 + _gap;
         },
-        add: function add(callback) {
-          _listeners.indexOf(callback) < 0 && _listeners.push(callback);
+        add: function add(callback, once, prioritize) {
+          var func = once ? function (t, d, f, v) {
+            callback(t, d, f, v);
+
+            _self.remove(func);
+          } : callback;
+
+          _self.remove(callback);
+
+          _listeners[prioritize ? "unshift" : "push"](func);
 
           _wake();
+
+          return func;
         },
-        remove: function remove(callback) {
-          var i;
+        remove: function remove(callback, i) {
           ~(i = _listeners.indexOf(callback)) && _listeners.splice(i, 1) && _i >= i && _i--;
         },
         _listeners: _listeners
@@ -107587,6 +108126,13 @@
         _setDuration(this, +vars.duration, 1, 1);
 
         this.data = vars.data;
+
+        if (_context) {
+          this._ctx = _context;
+
+          _context.data.push(this);
+        }
+
         _tickerActive || _ticker.wake();
       }
 
@@ -107630,7 +108176,7 @@
           !parent._dp || parent.parent || _postAddChecks(parent, this); // edge case: if this is a child of a timeline that already completed, for example, we must re-activate the parent.
           //in case any of the ancestor timelines had completed but should now be enabled, we should reset their totalTime() which will also ensure that they're lined up properly and enabled. Skip for animations that are on the root (wasteful). Example: a TimelineLite.exportRoot() is performed when there's a paused tween on the root, the export will not complete until that tween is unpaused, but imagine a child gets restarted later, after all [unpaused] tweens have completed. The start of that child would get pushed out, but one of the ancestors may have completed.
 
-          while (parent.parent) {
+          while (parent && parent.parent) {
             if (parent.parent._time !== parent._start + (parent._ts >= 0 ? parent._tTime / parent._ts : (parent.totalDuration() - parent._tTime) / -parent._ts)) {
               parent.totalTime(parent._tTime, true);
             }
@@ -107703,7 +108249,12 @@
         this._rts = +value || 0;
         this._ts = this._ps || value === -_tinyNum ? 0 : this._rts; // _ts is the functional timeScale which would be 0 if the animation is paused.
 
-        return _recacheAncestors(this.totalTime(_clamp(-this._delay, this._tDur, tTime), true));
+        this.totalTime(_clamp(-this._delay, this._tDur, tTime), true);
+
+        _setEnd(this); // if parent.smoothChildTiming was false, the end time didn't get updated in the _alignPlayhead() method, so do it here.
+
+
+        return _recacheAncestors(this);
       };
 
       _proto.paused = function paused(value) {
@@ -107742,13 +108293,31 @@
       };
 
       _proto.endTime = function endTime(includeRepeats) {
-        return this._start + (_isNotFalse(includeRepeats) ? this.totalDuration() : this.duration()) / Math.abs(this._ts);
+        return this._start + (_isNotFalse(includeRepeats) ? this.totalDuration() : this.duration()) / Math.abs(this._ts || 1);
       };
 
       _proto.rawTime = function rawTime(wrapRepeats) {
         var parent = this.parent || this._dp; // _dp = detached parent
 
         return !parent ? this._tTime : wrapRepeats && (!this._ts || this._repeat && this._time && this.totalProgress() < 1) ? this._tTime % (this._dur + this._rDelay) : !this._ts ? this._tTime : _parentToChildTotalTime(parent.rawTime(wrapRepeats), this);
+      };
+
+      _proto.revert = function revert(config) {
+        if (config === void 0) {
+          config = _revertConfig;
+        }
+
+        var prevIsReverting = _reverting$1;
+        _reverting$1 = config;
+
+        if (this._initted || this._startAt) {
+          this.timeline && this.timeline.revert(config);
+          this.totalTime(-0.01, config.suppressEvents);
+        }
+
+        this.data !== "nested" && config.kill !== false && this.kill();
+        _reverting$1 = prevIsReverting;
+        return this;
       };
 
       _proto.globalTime = function globalTime(rawTime) {
@@ -107760,7 +108329,7 @@
           animation = animation._dp;
         }
 
-        return time;
+        return !this.parent && this.vars.immediateRender ? -1 : time; // the _startAt tweens for .fromTo() and .from() that have immediateRender should always be FIRST in the timeline (important for Recording.revert())
       };
 
       _proto.repeat = function repeat(value) {
@@ -107999,8 +108568,9 @@
         var prevTime = this._time,
             tDur = this._dirty ? this.totalDuration() : this._tDur,
             dur = this._dur,
-            tTime = this !== _globalTimeline && totalTime > tDur - _tinyNum && totalTime >= 0 ? tDur : totalTime < _tinyNum ? 0 : totalTime,
-            crossingStart = this._zTime < 0 !== totalTime < 0 && (this._initted || !dur),
+            tTime = totalTime <= 0 ? 0 : _roundPrecise(totalTime),
+            // if a paused timeline is resumed (or its _start is updated for another reason...which rounds it), that could result in the playhead shifting a **tiny** amount and a zero-duration child at that spot may get rendered at a different ratio, like its totalTime in render() may be 1e-17 instead of 0, for example.
+        crossingStart = this._zTime < 0 !== totalTime < 0 && (this._initted || !dur),
             time,
             child,
             next,
@@ -108013,6 +108583,7 @@
             prevIteration,
             yoyo,
             isYoyo;
+        this !== _globalTimeline && tTime > tDur && totalTime >= 0 && (tTime = tDur);
 
         if (tTime !== this._tTime || force || crossingStart) {
           if (prevTime !== this._time && dur) {
@@ -108041,7 +108612,7 @@
               return this.totalTime(cycleDuration * 100 + totalTime, suppressEvents, force);
             }
 
-            time = _round(tTime % cycleDuration); //round to avoid floating point errors. (4 % 0.8 should be 0 but some browsers report it as 0.79999999!)
+            time = _roundPrecise(tTime % cycleDuration); //round to avoid floating point errors. (4 % 0.8 should be 0 but some browsers report it as 0.79999999!)
 
             if (tTime === tDur) {
               // the tDur === tTime is for edge cases where there's a lengthy decimal on the duration and it may reach the very end but the time is rendered as not-quite-there (remember, tDur is rounded to 4 decimals whereas dur isn't)
@@ -108081,7 +108652,7 @@
               iteration < prevIteration && (rewinding = !rewinding);
               prevTime = rewinding ? 0 : dur;
               this._lock = 1;
-              this.render(prevTime || (isYoyo ? 0 : _round(iteration * cycleDuration)), suppressEvents, !dur)._lock = 0;
+              this.render(prevTime || (isYoyo ? 0 : _roundPrecise(iteration * cycleDuration)), suppressEvents, !dur)._lock = 0;
               this._tTime = tTime; // if a user gets the iteration() inside the onRepeat, for example, it should be accurate.
 
               !suppressEvents && this.parent && _callback(this, "onRepeat");
@@ -108115,7 +108686,7 @@
           }
 
           if (this._hasPause && !this._forcing && this._lock < 2) {
-            pauseTween = _findNextPauseTween(this, _round(prevTime), _round(time));
+            pauseTween = _findNextPauseTween(this, _roundPrecise(prevTime), _roundPrecise(time));
 
             if (pauseTween) {
               tTime -= time - (time = pauseTween._start);
@@ -108180,7 +108751,7 @@
                   return this.render(totalTime, suppressEvents, force);
                 }
 
-                child.render(child._ts > 0 ? (adjustedTime - child._start) * child._ts : (child._dirty ? child.totalDuration() : child._tDur) + (adjustedTime - child._start) * child._ts, suppressEvents, force);
+                child.render(child._ts > 0 ? (adjustedTime - child._start) * child._ts : (child._dirty ? child.totalDuration() : child._tDur) + (adjustedTime - child._start) * child._ts, suppressEvents, force || _reverting$1 && (child._initted || child._startAt)); // if reverting, we should always force renders of initted tweens (but remember that .fromTo() or .from() may have a _startAt but not _initted yet). If, for example, a .fromTo() tween with a stagger (which creates an internal timeline) gets reverted BEFORE some of its child tweens render for the first time, it may not properly trigger them to revert.
 
                 if (time !== this._time || !this._ts && !prevPaused) {
                   //in case a tween pauses or seeks the timeline when rendering, like inside of an onUpdate/onComplete
@@ -108210,7 +108781,8 @@
           }
 
           this._onUpdate && !suppressEvents && _callback(this, "onUpdate", true);
-          if (tTime === tDur && tDur >= this.totalDuration() || !tTime && prevTime) if (prevStart === this._start || Math.abs(timeScale) !== Math.abs(this._ts)) if (!this._lock) {
+          if (tTime === tDur && this._tTime >= this.totalDuration() || !tTime && prevTime) if (prevStart === this._start || Math.abs(timeScale) !== Math.abs(this._ts)) if (!this._lock) {
+            // remember, a child's callback may alter this timeline's playhead or timeScale which is why we need to add some of these checks.
             (totalTime || !dur) && (tTime === tDur && this._ts > 0 || !tTime && this._ts < 0) && _removeFromParent(this, 1); // don't remove if the timeline is reversed and the playhead isn't at 0, otherwise tl.progress(1).reverse() won't work. Only remove if the playhead is at the end and timeScale is positive, or if the playhead is at 0 and the timeScale is negative.
 
             if (!suppressEvents && !(totalTime < 0 && !prevTime) && (tTime || prevTime || !tDur)) {
@@ -108325,7 +108897,7 @@
 
         if (!this._dp && this._ts) {
           //special case for the global timeline (or any other that has no parent or detached parent).
-          this._start = _round(_ticker.time - (this._ts > 0 ? _totalTime2 / this._ts : (this.totalDuration() - _totalTime2) / -this._ts));
+          this._start = _roundPrecise(_ticker.time - (this._ts > 0 ? _totalTime2 / this._ts : (this.totalDuration() - _totalTime2) / -this._ts));
         }
 
         _Animation.prototype.totalTime.call(this, _totalTime2, suppressEvents);
@@ -108500,16 +109072,16 @@
         return _uncache(this);
       };
 
-      _proto2.invalidate = function invalidate() {
+      _proto2.invalidate = function invalidate(soft) {
         var child = this._first;
         this._lock = 0;
 
         while (child) {
-          child.invalidate();
+          child.invalidate(soft);
           child = child._next;
         }
 
-        return _Animation.prototype.invalidate.call(this);
+        return _Animation.prototype.invalidate.call(this, soft);
       };
 
       _proto2.clear = function clear(includeLabels) {
@@ -108669,7 +109241,7 @@
             p: chunk || matchIndex === 1 ? chunk : ",",
             //note: SVG spec allows omission of comma/space when a negative sign is wedged between two numbers, like 2.5-5.3 instead of 2.5,-5.3 but when tweening, the negative value may switch to positive, so we insert the comma just in case.
             s: startNum,
-            c: endNum.charAt(1) === "=" ? parseFloat(endNum.substr(2)) * (endNum.charAt(0) === "-" ? -1 : 1) : parseFloat(endNum) - startNum,
+            c: endNum.charAt(1) === "=" ? _parseRelative(startNum, endNum) - startNum : parseFloat(endNum) - startNum,
             m: color && color < 4 ? Math.round : 0
           };
           index = _complexStringNumExp.lastIndex;
@@ -108688,7 +109260,7 @@
 
       return pt;
     },
-        _addPropTween = function _addPropTween(target, prop, start, end, index, targets, modifier, stringFilter, funcParam) {
+        _addPropTween = function _addPropTween(target, prop, start, end, index, targets, modifier, stringFilter, funcParam, optional) {
       _isFunction(end) && (end = end(index || 0, target, targets));
       var currentValue = target[prop],
           parsedStart = start !== "get" ? start : !_isFunction(currentValue) ? currentValue : funcParam ? target[prop.indexOf("set") || !_isFunction(target["get" + prop.substr(3)]) ? prop : "get" + prop.substr(3)](funcParam) : target[prop](),
@@ -108701,7 +109273,7 @@
         }
 
         if (end.charAt(1) === "=") {
-          pt = parseFloat(parsedStart) + parseFloat(end.substr(2)) * (end.charAt(0) === "-" ? -1 : 1) + (getUnit(parsedStart) || 0);
+          pt = _parseRelative(parsedStart, end) + (getUnit(parsedStart) || 0);
 
           if (pt || pt === 0) {
             // to avoid isNaN, like if someone passes in a value like "!= whatever"
@@ -108710,7 +109282,7 @@
         }
       }
 
-      if (parsedStart !== end) {
+      if (!optional || parsedStart !== end || _forceAllPropTweens) {
         if (!isNaN(parsedStart * end) && end !== "") {
           // fun fact: any number multiplied by "" is evaluated as the number 0!
           pt = new PropTween(this._pt, target, prop, +parsedStart || 0, end - (parsedStart || 0), typeof currentValue === "boolean" ? _renderBoolean : _renderPlain, 0, setter);
@@ -108761,7 +109333,8 @@
     },
         _overwritingTween,
         //store a reference temporarily so we can avoid overwriting itself.
-    _initTween = function _initTween(tween, time) {
+    _forceAllPropTweens,
+        _initTween = function _initTween(tween, time, tTime) {
       var vars = tween.vars,
           ease = vars.ease,
           startAt = vars.startAt,
@@ -108778,7 +109351,7 @@
           prevStartAt = tween._startAt,
           targets = tween._targets,
           parent = tween.parent,
-          fullTargets = parent && parent.data === "nested" ? parent.parent._targets : targets,
+          fullTargets = parent && parent.data === "nested" ? parent.vars.targets : targets,
           autoOverwrite = tween._overwrite === "auto" && !_suppressOverwrites,
           tl = tween.timeline,
           cleanVars,
@@ -108807,13 +109380,21 @@
 
       tween._from = !tl && !!vars.runBackwards; //nested timelines should never run backwards - the backwards-ness is in the child tweens.
 
-      if (!tl) {
+      if (!tl || keyframes && !vars.stagger) {
         //if there's an internal timeline, skip all the parsing because we passed that task down the chain.
         harness = targets[0] ? _getCache(targets[0]).harness : 0;
         harnessVars = harness && vars[harness.prop]; //someone may need to specify CSS-specific values AND non-CSS values, like if the element has an "x" property plus it's a standard DOM element. We allow people to distinguish by wrapping plugin-specific stuff in a css:{} object for example.
 
         cleanVars = _copyExcluding(vars, _reservedProps);
-        prevStartAt && prevStartAt.render(-1, true).kill();
+
+        if (prevStartAt) {
+          prevStartAt._zTime < 0 && prevStartAt.progress(1); // in case it's a lazy startAt that hasn't rendered yet.
+
+          time < 0 && runBackwards && immediateRender && !autoRevert ? prevStartAt.render(-1, true) : prevStartAt.revert(runBackwards && dur ? _revertConfigNoKill : _startAtRevertConfig); // if it's a "startAt" (not "from()" or runBackwards: true), we only need to do a shallow revert (keep transforms cached in CSSPlugin)
+          // don't just _removeFromParent(prevStartAt.render(-1, true)) because that'll leave inline styles. We're creating a new _startAt for "startAt" tweens that re-capture things to ensure that if the pre-tween values changed since the tween was created, they're recorded.
+
+          prevStartAt._lazy = 0;
+        }
 
         if (startAt) {
           _removeFromParent(tween._startAt = Tween.set(targets, _setDefaults({
@@ -108831,29 +109412,20 @@
           }, startAt))); //copy the properties/values into a new object to avoid collisions, like var to = {x:0}, from = {x:500}; timeline.fromTo(e, from, to).fromTo(e, to, from);
 
 
-          time < 0 && !immediateRender && !autoRevert && tween._startAt.render(-1, true); // rare edge case, like if a render is forced in the negative direction of a non-initted tween.
+          tween._startAt._dp = 0; // don't allow it to get put back into root timeline! Like when revert() is called and totalTime() gets set.
+
+          time < 0 && (_reverting$1 || !immediateRender && !autoRevert) && tween._startAt.revert(_revertConfigNoKill); // rare edge case, like if a render is forced in the negative direction of a non-initted tween.
 
           if (immediateRender) {
-            time > 0 && !autoRevert && (tween._startAt = 0); //tweens that render immediately (like most from() and fromTo() tweens) shouldn't revert when their parent timeline's playhead goes backward past the startTime because the initial render could have happened anytime and it shouldn't be directly correlated to this tween's startTime. Imagine setting up a complex animation where the beginning states of various objects are rendered immediately but the tween doesn't happen for quite some time - if we revert to the starting values as soon as the playhead goes backward past the tween's startTime, it will throw things off visually. Reversion should only happen in Timeline instances where immediateRender was false or when autoRevert is explicitly set to true.
-
-            if (dur && time <= 0) {
+            if (dur && time <= 0 && tTime <= 0) {
+              // check tTime here because in the case of a yoyo tween whose playhead gets pushed to the end like tween.progress(1), we should allow it through so that the onComplete gets fired properly.
               time && (tween._zTime = time);
               return; //we skip initialization here so that overwriting doesn't occur until the tween actually begins. Otherwise, if you create several immediateRender:true tweens of the same target/properties to drop into a Timeline, the last one created would overwrite the first ones because they didn't get placed into the timeline yet before the first render occurs and kicks in overwriting.
-            } // if (time > 0) {
-            // 	autoRevert || (tween._startAt = 0); //tweens that render immediately (like most from() and fromTo() tweens) shouldn't revert when their parent timeline's playhead goes backward past the startTime because the initial render could have happened anytime and it shouldn't be directly correlated to this tween's startTime. Imagine setting up a complex animation where the beginning states of various objects are rendered immediately but the tween doesn't happen for quite some time - if we revert to the starting values as soon as the playhead goes backward past the tween's startTime, it will throw things off visually. Reversion should only happen in Timeline instances where immediateRender was false or when autoRevert is explicitly set to true.
-            // } else if (dur && !(time < 0 && prevStartAt)) {
-            // 	time && (tween._zTime = time);
-            // 	return; //we skip initialization here so that overwriting doesn't occur until the tween actually begins. Otherwise, if you create several immediateRender:true tweens of the same target/properties to drop into a Timeline, the last one created would overwrite the first ones because they didn't get placed into the timeline yet before the first render occurs and kicks in overwriting.
-            // }
-
-          } else if (autoRevert === false) {
-            tween._startAt = 0;
+            }
           }
         } else if (runBackwards && dur) {
           //from() tweens must be handled uniquely: their beginning values must be rendered but we don't want overwriting to occur yet (when time is still 0). Wait until the tween actually begins before doing all the routines like overwriting. At that time, we should render at the END of the tween to ensure that things initialize correctly (remember, from() tweens go backwards)
-          if (prevStartAt) {
-            !autoRevert && (tween._startAt = 0);
-          } else {
+          if (!prevStartAt) {
             time && (immediateRender = false); //in rare cases (like if a from() tween runs and then is invalidate()-ed), immediateRender could be true but the initial forced-render gets skipped, so there's no need to force the render in this context when the _time is greater than 0
 
             p = _setDefaults({
@@ -108871,10 +109443,13 @@
 
             _removeFromParent(tween._startAt = Tween.set(targets, p));
 
-            time < 0 && tween._startAt.render(-1, true); // rare edge case, like if a render is forced in the negative direction of a non-initted from() tween.
+            tween._startAt._dp = 0; // don't allow it to get put back into root timeline!
+
+            time < 0 && (_reverting$1 ? tween._startAt.revert(_revertConfigNoKill) : tween._startAt.render(-1, true));
+            tween._zTime = time;
 
             if (!immediateRender) {
-              _initTween(tween._startAt, _tinyNum); //ensures that the initial values are recorded
+              _initTween(tween._startAt, _tinyNum, _tinyNum); //ensures that the initial values are recorded
 
             } else if (!time) {
               return;
@@ -108882,7 +109457,7 @@
           }
         }
 
-        tween._pt = 0;
+        tween._pt = tween._ptCache = 0;
         lazy = dur && _isNotFalse(lazy) || lazy && !dur;
 
         for (i = 0; i < targets.length; i++) {
@@ -108918,7 +109493,7 @@
           if (autoOverwrite && tween._pt) {
             _overwritingTween = tween;
 
-            _globalTimeline.killTweensOf(target, ptLookup, tween.globalTime(0)); //Also make sure the overwriting doesn't overwrite THIS tween!!!
+            _globalTimeline.killTweensOf(target, ptLookup, tween.globalTime(time)); // make sure the overwriting doesn't overwrite THIS tween!!!
 
 
             overwritten = !tween.parent;
@@ -108934,6 +109509,63 @@
 
       tween._onUpdate = onUpdate;
       tween._initted = (!tween._op || tween._pt) && !overwritten; // if overwrittenProps resulted in the entire tween being killed, do NOT flag it as initted or else it may render for one tick.
+
+      keyframes && time <= 0 && tl.render(_bigNum$1, true, true); // if there's a 0% keyframe, it'll render in the "before" state for any staggered/delayed animations thus when the following tween initializes, it'll use the "before" state instead of the "after" state as the initial values.
+    },
+        _updatePropTweens = function _updatePropTweens(tween, property, value, start, startIsRelative, ratio, time) {
+      var ptCache = (tween._pt && tween._ptCache || (tween._ptCache = {}))[property],
+          pt,
+          rootPT,
+          lookup,
+          i;
+
+      if (!ptCache) {
+        ptCache = tween._ptCache[property] = [];
+        lookup = tween._ptLookup;
+        i = tween._targets.length;
+
+        while (i--) {
+          pt = lookup[i][property];
+
+          if (pt && pt.d && pt.d._pt) {
+            // it's a plugin, so find the nested PropTween
+            pt = pt.d._pt;
+
+            while (pt && pt.p !== property && pt.fp !== property) {
+              // "fp" is functionParam for things like setting CSS variables which require .setProperty("--var-name", value)
+              pt = pt._next;
+            }
+          }
+
+          if (!pt) {
+            // there is no PropTween associated with that property, so we must FORCE one to be created and ditch out of this
+            // if the tween has other properties that already rendered at new positions, we'd normally have to rewind to put them back like tween.render(0, true) before forcing an _initTween(), but that can create another edge case like tweening a timeline's progress would trigger onUpdates to fire which could move other things around. It's better to just inform users that .resetTo() should ONLY be used for tweens that already have that property. For example, you can't gsap.to(...{ y: 0 }) and then tween.restTo("x", 200) for example.
+            _forceAllPropTweens = 1; // otherwise, when we _addPropTween() and it finds no change between the start and end values, it skips creating a PropTween (for efficiency...why tween when there's no difference?) but in this case we NEED that PropTween created so we can edit it.
+
+            tween.vars[property] = "+=0";
+
+            _initTween(tween, time);
+
+            _forceAllPropTweens = 0;
+            return 1;
+          }
+
+          ptCache.push(pt);
+        }
+      }
+
+      i = ptCache.length;
+
+      while (i--) {
+        rootPT = ptCache[i];
+        pt = rootPT._pt || rootPT; // complex values may have nested PropTweens. We only accommodate the FIRST value.
+
+        pt.s = (start || start === 0) && !startIsRelative ? start : pt.s + (start || 0) + ratio * pt.c;
+        pt.c = value - pt.s;
+        rootPT.e && (rootPT.e = _round(value) + getUnit(rootPT.e)); // mainly for CSSPlugin (end value)
+
+        rootPT.b && (rootPT.b = pt.s + getUnit(rootPT.b)); // (beginning value)
+      }
     },
         _addAliasesToVars = function _addAliasesToVars(targets, vars) {
       var harness = targets[0] ? _getCache(targets[0]).harness : 0,
@@ -108962,11 +109594,42 @@
 
       return copy;
     },
+        // parses multiple formats, like {"0%": {x: 100}, {"50%": {x: -20}} and { x: {"0%": 100, "50%": -20} }, and an "ease" can be set on any object. We populate an "allProps" object with an Array for each property, like {x: [{}, {}], y:[{}, {}]} with data for each property tween. The objects have a "t" (time), "v", (value), and "e" (ease) property. This allows us to piece together a timeline later.
+    _parseKeyframe = function _parseKeyframe(prop, obj, allProps, easeEach) {
+      var ease = obj.ease || easeEach || "power1.inOut",
+          p,
+          a;
+
+      if (_isArray(obj)) {
+        a = allProps[prop] || (allProps[prop] = []); // t = time (out of 100), v = value, e = ease
+
+        obj.forEach(function (value, i) {
+          return a.push({
+            t: i / (obj.length - 1) * 100,
+            v: value,
+            e: ease
+          });
+        });
+      } else {
+        for (p in obj) {
+          a = allProps[p] || (allProps[p] = []);
+          p === "ease" || a.push({
+            t: parseFloat(prop),
+            v: obj[p],
+            e: ease
+          });
+        }
+      }
+    },
         _parseFuncOrString = function _parseFuncOrString(value, tween, i, target, targets) {
       return _isFunction(value) ? value.call(tween, i, target, targets) : _isString(value) && ~value.indexOf("random(") ? _replaceRandom(value) : value;
     },
-        _staggerTweenProps = _callbackNames + "repeat,repeatDelay,yoyo,repeatRefresh,yoyoEase",
-        _staggerPropsToSkip = (_staggerTweenProps + ",id,stagger,delay,duration,paused,scrollTrigger").split(",");
+        _staggerTweenProps = _callbackNames + "repeat,repeatDelay,yoyo,repeatRefresh,yoyoEase,autoRevert",
+        _staggerPropsToSkip = {};
+
+    _forEachName(_staggerTweenProps + ",id,stagger,delay,duration,paused,scrollTrigger", function (name) {
+      return _staggerPropsToSkip[name] = 1;
+    });
     /*
      * --------------------------------------------------------------------------------------
      * TWEEN
@@ -109016,27 +109679,17 @@
           vars = _this3.vars;
           tl = _this3.timeline = new Timeline({
             data: "nested",
-            defaults: defaults || {}
-          });
+            defaults: defaults || {},
+            targets: parent && parent.data === "nested" ? parent.vars.targets : parsedTargets
+          }); // we need to store the targets because for staggers and keyframes, we end up creating an individual tween for each but function-based values need to know the index and the whole Array of targets.
+
           tl.kill();
           tl.parent = tl._dp = _assertThisInitialized(_this3);
           tl._start = 0;
 
-          if (keyframes) {
-            _setDefaults(tl.vars.defaults, {
-              ease: "none"
-            });
-
-            stagger ? parsedTargets.forEach(function (t, i) {
-              return keyframes.forEach(function (frame, j) {
-                return tl.to(t, frame, j ? ">" : i * stagger);
-              });
-            }) : keyframes.forEach(function (frame) {
-              return tl.to(parsedTargets, frame, ">");
-            });
-          } else {
+          if (stagger || _isFuncOrString(duration) || _isFuncOrString(delay)) {
             l = parsedTargets.length;
-            staggerFunc = stagger ? distribute(stagger) : _emptyFunc;
+            staggerFunc = stagger && distribute(stagger);
 
             if (_isObject(stagger)) {
               //users can pass in callbacks like onStart/onComplete in the stagger object. These should fire with each individual tween.
@@ -109049,14 +109702,7 @@
             }
 
             for (i = 0; i < l; i++) {
-              copy = {};
-
-              for (p in vars) {
-                if (_staggerPropsToSkip.indexOf(p) < 0) {
-                  copy[p] = vars[p];
-                }
-              }
-
+              copy = _copyExcluding(vars, _staggerPropsToSkip);
               copy.stagger = 0;
               yoyoEase && (copy.yoyoEase = yoyoEase);
               staggerVarsToMerge && _merge(copy, staggerVarsToMerge);
@@ -109072,10 +109718,56 @@
                 copy.delay = 0;
               }
 
-              tl.to(curTarget, copy, staggerFunc(i, curTarget, parsedTargets));
+              tl.to(curTarget, copy, staggerFunc ? staggerFunc(i, curTarget, parsedTargets) : 0);
+              tl._ease = _easeMap.none;
             }
 
             tl.duration() ? duration = delay = 0 : _this3.timeline = 0; // if the timeline's duration is 0, we don't need a timeline internally!
+          } else if (keyframes) {
+            _inheritDefaults(_setDefaults(tl.vars.defaults, {
+              ease: "none"
+            }));
+
+            tl._ease = _parseEase(keyframes.ease || vars.ease || "none");
+            var time = 0,
+                a,
+                kf,
+                v;
+
+            if (_isArray(keyframes)) {
+              keyframes.forEach(function (frame) {
+                return tl.to(parsedTargets, frame, ">");
+              });
+              tl.duration(); // to ensure tl._dur is cached because we tap into it for performance purposes in the render() method.
+            } else {
+              copy = {};
+
+              for (p in keyframes) {
+                p === "ease" || p === "easeEach" || _parseKeyframe(p, keyframes[p], copy, keyframes.easeEach);
+              }
+
+              for (p in copy) {
+                a = copy[p].sort(function (a, b) {
+                  return a.t - b.t;
+                });
+                time = 0;
+
+                for (i = 0; i < a.length; i++) {
+                  kf = a[i];
+                  v = {
+                    ease: kf.e,
+                    duration: (kf.t - (i ? a[i - 1].t : 0)) / 100 * duration
+                  };
+                  v[p] = kf.v;
+                  tl.to(parsedTargets, v, time);
+                  time += v.duration;
+                }
+              }
+
+              tl.duration() < duration && tl.to({}, {
+                duration: duration - tl.duration()
+              }); // in case keyframes didn't go to 100%
+            }
           }
 
           duration || _this3.duration(duration = tl.duration());
@@ -109096,10 +109788,10 @@
         vars.reversed && _this3.reverse();
         vars.paused && _this3.paused(true);
 
-        if (immediateRender || !duration && !keyframes && _this3._start === _round(parent._time) && _isNotFalse(immediateRender) && _hasNoPausedAncestors(_assertThisInitialized(_this3)) && parent.data !== "nested") {
+        if (immediateRender || !duration && !keyframes && _this3._start === _roundPrecise(parent._time) && _isNotFalse(immediateRender) && _hasNoPausedAncestors(_assertThisInitialized(_this3)) && parent.data !== "nested") {
           _this3._tTime = -_tinyNum; //forces a render without having to set the render() "force" parameter to true because we want to allow lazying by default (using the "force" parameter always forces an immediate full render)
 
-          _this3.render(Math.max(0, -delay)); //in case delay is negative
+          _this3.render(Math.max(0, -delay) || 0); //in case delay is negative
 
         }
 
@@ -109113,7 +109805,8 @@
         var prevTime = this._time,
             tDur = this._tDur,
             dur = this._dur,
-            tTime = totalTime > tDur - _tinyNum && totalTime >= 0 ? tDur : totalTime < _tinyNum ? 0 : totalTime,
+            isNegative = totalTime < 0,
+            tTime = totalTime > tDur - _tinyNum && !isNegative ? tDur : totalTime < _tinyNum ? 0 : totalTime,
             time,
             pt,
             iteration,
@@ -109126,7 +109819,7 @@
 
         if (!dur) {
           _renderZeroDurationTween(this, totalTime, suppressEvents, force);
-        } else if (tTime !== this._tTime || !totalTime || force || !this._initted && this._tTime || this._startAt && this._zTime < 0 !== totalTime < 0) {
+        } else if (tTime !== this._tTime || !totalTime || force || !this._initted && this._tTime || this._startAt && this._zTime < 0 !== isNegative) {
           //this senses if we're crossing over the start time, in which case we must record _zTime and force the render, but we do it in this lengthy conditional way for performance reasons (usually we can skip the calculations): this._initted && (this._zTime < 0) !== (totalTime < 0)
           time = tTime;
           timeline = this.timeline;
@@ -109135,11 +109828,11 @@
             //adjust the time for repeats and yoyos
             cycleDuration = dur + this._rDelay;
 
-            if (this._repeat < -1 && totalTime < 0) {
+            if (this._repeat < -1 && isNegative) {
               return this.totalTime(cycleDuration * 100 + totalTime, suppressEvents, force);
             }
 
-            time = _round(tTime % cycleDuration); //round to avoid floating point errors. (4 % 0.8 should be 0 but some browsers report it as 0.79999999!)
+            time = _roundPrecise(tTime % cycleDuration); //round to avoid floating point errors. (4 % 0.8 should be 0 but some browsers report it as 0.79999999!)
 
             if (tTime === tDur) {
               // the tDur === tTime is for edge cases where there's a lengthy decimal on the duration and it may reach the very end but the time is rendered as not-quite-there (remember, tDur is rounded to 4 decimals whereas dur isn't)
@@ -109167,6 +109860,7 @@
 
             if (time === prevTime && !force && this._initted) {
               //could be during the repeatDelay part. No need to render and fire callbacks.
+              this._tTime = tTime;
               return this;
             }
 
@@ -109176,15 +109870,20 @@
               if (this.vars.repeatRefresh && !isYoyo && !this._lock) {
                 this._lock = force = 1; //force, otherwise if lazy is true, the _attemptInitTween() will return and we'll jump out and get caught bouncing on each tick.
 
-                this.render(_round(cycleDuration * iteration), true).invalidate()._lock = 0;
+                this.render(_roundPrecise(cycleDuration * iteration), true).invalidate()._lock = 0;
               }
             }
           }
 
           if (!this._initted) {
-            if (_attemptInitTween(this, totalTime < 0 ? totalTime : time, force, suppressEvents)) {
+            if (_attemptInitTween(this, isNegative ? totalTime : time, force, suppressEvents, tTime)) {
               this._tTime = 0; // in constructor if immediateRender is true, we set _tTime to -_tinyNum to have the playhead cross the starting point but we can't leave _tTime as a negative number.
 
+              return this;
+            }
+
+            if (prevTime !== this._time) {
+              // rare edge case - during initialization, an onUpdate in the _startAt (.fromTo()) might force this tween to render at a different spot in which case we should ditch this render() call so that it doesn't revert the values.
               return this;
             }
 
@@ -109225,10 +109924,10 @@
             pt = pt._next;
           }
 
-          timeline && timeline.render(totalTime < 0 ? totalTime : !time && isYoyo ? -_tinyNum : timeline._dur * ratio, suppressEvents, force) || this._startAt && (this._zTime = totalTime);
+          timeline && timeline.render(totalTime < 0 ? totalTime : !time && isYoyo ? -_tinyNum : timeline._dur * timeline._ease(time / this._dur), suppressEvents, force) || this._startAt && (this._zTime = totalTime);
 
           if (this._onUpdate && !suppressEvents) {
-            totalTime < 0 && this._startAt && this._startAt.render(totalTime, true, force); //note: for performance reasons, we tuck this conditional logic inside less traveled areas (most tweens don't have an onUpdate). We'd just have it at the end before the onComplete, but the values should be updated before any onUpdate is called, so we ALSO put it here and then if it's not called, we do so later near the onComplete.
+            isNegative && _rewindStartAt(this, totalTime, suppressEvents, force); //note: for performance reasons, we tuck this conditional logic inside less traveled areas (most tweens don't have an onUpdate). We'd just have it at the end before the onComplete, but the values should be updated before any onUpdate is called, so we ALSO put it here and then if it's not called, we do so later near the onComplete.
 
             _callback(this, "onUpdate");
           }
@@ -109236,10 +109935,10 @@
           this._repeat && iteration !== prevIteration && this.vars.onRepeat && !suppressEvents && this.parent && _callback(this, "onRepeat");
 
           if ((tTime === this._tDur || !tTime) && this._tTime === tTime) {
-            totalTime < 0 && this._startAt && !this._onUpdate && this._startAt.render(totalTime, true, true);
+            isNegative && !this._onUpdate && _rewindStartAt(this, totalTime, true, true);
             (totalTime || !dur) && (tTime === this._tDur && this._ts > 0 || !tTime && this._ts < 0) && _removeFromParent(this, 1); // don't remove if we're rendering at exactly a time of 0, as there could be autoRevert values that should get set on the next tick (if the playhead goes backward beyond the startTime, negative totalTime). Don't remove if the timeline is reversed and the playhead isn't at 0, otherwise tl.progress(1).reverse() won't work. Only remove if the playhead is at the end and timeScale is positive, or if the playhead is at 0 and the timeScale is negative.
 
-            if (!suppressEvents && !(totalTime < 0 && !prevTime) && (tTime || prevTime)) {
+            if (!suppressEvents && !(isNegative && !prevTime) && (tTime || prevTime || isYoyo)) {
               // if prevTime and tTime are zero, we shouldn't fire the onReverseComplete. This could happen if you gsap.to(... {paused:true}).play();
               _callback(this, tTime === tDur ? "onComplete" : "onReverseComplete", true);
 
@@ -109255,11 +109954,40 @@
         return this._targets;
       };
 
-      _proto3.invalidate = function invalidate() {
-        this._pt = this._op = this._startAt = this._onUpdate = this._lazy = this.ratio = 0;
+      _proto3.invalidate = function invalidate(soft) {
+        // "soft" gives us a way to clear out everything EXCEPT the recorded pre-"from" portion of from() tweens. Otherwise, for example, if you tween.progress(1).render(0, true true).invalidate(), the "from" values would persist and then on the next render, the from() tweens would initialize and the current value would match the "from" values, thus animate from the same value to the same value (no animation). We tap into this in ScrollTrigger's refresh() where we must push a tween to completion and then back again but honor its init state in case the tween is dependent on another tween further up on the page.
+        (!soft || !this.vars.runBackwards) && (this._startAt = 0);
+        this._pt = this._op = this._onUpdate = this._lazy = this.ratio = 0;
         this._ptLookup = [];
-        this.timeline && this.timeline.invalidate();
-        return _Animation2.prototype.invalidate.call(this);
+        this.timeline && this.timeline.invalidate(soft);
+        return _Animation2.prototype.invalidate.call(this, soft);
+      };
+
+      _proto3.resetTo = function resetTo(property, value, start, startIsRelative) {
+        _tickerActive || _ticker.wake();
+        this._ts || this.play();
+        var time = Math.min(this._dur, (this._dp._time - this._start) * this._ts),
+            ratio;
+        this._initted || _initTween(this, time);
+        ratio = this._ease(time / this._dur); // don't just get tween.ratio because it may not have rendered yet.
+        // possible future addition to allow an object with multiple values to update, like tween.resetTo({x: 100, y: 200}); At this point, it doesn't seem worth the added kb given the fact that most users will likely opt for the convenient gsap.quickTo() way of interacting with this method.
+        // if (_isObject(property)) { // performance optimization
+        // 	for (p in property) {
+        // 		if (_updatePropTweens(this, p, property[p], value ? value[p] : null, start, ratio, time)) {
+        // 			return this.resetTo(property, value, start, startIsRelative); // if a PropTween wasn't found for the property, it'll get forced with a re-initialization so we need to jump out and start over again.
+        // 		}
+        // 	}
+        // } else {
+
+        if (_updatePropTweens(this, property, value, start, startIsRelative, ratio, time)) {
+          return this.resetTo(property, value, start, startIsRelative); // if a PropTween wasn't found for the property, it'll get forced with a re-initialization so we need to jump out and start over again.
+        } //}
+
+
+        _alignPlayhead(this, 0);
+
+        this.parent || _addLinkedListItem(this._dp, this, "_first", "_last", this._dp._sort ? "_start" : 0);
+        return this.render(0);
       };
 
       _proto3.kill = function kill(targets, vars) {
@@ -109372,7 +110100,7 @@
           onCompleteParams: params,
           onReverseCompleteParams: params,
           callbackScope: scope
-        });
+        }); // we must use onReverseComplete too for things like timeline.add(() => {...}) which should be triggered in BOTH directions (forward and reverse)
       };
 
       Tween.fromTo = function fromTo(targets, fromVars, toVars) {
@@ -109587,11 +110315,240 @@
       smoothChildTiming: true
     });
     _config.stringFilter = _colorStringFilter;
+
+    var _media = [],
+        _listeners = {},
+        _emptyArray = [],
+        _lastMediaTime = 0,
+        _dispatch = function _dispatch(type) {
+      return (_listeners[type] || _emptyArray).map(function (f) {
+        return f();
+      });
+    },
+        _onMediaChange = function _onMediaChange() {
+      var time = Date.now(),
+          matches = [];
+
+      if (time - _lastMediaTime > 2) {
+        _dispatch("matchMediaInit");
+
+        _media.forEach(function (c) {
+          var queries = c.queries,
+              conditions = c.conditions,
+              match,
+              p,
+              anyMatch,
+              toggled;
+
+          for (p in queries) {
+            match = _win$1.matchMedia(queries[p]).matches; // Firefox doesn't update the "matches" property of the MediaQueryList object correctly - it only does so as it calls its change handler - so we must re-create a media query here to ensure it's accurate.
+
+            match && (anyMatch = 1);
+
+            if (match !== conditions[p]) {
+              conditions[p] = match;
+              toggled = 1;
+            }
+          }
+
+          if (toggled) {
+            c.revert();
+            anyMatch && matches.push(c);
+          }
+        });
+
+        _dispatch("matchMediaRevert");
+
+        matches.forEach(function (c) {
+          return c.onMatch(c);
+        });
+        _lastMediaTime = time;
+
+        _dispatch("matchMedia");
+      }
+    };
+
+    var Context = /*#__PURE__*/function () {
+      function Context(func, scope) {
+        this.selector = scope && selector(scope);
+        this.data = [];
+        this._r = []; // returned/cleanup functions
+
+        this.isReverted = false;
+        func && this.add(func);
+      }
+
+      var _proto5 = Context.prototype;
+
+      _proto5.add = function add(name, func, scope) {
+        if (_isFunction(name)) {
+          scope = func;
+          func = name;
+          name = _isFunction;
+        }
+
+        var self = this,
+            f = function f() {
+          var prev = _context,
+              prevSelector = self.selector,
+              result;
+          prev && prev !== self && prev.data.push(self);
+          scope && (self.selector = selector(scope));
+          _context = self;
+          result = func.apply(self, arguments);
+          _isFunction(result) && self._r.push(result);
+          _context = prev;
+          self.selector = prevSelector;
+          self.isReverted = false;
+          return result;
+        };
+
+        self.last = f;
+        return name === _isFunction ? f(self) : name ? self[name] = f : f;
+      };
+
+      _proto5.ignore = function ignore(func) {
+        var prev = _context;
+        _context = null;
+        func(this);
+        _context = prev;
+      };
+
+      _proto5.getTweens = function getTweens() {
+        var a = [];
+        this.data.forEach(function (e) {
+          return e instanceof Context ? a.push.apply(a, e.getTweens()) : e instanceof Tween && !(e.parent && e.parent.data === "nested") && a.push(e);
+        });
+        return a;
+      };
+
+      _proto5.clear = function clear() {
+        this._r.length = this.data.length = 0;
+      };
+
+      _proto5.kill = function kill(revert, matchMedia) {
+        var _this4 = this;
+
+        if (revert) {
+          var tweens = this.getTweens();
+          this.data.forEach(function (t) {
+            // Flip plugin tweens are very different in that they should actually be pushed to their end. The plugin replaces the timeline's .revert() method to do exactly that. But we also need to remove any of those nested tweens inside the flip timeline so that they don't get individually reverted.
+            if (t.data === "isFlip") {
+              t.revert();
+              t.getChildren(true, true, false).forEach(function (tween) {
+                return tweens.splice(tweens.indexOf(tween), 1);
+              });
+            }
+          }); // save as an object so that we can cache the globalTime for each tween to optimize performance during the sort
+
+          tweens.map(function (t) {
+            return {
+              g: t.globalTime(0),
+              t: t
+            };
+          }).sort(function (a, b) {
+            return b.g - a.g || -1;
+          }).forEach(function (o) {
+            return o.t.revert(revert);
+          }); // note: all of the _startAt tweens should be reverted in reverse order that thy were created, and they'll all have the same globalTime (-1) so the " || -1" in the sort keeps the order properly.
+
+          this.data.forEach(function (e) {
+            return !(e instanceof Animation) && e.revert && e.revert(revert);
+          });
+
+          this._r.forEach(function (f) {
+            return f(revert, _this4);
+          });
+
+          this.isReverted = true;
+        } else {
+          this.data.forEach(function (e) {
+            return e.kill && e.kill();
+          });
+        }
+
+        this.clear();
+
+        if (matchMedia) {
+          var i = _media.indexOf(this);
+
+          !!~i && _media.splice(i, 1);
+        }
+      };
+
+      _proto5.revert = function revert(config) {
+        this.kill(config || {});
+      };
+
+      return Context;
+    }();
+
+    var MatchMedia = /*#__PURE__*/function () {
+      function MatchMedia(scope) {
+        this.contexts = [];
+        this.scope = scope;
+      }
+
+      var _proto6 = MatchMedia.prototype;
+
+      _proto6.add = function add(conditions, func, scope) {
+        _isObject(conditions) || (conditions = {
+          matches: conditions
+        });
+        var context = new Context(0, scope || this.scope),
+            cond = context.conditions = {},
+            mq,
+            p,
+            active;
+        this.contexts.push(context);
+        func = context.add("onMatch", func);
+        context.queries = conditions;
+
+        for (p in conditions) {
+          if (p === "all") {
+            active = 1;
+          } else {
+            mq = _win$1.matchMedia(conditions[p]);
+
+            if (mq) {
+              _media.indexOf(context) < 0 && _media.push(context);
+              (cond[p] = mq.matches) && (active = 1);
+              mq.addListener ? mq.addListener(_onMediaChange) : mq.addEventListener("change", _onMediaChange);
+            }
+          }
+        }
+
+        active && func(context);
+        return this;
+      } // refresh() {
+      // 	let time = _lastMediaTime,
+      // 		media = _media;
+      // 	_lastMediaTime = -1;
+      // 	_media = this.contexts;
+      // 	_onMediaChange();
+      // 	_lastMediaTime = time;
+      // 	_media = media;
+      // }
+      ;
+
+      _proto6.revert = function revert(config) {
+        this.kill(config || {});
+      };
+
+      _proto6.kill = function kill(revert) {
+        this.contexts.forEach(function (c) {
+          return c.kill(revert, true);
+        });
+      };
+
+      return MatchMedia;
+    }();
     /*
      * --------------------------------------------------------------------------------------
      * GSAP
      * --------------------------------------------------------------------------------------
      */
+
 
     var _gsap = {
       registerPlugin: function registerPlugin() {
@@ -109654,6 +110611,17 @@
         return Plugin ? setter : function (value) {
           return setter(target, p, unit ? value + unit : value, cache, 1);
         };
+      },
+      quickTo: function quickTo(target, property, vars) {
+        var _merge2;
+
+        var tween = gsap.to(target, _merge((_merge2 = {}, _merge2[property] = "+=0.1", _merge2.paused = true, _merge2), vars || {})),
+            func = function func(value, start, startIsRelative) {
+          return tween.resetTo(property, value, start, startIsRelative);
+        };
+
+        func.tween = tween;
+        return func;
       },
       isTweening: function isTweening(targets) {
         return _globalTimeline.getTweensOf(targets, true).length > 0;
@@ -109725,6 +110693,37 @@
 
         return tl;
       },
+      context: function context(func, scope) {
+        return func ? new Context(func, scope) : _context;
+      },
+      matchMedia: function matchMedia(scope) {
+        return new MatchMedia(scope);
+      },
+      matchMediaRefresh: function matchMediaRefresh() {
+        return _media.forEach(function (c) {
+          var cond = c.conditions,
+              found,
+              p;
+
+          for (p in cond) {
+            if (cond[p]) {
+              cond[p] = false;
+              found = 1;
+            }
+          }
+
+          found && c.revert();
+        }) || _onMediaChange();
+      },
+      addEventListener: function addEventListener(type, callback) {
+        var a = _listeners[type] || (_listeners[type] = []);
+        ~a.indexOf(callback) || a.push(callback);
+      },
+      removeEventListener: function removeEventListener(type, callback) {
+        var a = _listeners[type],
+            i = a && a.indexOf(callback);
+        i >= 0 && a.splice(i, 1);
+      },
       utils: {
         wrap: wrap,
         wrapYoyo: wrapYoyo,
@@ -109757,6 +110756,18 @@
         Animation: Animation,
         getCache: _getCache,
         _removeLinkedListItem: _removeLinkedListItem,
+        reverting: function reverting() {
+          return _reverting$1;
+        },
+        context: function context(toAdd) {
+          if (toAdd && _context) {
+            _context.data.push(toAdd);
+
+            toAdd._ctx = _context;
+          }
+
+          return _context;
+        },
         suppressOverwrites: function suppressOverwrites(value) {
           return _suppressOverwrites = value;
         }
@@ -109845,13 +110856,25 @@
     var gsap = _gsap.registerPlugin({
       name: "attr",
       init: function init(target, vars, tween, index, targets) {
-        var p, pt;
+        var p, pt, v;
+        this.tween = tween;
 
         for (p in vars) {
-          pt = this.add(target, "setAttribute", (target.getAttribute(p) || 0) + "", vars[p], index, targets, 0, 0, p);
-          pt && (pt.op = p);
+          v = target.getAttribute(p) || "";
+          pt = this.add(target, "setAttribute", (v || 0) + "", vars[p], index, targets, 0, 0, p);
+          pt.op = p;
+          pt.b = v; // record the beginning value so we can revert()
 
           this._props.push(p);
+        }
+      },
+      render: function render(ratio, data) {
+        var pt = data._pt;
+
+        while (pt) {
+          _reverting$1 ? pt.set(pt.t, pt.p, pt.b, pt) : pt.r(ratio, pt.d); // if reverting, go back to the original (pt.b)
+
+          pt = pt._next;
         }
       }
     }, {
@@ -109860,12 +110883,12 @@
         var i = value.length;
 
         while (i--) {
-          this.add(target, i, target[i] || 0, value[i]);
+          this.add(target, i, target[i] || 0, value[i], 0, 0, 0, 0, 0, 1);
         }
       }
     }, _buildModifierPlugin("roundProps", _roundModifier), _buildModifierPlugin("modifiers"), _buildModifierPlugin("snap", snap)) || _gsap; //to prevent the core plugins from being dropped via aggressive tree shaking, we must include them in the variable declaration in this way.
 
-    Tween.version = Timeline.version = gsap.version = "3.7.1";
+    Tween.version = Timeline.version = gsap.version = "3.11.3";
     _coreReady = 1;
     _windowExists$1() && _wake();
     _easeMap.Power0;
@@ -109888,10 +110911,10 @@
         _easeMap.Circ;
 
     /*!
-     * CSSPlugin 3.7.1
+     * CSSPlugin 3.11.3
      * https://greensock.com
      *
-     * Copyright 2008-2021, GreenSock. All rights reserved.
+     * Copyright 2008-2022, GreenSock. All rights reserved.
      * Subject to the terms at https://greensock.com/standard-license or for
      * Club GreenSock members, the agreement issued with that membership.
      * @author: Jack Doyle, jack@greensock.com
@@ -109903,6 +110926,7 @@
         _pluginInitted,
         _tempDiv,
         _recentSetterPlugin,
+        _reverting,
         _windowExists = function _windowExists() {
       return typeof window !== "undefined";
     },
@@ -109912,7 +110936,7 @@
         _atan2 = Math.atan2,
         _bigNum = 1e8,
         _capsExp = /([A-Z])/g,
-        _horizontalExp = /(?:left|right|width|margin|padding|x)/i,
+        _horizontalExp = /(left|right|width|margin|padding|x)/i,
         _complexExp = /[\s,\(]\S/,
         _propertyAliases = {
       autoAlpha: "opacity,visibility",
@@ -109963,6 +110987,87 @@
     },
         _transformProp = "transform",
         _transformOriginProp = _transformProp + "Origin",
+        _saveStyle = function _saveStyle(property, isNotCSS) {
+      var _this = this;
+
+      var target = this.target,
+          style = target.style;
+
+      if (property in _transformProps) {
+        this.tfm = this.tfm || {};
+
+        if (property !== "transform") {
+          property = _propertyAliases[property] || property;
+          ~property.indexOf(",") ? property.split(",").forEach(function (a) {
+            return _this.tfm[a] = _get(target, a);
+          }) : this.tfm[property] = target._gsap.x ? target._gsap[property] : _get(target, property); // note: scale would map to "scaleX,scaleY", thus we loop and apply them both.
+        }
+
+        if (this.props.indexOf(_transformProp) >= 0) {
+          return;
+        }
+
+        if (target._gsap.svg) {
+          this.svgo = target.getAttribute("data-svg-origin");
+          this.props.push(_transformOriginProp, isNotCSS, "");
+        }
+
+        property = _transformProp;
+      }
+
+      (style || isNotCSS) && this.props.push(property, isNotCSS, style[property]);
+    },
+        _removeIndependentTransforms = function _removeIndependentTransforms(style) {
+      if (style.translate) {
+        style.removeProperty("translate");
+        style.removeProperty("scale");
+        style.removeProperty("rotate");
+      }
+    },
+        _revertStyle = function _revertStyle() {
+      var props = this.props,
+          target = this.target,
+          style = target.style,
+          cache = target._gsap,
+          i,
+          p;
+
+      for (i = 0; i < props.length; i += 3) {
+        // stored like this: property, isNotCSS, value
+        props[i + 1] ? target[props[i]] = props[i + 2] : props[i + 2] ? style[props[i]] = props[i + 2] : style.removeProperty(props[i].replace(_capsExp, "-$1").toLowerCase());
+      }
+
+      if (this.tfm) {
+        for (p in this.tfm) {
+          cache[p] = this.tfm[p];
+        }
+
+        if (cache.svg) {
+          cache.renderTransform();
+          target.setAttribute("data-svg-origin", this.svgo || "");
+        }
+
+        i = _reverting();
+
+        if (i && !i.isStart && !style[_transformProp]) {
+          _removeIndependentTransforms(style);
+
+          cache.uncache = 1; // if it's a startAt that's being reverted in the _initTween() of the core, we don't need to uncache transforms. This is purely a performance optimization.
+        }
+      }
+    },
+        _getStyleSaver = function _getStyleSaver(target, properties) {
+      var saver = {
+        target: target,
+        props: [],
+        revert: _revertStyle,
+        save: _saveStyle
+      };
+      properties && properties.split(",").forEach(function (p) {
+        return saver.save(p);
+      });
+      return saver;
+    },
         _supports3D,
         _createElement = function _createElement(type, ns) {
       var e = _doc.createElementNS ? _doc.createElementNS((ns || "http://www.w3.org/1999/xhtml").replace(/^https/, "http"), type) : _doc.createElement(type); //some servers swap in https for http in the namespace which can break things, making "style" inaccessible.
@@ -110003,6 +111108,7 @@
         _tempDiv.style.cssText = "border-width:0;line-height:0;position:absolute;padding:0"; //make sure to override certain properties that may contaminate measurements, in case the user has overreaching style sheets.
 
         _supports3D = !!_checkPropPrefix("perspective");
+        _reverting = gsap.core.reverting;
         _pluginInitted = 1;
       }
     },
@@ -110110,6 +111216,10 @@
       rad: 1,
       turn: 1
     },
+        _nonStandardLayouts = {
+      grid: 1,
+      flex: 1
+    },
         //takes a single value like 20px and converts it to the unit specified, like "%", returning only the numeric amount.
     _convertToUnit = function _convertToUnit(target, property, value, unit) {
       var curValue = parseFloat(value) || 0,
@@ -110152,10 +111262,10 @@
 
       cache = parent._gsap;
 
-      if (cache && toPercent && cache.width && horizontal && cache.time === _ticker.time) {
+      if (cache && toPercent && cache.width && horizontal && cache.time === _ticker.time && !cache.uncache) {
         return _round(curValue / cache.width * amount);
       } else {
-        (toPercent || curUnit === "%") && (style.position = _getComputedProperty(target, "position"));
+        (toPercent || curUnit === "%") && !_nonStandardLayouts[_getComputedProperty(parent, "display")] && (style.position = _getComputedProperty(target, "position"));
         parent === target && (style.position = "static"); // like for borderRadius, if it's a % we must have it relative to the target itself but that may not have position: relative or position: absolute in which case it'd go up the chain until it finds its offsetParent (bad). position: static protects against that.
 
         parent.appendChild(_tempDiv);
@@ -110198,7 +111308,7 @@
       return unit && !~(value + "").trim().indexOf(" ") ? _convertToUnit(target, property, value, unit) + unit : value;
     },
         _tweenComplexCSSString = function _tweenComplexCSSString(target, prop, start, end) {
-      //note: we call _tweenComplexCSSString.call(pluginInstance...) to ensure that it's scoped properly. We may call it from within a plugin too, thus "this" would refer to the plugin.
+      // note: we call _tweenComplexCSSString.call(pluginInstance...) to ensure that it's scoped properly. We may call it from within a plugin too, thus "this" would refer to the plugin.
       if (!start || start === "none") {
         // some browsers like Safari actually PREFER the prefixed property and mis-report the unprefixed value like clipPath (BUG). In other words, even though clipPath exists in the style ("clipPath" in target.style) and it's set in the CSS properly (along with -webkit-clip-path), Safari reports clipPath as "none" whereas WebkitClipPath reports accurately like "ellipse(100% 0% at 50% 0%)", so in this case we must SWITCH to using the prefixed property instead. See https://greensock.com/forums/topic/18310-clippath-doesnt-work-on-ios/
         var p = _checkPropPrefix(prop, target, 1),
@@ -110226,11 +111336,10 @@
           chunk,
           endUnit,
           startUnit,
-          relative,
           endValues;
       pt.b = start;
       pt.e = end;
-      start += ""; //ensure values are strings
+      start += ""; // ensure values are strings
 
       end += "";
 
@@ -110242,7 +111351,7 @@
 
       a = [start, end];
 
-      _colorStringFilter(a); //pass an array with the starting and ending values and let the filter do whatever it needs to the values. If colors are found, it returns true and then we must match where the color shows up order-wise because for things like boxShadow, sometimes the browser provides the computed values with the color FIRST, but the user provides it with the color LAST, so flip them if necessary. Same for drop-shadow().
+      _colorStringFilter(a); // pass an array with the starting and ending values and let the filter do whatever it needs to the values. If colors are found, it returns true and then we must match where the color shows up order-wise because for things like boxShadow, sometimes the browser provides the computed values with the color FIRST, but the user provides it with the color LAST, so flip them if necessary. Same for drop-shadow().
 
 
       start = a[0];
@@ -110264,12 +111373,7 @@
           if (endValue !== (startValue = startValues[matchIndex++] || "")) {
             startNum = parseFloat(startValue) || 0;
             startUnit = startValue.substr((startNum + "").length);
-            relative = endValue.charAt(1) === "=" ? +(endValue.charAt(0) + "1") : 0;
-
-            if (relative) {
-              endValue = endValue.substr(2);
-            }
-
+            endValue.charAt(1) === "=" && (endValue = _parseRelative(startNum, endValue) + startUnit);
             endNum = parseFloat(endValue);
             endUnit = endValue.substr((endNum + "").length);
             index = _numWithUnitExp.lastIndex - endUnit.length;
@@ -110286,7 +111390,7 @@
 
             if (startUnit !== endUnit) {
               startNum = _convertToUnit(target, prop, startValue, endUnit) || 0;
-            } //these nested PropTweens are handled in a special way - we'll never actually call a render or setter method on them. We'll just loop through them in the parent complex string PropTween's render method.
+            } // these nested PropTweens are handled in a special way - we'll never actually call a render or setter method on them. We'll just loop through them in the parent complex string PropTween's render method.
 
 
             pt._pt = {
@@ -110294,7 +111398,7 @@
               p: chunk || matchIndex === 1 ? chunk : ",",
               //note: SVG spec allows omission of comma/space when a negative sign is wedged between two numbers, like 2.5-5.3 instead of 2.5,-5.3 but when tweening, the negative value may switch to positive, so we insert the comma just in case.
               s: startNum,
-              c: relative ? relative * endNum : endNum - startNum,
+              c: endNum - startNum,
               m: color && color < 4 || prop === "zIndex" ? Math.round : 0
             };
           }
@@ -110373,6 +111477,8 @@
 
 
             cache.uncache = 1;
+
+            _removeIndependentTransforms(style);
           }
         }
       }
@@ -110497,7 +111603,7 @@
           // note: in 3.3.0 we switched target.offsetParent to _doc.body.contains(target) to avoid [sometimes unnecessary] MutationObserver calls but that wasn't adequate because there are edge cases where nested position: fixed elements need to get reparented to accurately sense transforms. See https://github.com/greensock/GSAP/issues/388 and https://github.com/greensock/GSAP/issues/375
           addedToDOM = 1; //flag
 
-          nextSibling = target.nextSibling;
+          nextSibling = target.nextElementSibling;
 
           _docElement.appendChild(target); //we must add it to the DOM in order to get values properly
 
@@ -110585,6 +111691,7 @@
           invertedScaleX = cache.scaleX < 0,
           px = "px",
           deg = "deg",
+          cs = getComputedStyle(target),
           origin = _getComputedProperty(target, _transformOriginProp) || "0",
           x,
           y,
@@ -110621,10 +111728,27 @@
       x = y = z = rotation = rotationX = rotationY = skewX = skewY = perspective = 0;
       scaleX = scaleY = 1;
       cache.svg = !!(target.getCTM && _isSVG(target));
+
+      if (cs.translate) {
+        // accommodate independent transforms by combining them into normal ones.
+        if (cs.translate !== "none" || cs.scale !== "none" || cs.rotate !== "none") {
+          style[_transformProp] = (cs.translate !== "none" ? "translate3d(" + (cs.translate + " 0 0").split(" ").slice(0, 3).join(", ") + ") " : "") + (cs.rotate !== "none" ? "rotate(" + cs.rotate + ") " : "") + (cs.scale !== "none" ? "scale(" + cs.scale.split(" ").join(",") + ") " : "") + (cs[_transformProp] !== "none" ? cs[_transformProp] : "");
+        }
+
+        style.scale = style.rotate = style.translate = "none";
+      }
+
       matrix = _getMatrix(target, cache.svg);
 
       if (cache.svg) {
-        t1 = (!cache.uncache || origin === "0px 0px") && !uncache && target.getAttribute("data-svg-origin"); // if origin is 0,0 and cache.uncache is true, let the recorded data-svg-origin stay. Otherwise, whenever we set cache.uncache to true, we'd need to set element.style.transformOrigin = (cache.xOrigin - bbox.x) + "px " + (cache.yOrigin - bbox.y) + "px". Remember, to work around browser inconsistencies we always force SVG elements' transformOrigin to 0,0 and offset the translation accordingly.
+        if (cache.uncache) {
+          // if cache.uncache is true (and maybe if origin is 0,0), we need to set element.style.transformOrigin = (cache.xOrigin - bbox.x) + "px " + (cache.yOrigin - bbox.y) + "px". Previously we let the data-svg-origin stay instead, but when introducing revert(), it complicated things.
+          t2 = target.getBBox();
+          origin = cache.xOrigin - t2.x + "px " + (cache.yOrigin - t2.y) + "px";
+          t1 = "";
+        } else {
+          t1 = !uncache && target.getAttribute("data-svg-origin"); //  Remember, to work around browser inconsistencies we always force SVG elements' transformOrigin to 0,0 and offset the translation accordingly.
+        }
 
         _applySVGOrigin(target, t1 || origin, !!t1 || cache.originIsAbsolute, cache.smooth !== false, matrix);
       }
@@ -110748,8 +111872,9 @@
         }
       }
 
-      cache.x = x - ((cache.xPercent = x && (cache.xPercent || (Math.round(target.offsetWidth / 2) === Math.round(-x) ? -50 : 0))) ? target.offsetWidth * cache.xPercent / 100 : 0) + px;
-      cache.y = y - ((cache.yPercent = y && (cache.yPercent || (Math.round(target.offsetHeight / 2) === Math.round(-y) ? -50 : 0))) ? target.offsetHeight * cache.yPercent / 100 : 0) + px;
+      uncache = uncache || cache.uncache;
+      cache.x = x - ((cache.xPercent = x && (!uncache && cache.xPercent || (Math.round(target.offsetWidth / 2) === Math.round(-x) ? -50 : 0))) ? target.offsetWidth * cache.xPercent / 100 : 0) + px;
+      cache.y = y - ((cache.yPercent = y && (!uncache && cache.yPercent || (Math.round(target.offsetHeight / 2) === Math.round(-y) ? -50 : 0))) ? target.offsetHeight * cache.yPercent / 100 : 0) + px;
       cache.z = z + px;
       cache.scaleX = _round(scaleX);
       cache.scaleY = _round(scaleY);
@@ -110945,13 +112070,13 @@
 
       temp = "matrix(" + a11 + "," + a21 + "," + a12 + "," + a22 + "," + tx + "," + ty + ")";
       target.setAttribute("transform", temp);
-      forceCSS && (target.style[_transformProp] = temp); //some browsers prioritize CSS transforms over the transform attribute. When we sense that the user has CSS transforms applied, we must overwrite them this way (otherwise some browser simply won't render the  transform attribute changes!)
+      forceCSS && (target.style[_transformProp] = temp); //some browsers prioritize CSS transforms over the transform attribute. When we sense that the user has CSS transforms applied, we must overwrite them this way (otherwise some browser simply won't render the transform attribute changes!)
     },
-        _addRotationalPropTween = function _addRotationalPropTween(plugin, target, property, startNum, endValue, relative) {
+        _addRotationalPropTween = function _addRotationalPropTween(plugin, target, property, startNum, endValue) {
       var cap = 360,
           isString = _isString(endValue),
           endNum = parseFloat(endValue) * (isString && ~endValue.indexOf("rad") ? _RAD2DEG : 1),
-          change = relative ? endNum * relative : endNum - startNum,
+          change = endNum - startNum,
           finalValue = startNum + change + "deg",
           direction,
           pt;
@@ -111095,8 +112220,13 @@
             transformPropTween,
             cache,
             smooth,
-            hasPriority;
-        _pluginInitted || _initCore();
+            hasPriority,
+            inlineProps;
+        _pluginInitted || _initCore(); // we may call init() multiple times on the same plugin instance, like when adding special properties, so make sure we don't overwrite the revert data or inlineProps
+
+        this.styles = this.styles || _getStyleSaver(target);
+        inlineProps = this.styles.props;
+        this.tween = tween;
 
         for (p in vars) {
           if (p === "autoRound") {
@@ -111139,11 +112269,13 @@
             endUnit ? startUnit !== endUnit && (startValue = _convertToUnit(target, p, startValue, endUnit) + endUnit) : startUnit && (endValue += startUnit);
             this.add(style, "setProperty", startValue, endValue, index, targets, 0, 0, p);
             props.push(p);
+            inlineProps.push(p, 0, style[p]);
           } else if (type !== "undefined") {
             if (startAt && p in startAt) {
               // in case someone hard-codes a complex value as the start, like top: "calc(2vh / 2)". Without this, it'd use the computed value (always in px)
               startValue = typeof startAt[p] === "function" ? startAt[p].call(tween, index, target, targets) : startAt[p];
-              p in _config.units && !getUnit(startValue) && (startValue += _config.units[p]); // for cases when someone passes in a unitless value like {x: 100}; if we try setting translate(100, 0px) it won't work.
+              _isString(startValue) && ~startValue.indexOf("random(") && (startValue = _replaceRandom(startValue));
+              getUnit(startValue + "") || (startValue += _config.units[p] || getUnit(_get(target, p)) || ""); // for cases when someone passes in a unitless value like {x: 100}; if we try setting translate(100, 0px) it won't work.
 
               (startValue + "").charAt(1) === "=" && (startValue = _get(target, p)); // can't work with relative values
             } else {
@@ -111151,7 +112283,7 @@
             }
 
             startNum = parseFloat(startValue);
-            relative = type === "string" && endValue.charAt(1) === "=" ? +(endValue.charAt(0) + "1") : 0;
+            relative = type === "string" && endValue.charAt(1) === "=" && endValue.substr(0, 2);
             relative && (endValue = endValue.substr(2));
             endNum = parseFloat(endValue);
 
@@ -111162,6 +112294,8 @@
                   //if visibility is initially set to "hidden", we should interpret that as intent to make opacity 0 (a convenience)
                   startNum = 0;
                 }
+
+                inlineProps.push("visibility", 0, style.visibility);
 
                 _addNonTweeningPT(this, style, "visibility", startNum ? "inherit" : "hidden", endNum ? "inherit" : "hidden", !endNum);
               }
@@ -111175,6 +112309,8 @@
             isTransformRelated = p in _transformProps; //--- TRANSFORM-RELATED ---
 
             if (isTransformRelated) {
+              this.styles.save(p);
+
               if (!transformPropTween) {
                 cache = target._gsap;
                 cache.renderTransform && !vars.parseTransform || _parseTransform(target, vars.parseTransform); // if, for example, gsap.set(... {transform:"translateX(50vw)"}), the _get() call doesn't parse the transform, thus cache.renderTransform won't be set yet so force the parsing of the transform here.
@@ -111186,10 +112322,12 @@
               }
 
               if (p === "scale") {
-                this._pt = new PropTween(this._pt, cache, "scaleY", cache.scaleY, (relative ? relative * endNum : endNum - cache.scaleY) || 0);
+                this._pt = new PropTween(this._pt, cache, "scaleY", startNum, (relative ? _parseRelative(startNum, relative + endNum) : endNum) - startNum || 0, _renderCSSProp);
+                this._pt.u = 0;
                 props.push("scaleY", p);
                 p += "X";
               } else if (p === "transformOrigin") {
+                inlineProps.push(_transformOriginProp, 0, style[_transformOriginProp]);
                 endValue = _convertKeywordsToPercentages(endValue); //in case something like "left top" or "bottom right" is passed in. Convert to percentages.
 
                 if (cache.svg) {
@@ -111208,7 +112346,7 @@
 
                 continue;
               } else if (p in _rotationalProperties) {
-                _addRotationalPropTween(this, cache, p, startNum, endValue, relative);
+                _addRotationalPropTween(this, cache, p, startNum, relative ? _parseRelative(startNum, relative + endValue) : endValue);
 
                 continue;
               } else if (p === "smoothOrigin") {
@@ -111233,10 +112371,10 @@
 
               endUnit = getUnit(endValue) || (p in _config.units ? _config.units[p] : startUnit);
               startUnit !== endUnit && (startNum = _convertToUnit(target, p, startValue, endUnit));
-              this._pt = new PropTween(this._pt, isTransformRelated ? cache : style, p, startNum, relative ? relative * endNum : endNum - startNum, !isTransformRelated && (endUnit === "px" || p === "zIndex") && vars.autoRound !== false ? _renderRoundedCSSProp : _renderCSSProp);
+              this._pt = new PropTween(this._pt, isTransformRelated ? cache : style, p, startNum, (relative ? _parseRelative(startNum, relative + endNum) : endNum) - startNum, !isTransformRelated && (endUnit === "px" || p === "zIndex") && vars.autoRound !== false ? _renderRoundedCSSProp : _renderCSSProp);
               this._pt.u = endUnit || 0;
 
-              if (startUnit !== endUnit) {
+              if (startUnit !== endUnit && endUnit !== "%") {
                 //when the tween goes all the way back to the beginning, we need to revert it to the OLD/ORIGINAL value (with those units). We record that as a "b" (beginning) property and point to a render method that handles that. (performance optimization)
                 this._pt.b = startValue;
                 this._pt.r = _renderCSSPropWithBeginning;
@@ -111244,21 +112382,34 @@
             } else if (!(p in style)) {
               if (p in target) {
                 //maybe it's not a style - it could be a property added directly to an element in which case we'll try to animate that.
-                this.add(target, p, startValue || target[p], endValue, index, targets);
+                this.add(target, p, startValue || target[p], relative ? relative + endValue : endValue, index, targets);
               } else {
                 _missingPlugin(p, endValue);
 
                 continue;
               }
             } else {
-              _tweenComplexCSSString.call(this, target, p, startValue, endValue);
+              _tweenComplexCSSString.call(this, target, p, startValue, relative ? relative + endValue : endValue);
             }
 
+            isTransformRelated || (p in style ? inlineProps.push(p, 0, style[p]) : inlineProps.push(p, 1, startValue || target[p]));
             props.push(p);
           }
         }
 
         hasPriority && _sortPropTweensByPriority(this);
+      },
+      render: function render(ratio, data) {
+        if (data.tween._time || !_reverting()) {
+          var pt = data._pt;
+
+          while (pt) {
+            pt.r(ratio, pt.d);
+            pt = pt._next;
+          }
+        } else {
+          data.styles.revert();
+        }
       },
       get: _get,
       aliases: _propertyAliases,
@@ -111274,6 +112425,7 @@
       }
     };
     gsap.utils.checkPrefix = _checkPropPrefix;
+    gsap.core.getStyleSaver = _getStyleSaver;
 
     (function (positionAndScale, rotation, others, aliases) {
       var all = _forEachName(positionAndScale + "," + rotation + "," + others, function (name) {
@@ -121824,7 +122976,7 @@
         propiedadesLimpio[slabsID] = slabData;
         //console.log(slabData);
       }
-      
+
       for(const surf in gbxmlData.Campus.Surface)
       {
         const data = gbxmlData.Campus.Surface[surf].PlanarGeometry;
@@ -121859,16 +123011,13 @@
       }
 
       for (const prop in propiedadesLimpio) {
-        if (propiedadesLimpio.hasOwnProperty(prop)) {
-          textoaCerma += propiedadesLimpio[prop]['nombre']+' '+propiedadesLimpio[prop].tag+"\n";
-          //console.log(`${prop}: ${propiedadesLimpio[prop]['nombre']} tag ${propiedadesLimpio[prop].tag}`);
-        }
+        if (propiedadesLimpio.hasOwnProperty(prop)) ;
       }
 
 
 
-      console.table (propiedades);
-      console.table (propiedadesLimpio);
+      // console.table (propiedades);
+      // console.table (propiedadesLimpio);
 
       console.log('textoaCerma:');console.log(textoaCerma);
       console.log('textoaCermaDENTROdeLOAD:');console.log(textoaCerma);
@@ -121943,11 +123092,10 @@
 
       model = await viewer.IFC.loadIfc(event.target.files[0], false);
 
-      // model.material.forEach(mat => mat.side = 2);
-
       aCerma();
-      
-      if(first) first = false;
+
+      model.material.forEach(mat => mat.side = 2);
+      if (first) first = false;
       else {
         ClippingEdges.forceStyleUpdate = true;
       }
@@ -122047,8 +123195,6 @@
         [IFCOPENINGELEMENT]: false
       });
 
-      model = await viewer.IFC.loadIfcUrl("models/"+query+".ifc", false);
-
 
     // adquisición de datos desde el fichero ...gb.xml
       var url = "models/" + query + ".xml";
@@ -122060,14 +123206,15 @@
       // handle response
       function XHRhandler() {
         if (xhr.readyState == 4) {
-          var obj = XML2jsobj(xhr.responseXML.documentElement);
+          gbxmlData = XML2jsobj(xhr.responseXML.documentElement);
           xhr = null;
           console.log('datos gbXml');
-          console.log(obj);
+          console.log(gbxmlData);
         }
       }
+      model = await viewer.IFC.loadIfcUrl("models/"+query+".ifc", false);
 
-      // model.material.forEach(mat => mat.side = 2);
+      model.material.forEach(mat => mat.side = 2);
 
       aCerma();
 
@@ -122122,44 +123269,41 @@
       var hr = new XMLHttpRequest();
       hr.open("POST", "leedir.php", true);			////MIRAR BIEN LO DE TRUE AL FINAL
       hr.setRequestHeader("Content-type","application/json; charset=utf-8");
-      hr.onload = function(e) {
-        if (hr.response.lastIndexOf('ERROR', 0) === 0) {
+      hr.addEventListener('load', function(e) {
+          if (hr.response.lastIndexOf('ERROR', 0) === 0) {
           console.log (hr.response+".");
         } else {
           // console.log (hr.response+".");
 
-          let listaArchivos = JSON.parse(hr.response);
+          const listaArchivos = JSON.parse(hr.response);
           console.log (listaArchivos);
           // const dialogo = document.createElement('dialog');   
           const divListaarchivos = document.createElement('div');   
           // divListaarchivos.style.display="none";		
-          divListaarchivos.style.top="100px";		
-          divListaarchivos.style.left="100px";		
-          divListaarchivos.style.position="fixed";		
+          divListaarchivos.style.top="5%";		
+          divListaarchivos.style.left="5%";		
+          divListaarchivos.style.position="absolute";		
           divListaarchivos.id="divColores";						document.getElementsByTagName('body')[0].appendChild(divListaarchivos);
           
           //cabecera de tabla
           const row = document.createElement('div');         divListaarchivos.appendChild(row);
           row.className = 'row';
-            const cell = document.createElement('div');         row.appendChild(cell);
-            cell.className = 'cell colIni';
-            cell.innerHTML = "IFC";
 
-            const cell2 = document.createElement('div');         row.appendChild(cell2);
-            cell2.className = 'cell textPeque';
-            cell2.innerHTML = "";
+          const createCell = (className, innerHTML) => {
+            const cell = document.createElement('div');
+            cell.className = `cell ${className}`;
+            cell.innerHTML = innerHTML;
+            return cell;
+          };
+          
+          row.appendChild(createCell('colIni', 'IFC'));
+          row.appendChild(createCell('textPeque', ''));
+          row.appendChild(createCell('textPeque', ''));
+          row.appendChild(createCell('textPeque', '(gb)XML'));
+          row.appendChild(createCell('textPeque', ''));
 
-            const cell3 = document.createElement('div');         row.appendChild(cell3);
-            cell3.className = 'cell textPeque';
-            cell3.innerHTML = "";
 
-            const cell4 = document.createElement('div');         row.appendChild(cell4);
-            cell4.className = 'cell textPeque';
-            cell4.innerHTML = "(gb)XML";
 
-            const cell5 = document.createElement('div');         row.appendChild(cell5);
-            cell5.className = 'cell textPeque';
-            cell5.innerHTML = "";
 
           listaArchivos.forEach((archivo) => {
             const row = document.createElement('div');         divListaarchivos.appendChild(row);
@@ -122193,14 +123337,12 @@
               } else {
                 cell5.innerHTML = "";
               }
-      
-
 
           });
           // divListaarchivos.style.visibility = "visible";
           // divListaarchivos.style.display = "block";
         }
-      };
+      });
       var enviaArray={};
       let pru = "PRU";
       // console.log ( 'tablaActual:',tablaActual,'variable:',variableCompleta, 'onoff:','off', 'servSQL:',servSQL);
