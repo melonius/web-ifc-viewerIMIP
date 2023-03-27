@@ -122985,13 +122985,16 @@
         {
           const point = data.PolyLoop.CartesianPoint[pt];
           coordsList.push(point.Coordinate[0]);
-          coordsList.push(point.Coordinate[1]);
           coordsList.push(point.Coordinate[2]);
+          coordsList.push(point.Coordinate[1] + 1);
         }
         const triangles = Earcut.triangulate(coordsList, null, 3);
         const scene = viewer.IFC.context.getScene();
         const geometry = new BufferGeometry();
         const vertices = new Float32Array(triangles.length * 3);
+
+        console.log(triangles);
+
         let id = 0;
         for(const idx in triangles)
         {
@@ -122999,9 +123002,9 @@
           const point = data.PolyLoop.CartesianPoint[pt];
           vertices[id] = point.Coordinate[0];
           id++;
-          vertices[id] = point.Coordinate[1];
-          id++;
           vertices[id] = point.Coordinate[2];
+          id++;
+          vertices[id] = point.Coordinate[1] + 1;
           id++;
         }
         geometry.setAttribute( 'position', new BufferAttribute( vertices, 3 ) );
