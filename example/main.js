@@ -101,6 +101,7 @@ async function getAllWallMeshes() {
 
 
 let gbxmlData;
+let plantillaCerma;
 
 // viewer.IFC.loader.ifcManager.useWebWorkers(true, 'files/IFCWorker.js');
 viewer.IFC.setWasmPath('files/');
@@ -114,6 +115,27 @@ viewer.context.renderer.postProduction.active = true;
 
 
 async function aCerma() {
+
+  // adquisición de plantilla CERMA
+  var url = "models/VAlencia_V1.xml";
+  // AJAX request
+  var xhr = (window.XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP"));
+  xhr.onreadystatechange = XHRhandler;
+  xhr.open("GET", url, true);
+  xhr.send(null);
+  // handle response
+  function XHRhandler() {
+    if (xhr.readyState == 4) {
+      plantillaCerma = XML2jsobj(xhr.responseXML.documentElement);
+      xhr = null;
+      console.log('datos plantilla CERMA');
+      console.log(plantillaCerma);
+    }
+  }
+
+
+
+
   let textoaCerma ='';
 
   const propiedades = [];
