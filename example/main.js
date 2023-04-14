@@ -247,14 +247,17 @@ async function aCerma() {
     propiedadesLimpio[slabsID] = slabData;
     //console.log(slabData);
   }
-
+  for(const surf in gbxmlData.Construction)
+  {
+    //const data = gbxmlData.Construction[surf].U-value;
+    console.log(gbxmlData.Construction[surf].id);
+  }
   for(const surf in gbxmlData.Campus.Surface)
   {
     const orient = gbxmlData.Campus.Surface[surf].RectangularGeometry;
     const Wallid = orient.id;
     const az = orient.Azimuth;
     const tl = orient.Tolt;
-
     const data = gbxmlData.Campus.Surface[surf].PlanarGeometry;
     const coordsList = [];
     for(const pt in data.PolyLoop.CartesianPoint)
