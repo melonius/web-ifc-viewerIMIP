@@ -133,9 +133,6 @@ async function aCerma() {
     }
   }
 
-
-
-
   let textoaCerma ='';
 
   const propiedades = [];
@@ -269,11 +266,61 @@ async function aCerma() {
     propiedadesLimpio[slabsID] = slabData;
     //console.log(slabData);
   }
-  for(const surf in gbxmlData.Construction)
-  {
-    //const data = gbxmlData.Construction[surf].U-value;
-    console.log(gbxmlData.Construction[surf].id);
+
+  //////////////////// CHATGPT CODE ///////////////////////////////
+
+  const surfaces = gbxmlData.Campus.Surface;
+  const matchingSurfaces = {};
+
+  // Iterate over surfaces and accumulate areas and other properties for each id, azimuth, and tilt
+  for (const surf in surfaces) {
+    const surface = surfaces[surf];
+    const id = surface.constructionIdRef;
+
+    // Calculate the area of the surface from its polygon vertices
+    const area = parseFloat(surface.RectangularGeometry.Height) * parseFloat(surface.RectangularGeometry.Width);
+
+    // Extract other properties of interest
+    const azimuth = parseFloat(surface.RectangularGeometry.Azimuth);
+    const tilt = parseFloat(surface.RectangularGeometry.Tilt);
+
+    if (!(id in matchingSurfaces)) {
+      matchingSurfaces[id] = {};
+    }
+    if (!(azimuth in matchingSurfaces[id])) {
+      matchingSurfaces[id][azimuth] = {};
+    }
+    if (!(tilt in matchingSurfaces[id][azimuth])) {
+      matchingSurfaces[id][azimuth][tilt] = {
+        'area': 0,
+      };
+    }
+
+    matchingSurfaces[id][azimuth][tilt].area += area;
   }
+
+  // Iterate over accumulated areas and create objects with U-value, accumulated area, azimuth, and tilt
+  const result = [];
+  for (const id in matchingSurfaces) {
+    for (const azimuth in matchingSurfaces[id]) {
+      for (const tilt in matchingSurfaces[id][azimuth]) {
+        const area = matchingSurfaces[id][azimuth][tilt].area;
+        const uValue = gbxmlData.Construction.find(construction => construction.id === id)['U-value'];
+        result.push({
+          'id': id,
+          'U-value': uValue,
+          'area': area,
+          'azimuth': parseFloat(azimuth),
+          'tilt': parseFloat(tilt),
+        });
+      }
+    }
+  }
+
+  console.log(plantillaCerma);
+
+  //////////////////////////////////////////////////////////////////////////
+
   for(const surf in gbxmlData.Campus.Surface)
   {
     const orient = gbxmlData.Campus.Surface[surf].RectangularGeometry;
