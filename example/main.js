@@ -120,6 +120,7 @@ async function aCerma() {
 
   const surfaces = gbxmlData.Campus.Surface;
   const matchingSurfaces = {};
+  let textoaCerma ='';
 
   // Iterate over surfaces and accumulate areas and other properties for each id, azimuth, and tilt
   for (const surf in surfaces) {
@@ -192,12 +193,10 @@ async function aCerma() {
       plantillaCerma.DatosPersonalizados.Cerma.Cubiertas.CubiertasIncl.CubiertaIncl.U_Cubierta_incl_W_m2K.name = result[4]['U-value'];
       plantillaCerma.DatosPersonalizados.Cerma.Cubiertas.CubiertasIncl.CubiertaIncl.Cubierta_incl_sur_m2.name = result[4]['area'];
       plantillaCerma.DatosPersonalizados.Cerma.Cubiertas.CubiertasIncl.CubiertaIncl.Cubierta_incl_norte_m2.name = result[5]['area'];
-      const newCerma = jsobj2XML(plantillaCerma, 'DatosEnergeticosDelEdificio');
-      console.log(newCerma);
+      textoaCerma = jsobj2XML(plantillaCerma, 'DatosEnergeticosDelEdificio');
+      downloadXML(textoaCerma, 'new_cerma.xml');
     }
   }
-
-  let textoaCerma ='';
 
   const propiedades = [];
   const propiedadesLimpio = [];
@@ -745,6 +744,21 @@ async function opendir() {
   hr.send(JSON.stringify(enviaArray));	
 }
 
+function downloadXML(xmlString, filename) {
+  // create a blob object
+  const blob = new Blob([xmlString], {type: 'text/xml'});
+
+  // create a download link
+  const link = document.createElement('a');
+  link.href = window.URL.createObjectURL(blob);
+  link.download = filename;
+
+  // simulate a click on the download link
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+
 //Setup UI
 const loadButton = createSideMenuButton('./resources/folder-icon.svg');
 loadButton.addEventListener('click', () => {
@@ -799,7 +813,7 @@ const sideMenu = document.getElementById('side-menu-left');
 sideMenu.appendChild(aElement);
 
 aElement.setAttribute('id', 'downloadLink');
-aElement.setAttribute('download', 'cerma.txt');
+aElement.setAttribute('download', 'cerma.xml');
 aElement.setAttribute('href', '#');
 
 if (typeof query !== 'undefined') 
