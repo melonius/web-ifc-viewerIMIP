@@ -192,6 +192,8 @@ async function aCerma() {
       plantillaCerma.DatosPersonalizados.Cerma.Cubiertas.CubiertasIncl.CubiertaIncl.U_Cubierta_incl_W_m2K.name = result[4]['U-value'];
       plantillaCerma.DatosPersonalizados.Cerma.Cubiertas.CubiertasIncl.CubiertaIncl.Cubierta_incl_sur_m2.name = result[4]['area'];
       plantillaCerma.DatosPersonalizados.Cerma.Cubiertas.CubiertasIncl.CubiertaIncl.Cubierta_incl_norte_m2.name = result[5]['area'];
+      const newCerma = jsobj2XML(plantillaCerma, 'DatosEnergeticosDelEdificio');
+      console.log(newCerma);
     }
   }
 
@@ -517,6 +519,35 @@ function XML2jsobj(node) {
 		}
 	}
 	return data;
+}
+
+function jsobj2XML(obj, rootElementName, includeDeclaration = true) {
+  var xml = '';
+
+  // Add the root element
+  if (includeDeclaration) {
+    xml += '<?xml version="1.0" encoding="UTF-8"?>\n';
+  }
+  xml += '<' + rootElementName + '>\n';
+
+  // Convert each property to an XML element
+  for (var prop in obj) {
+    if (obj.hasOwnProperty(prop)) {
+      var val = obj[prop];
+
+      // If the value is an object, recurse
+      if (typeof val === 'object') {
+        xml += jsobj2XML(val, prop, false);
+      } else {
+        xml += '<' + prop + '>' + val + '</' + prop + '>\n';
+      }
+    }
+  }
+
+  // Close the root element
+  xml += '</' + rootElementName + '>\n';
+
+  return xml;
 }
 
 // let textoaCerma ='';
