@@ -121693,6 +121693,58 @@
 
     async function aCerma() {
 
+      //////////////////// CHATGPT CODE ///////////////////////////////
+
+      const surfaces = gbxmlData.Campus.Surface;
+      const matchingSurfaces = {};
+
+      // Iterate over surfaces and accumulate areas and other properties for each id, azimuth, and tilt
+      for (const surf in surfaces) {
+        const surface = surfaces[surf];
+        const id = surface.constructionIdRef;
+
+        // Calculate the area of the surface from its polygon vertices
+        const area = parseFloat(surface.RectangularGeometry.Height) * parseFloat(surface.RectangularGeometry.Width);
+
+        // Extract other properties of interest
+        const azimuth = parseFloat(surface.RectangularGeometry.Azimuth);
+        const tilt = parseFloat(surface.RectangularGeometry.Tilt);
+
+        if (!(id in matchingSurfaces)) {
+          matchingSurfaces[id] = {};
+        }
+        if (!(azimuth in matchingSurfaces[id])) {
+          matchingSurfaces[id][azimuth] = {};
+        }
+        if (!(tilt in matchingSurfaces[id][azimuth])) {
+          matchingSurfaces[id][azimuth][tilt] = {
+            'area': 0,
+          };
+        }
+
+        matchingSurfaces[id][azimuth][tilt].area += area;
+      }
+
+      // Iterate over accumulated areas and create objects with U-value, accumulated area, azimuth, and tilt
+      const result = [];
+      for (const id in matchingSurfaces) {
+        for (const azimuth in matchingSurfaces[id]) {
+          for (const tilt in matchingSurfaces[id][azimuth]) {
+            const area = matchingSurfaces[id][azimuth][tilt].area;
+            const uValue = gbxmlData.Construction.find(construction => construction.id === id)['U-value'];
+            result.push({
+              'id': id,
+              'U-value': uValue,
+              'area': area,
+              'azimuth': parseFloat(azimuth),
+              'tilt': parseFloat(tilt),
+            });
+          }
+        }
+      }
+
+      //////////////////////////////////////////////////////////////////////////
+
       // adquisición de plantilla CERMA
       var url = "models/VAlencia_V1.xml";
       // AJAX request
@@ -121707,6 +121759,20 @@
           xhr = null;
           console.log('datos plantilla CERMA');
           console.log(plantillaCerma);
+          console.log(result);
+          console.log(plantillaCerma.DatosPersonalizados.Cerma.Muros.MurosExt.MuroExt);
+          plantillaCerma.DatosPersonalizados.Cerma.Muros.MurosExt.MuroExt.U_Muro_ext_W_m2K.name = result[1]['U-value'];
+          plantillaCerma.DatosPersonalizados.Cerma.Muros.MurosExt.MuroExt.Muro_ext_norte_m2.name = result[0]['area'];
+          plantillaCerma.DatosPersonalizados.Cerma.Muros.MurosExt.MuroExt.Muro_ext_oeste_m2.name = result[1]['area'];
+          plantillaCerma.DatosPersonalizados.Cerma.Muros.MurosExt.MuroExt.Muro_ext_sur_m2.name = result[2]['area'];
+          plantillaCerma.DatosPersonalizados.Cerma.Muros.MurosExt.MuroExt.Muro_ext_este_m2.name = result[3]['area'];
+          plantillaCerma.DatosPersonalizados.Cerma.Cubiertas.CubiertasIncl.CubiertaIncl.U_Cubierta_incl_W_m2K.name = result[4]['U-value'];
+          plantillaCerma.DatosPersonalizados.Cerma.Cubiertas.CubiertasIncl.CubiertaIncl.Cubierta_incl_sur_m2.name = result[4]['area'];
+          plantillaCerma.DatosPersonalizados.Cerma.Cubiertas.CubiertasIncl.CubiertaIncl.Cubierta_incl_norte_m2.name = result[5]['area'];
+          // Muro_ext_Var_este_m2
+          // Muro_ext_Var_oeste_m2
+          // Muro_ext_Var_sur_m2
+
         }
       }
 
@@ -121843,50 +121909,6 @@
         propiedadesLimpio[slabsID] = slabData;
         //console.log(slabData);
       }
-
-      //////////////////// CHATGPT CODE ///////////////////////////////
-
-      const surfaces = gbxmlData.Campus.Surface;
-      const matchingSurfaces = {};
-
-      // Iterate over surfaces and accumulate areas and other properties for each id, azimuth, and tilt
-      for (const surf in surfaces) {
-        const surface = surfaces[surf];
-        const id = surface.constructionIdRef;
-
-        // Calculate the area of the surface from its polygon vertices
-        const area = parseFloat(surface.RectangularGeometry.Height) * parseFloat(surface.RectangularGeometry.Width);
-
-        // Extract other properties of interest
-        const azimuth = parseFloat(surface.RectangularGeometry.Azimuth);
-        const tilt = parseFloat(surface.RectangularGeometry.Tilt);
-
-        if (!(id in matchingSurfaces)) {
-          matchingSurfaces[id] = {};
-        }
-        if (!(azimuth in matchingSurfaces[id])) {
-          matchingSurfaces[id][azimuth] = {};
-        }
-        if (!(tilt in matchingSurfaces[id][azimuth])) {
-          matchingSurfaces[id][azimuth][tilt] = {
-            'area': 0,
-          };
-        }
-
-        matchingSurfaces[id][azimuth][tilt].area += area;
-      }
-      for (const id in matchingSurfaces) {
-        for (const azimuth in matchingSurfaces[id]) {
-          for (const tilt in matchingSurfaces[id][azimuth]) {
-            matchingSurfaces[id][azimuth][tilt].area;
-            gbxmlData.Construction.find(construction => construction.id === id)['U-value'];
-          }
-        }
-      }
-
-      console.log(plantillaCerma);
-
-      //////////////////////////////////////////////////////////////////////////
 
       for(const surf in gbxmlData.Campus.Surface)
       {
