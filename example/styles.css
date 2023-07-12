@@ -14,9 +14,10 @@ html, body {
 }
 
 .icon {
-    max-width: 20px;
-    max-height: 20px;
-    margin: auto;
+    /* max-width: 20px;
+    max-height: 20px; */
+    margin: 10px 0;
+    width: 35px;
 }
 
 .text {
@@ -48,7 +49,7 @@ html, body {
 .side-menu {
     z-index: 1;
     position: fixed;
-    background-color: #36393F;
+    background-color: #202225;
     height: 100vh;
 }
 

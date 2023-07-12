@@ -14,6 +14,9 @@ import {
 import { ClippingEdges } from 'web-ifc-viewer/dist/components/display/clipping-planes/clipping-edges';
 import Stats from 'stats.js/src/Stats';
 import { Earcut } from 'three/src/extras/Earcut';
+// import { Math } ;
+// import  mean  from 'mathjs';
+// npm install mathjs
 
 const container = document.getElementById('viewer-container');
 const viewer = new IfcViewerAPI({ container, backgroundColor: new Color(255, 255, 255) });
@@ -114,11 +117,40 @@ viewer.IFC.loader.ifcManager.applyWebIfcConfig({
 viewer.context.renderer.postProduction.active = true;
 
 
+async function aHulc() {
+  const surfaces = gbxmlData.Campus.Surface;
+  // console.log (surfaces);
+  for (const surf in surfaces) {
+   const puntos = [];
+    for ( const pto in surfaces[surf].PlanarGeometry.PolyLoop.CartesianPoint ) {
+      puntos.push (surfaces[surf].PlanarGeometry.PolyLoop.CartesianPoint[pto].Coordinate);
+    }
+
+    console.log ("puntos",puntos);
+
+    const lasX = [];
+    const lasY = [];
+    const lasZ = [];
+
+    for ( const p in puntos ) {
+      lasX.push(parseFloat(puntos[p][0]));
+      lasY.push(parseFloat(puntos[p][1]));
+      lasZ.push(parseFloat(puntos[p][2]));
+    }
+    const mediaX = lasX.reduce((total, el) => total + el, 0) / lasX.length;
+    const mediaY = lasY.reduce((total, el) => total + el, 0) / lasY.length;
+    const mediaZ = lasZ.reduce((total, el) => total + el, 0) / lasZ.length;
+    console.log ( 'mediaX', mediaX);
+  }
+
+
+} // aHulc
+
 async function aCerma() {
 
-  //////////////////// CHATGPT CODE ///////////////////////////////
 
   const surfaces = gbxmlData.Campus.Surface;
+  // console.log(surfaces);
   const matchingSurfaces = {};
   let textoaCerma ='';
 
@@ -147,8 +179,9 @@ async function aCerma() {
     }
 
     matchingSurfaces[id][azimuth][tilt].area += area;
+   
   }
-
+  // console.log ('PRU',matchingSurfaces);
   // Iterate over accumulated areas and create objects with U-value, accumulated area, azimuth, and tilt
   const result = [];
   for (const id in matchingSurfaces) {
@@ -166,8 +199,8 @@ async function aCerma() {
       }
     }
   }
+  // console.log ('PRU2',result);
 
-  //////////////////////////////////////////////////////////////////////////
 
   // adquisición de plantilla CERMA
   var url = "models/VAlencia_V1.xml";
@@ -181,10 +214,10 @@ async function aCerma() {
     if (xhr.readyState == 4) {
       plantillaCerma = XML2jsobj(xhr.responseXML.documentElement);
       xhr = null;
-      console.log('datos plantilla CERMA');
-      console.log(plantillaCerma);
-      console.log(result);
-      console.log(plantillaCerma.DatosPersonalizados.Cerma.Muros.MurosExt.MuroExt);
+      // console.log('datos plantilla CERMA');
+      // console.log(plantillaCerma);
+      // console.log(result);
+      // console.log(plantillaCerma.DatosPersonalizados.Cerma.Muros.MurosExt.MuroExt);
       plantillaCerma.DatosPersonalizados.Cerma.Muros.MurosExt.MuroExt.U_Muro_ext_W_m2K.name = result[1]['U-value'];
       plantillaCerma.DatosPersonalizados.Cerma.Muros.MurosExt.MuroExt.Muro_ext_norte_m2.name = result[0]['area'];
       plantillaCerma.DatosPersonalizados.Cerma.Muros.MurosExt.MuroExt.Muro_ext_oeste_m2.name = result[1]['area'];
@@ -194,7 +227,7 @@ async function aCerma() {
       plantillaCerma.DatosPersonalizados.Cerma.Cubiertas.CubiertasIncl.CubiertaIncl.Cubierta_incl_sur_m2.name = result[4]['area'];
       plantillaCerma.DatosPersonalizados.Cerma.Cubiertas.CubiertasIncl.CubiertaIncl.Cubierta_incl_norte_m2.name = result[5]['area'];
       textoaCerma = jsobj2XML(plantillaCerma, 'DatosEnergeticosDelEdificio');
-      downloadXML(textoaCerma, 'new_cerma.xml');
+      // downloadXML(textoaCerma, 'new_cerma.xml');
     }
   }
 
@@ -216,11 +249,13 @@ async function aCerma() {
             const data = await viewer.IFC.loader.ifcManager.properties.getItemProperties(0, propID.value);
             if(data.Name.value == "Heat Transfer Coefficient (U)")
             {
-              wallData.push({nombre: "U", tag: data.NominalValue.value})
+              // wallData.push({nombre: "U", tag: data.NominalValue.value}
+              wallData.push({'U': data.NominalValue.value});
             }
             if(data.Name.value == "Area")
             {
-              wallData.push({nombre: "Area", tag: data.NominalValue.value})
+              // wallData.push({nombre: "Area", tag: data.NominalValue.value})
+              wallData.push({'Area': data.NominalValue.value});
             }
           }
         }
@@ -228,8 +263,9 @@ async function aCerma() {
     }
     propiedades[wallID] = wallData;
     propiedadesLimpio[wallID] = wallData;
-    //console.log(wallData);
   }
+  // console.log(propiedades);
+  // console.log(propiedadesLimpio);
 
   const windowsIDs = await manager.getAllItemsOfType(0, IFCWINDOW, false);
   for (const windowID of windowsIDs) {
@@ -330,46 +366,51 @@ async function aCerma() {
     //console.log(slabData);
   }
 
-  // for(const surf in gbxmlData.Campus.Surface)
-  // {
-  //   const orient = gbxmlData.Campus.Surface[surf].RectangularGeometry;
-  //   const Wallid = orient.id;
-  //   const az = orient.Azimuth;
-  //   const tl = orient.Tolt;
-  //   const data = gbxmlData.Campus.Surface[surf].PlanarGeometry;
-  //   const coordsList = [];
-  //   for(const pt in data.PolyLoop.CartesianPoint)
-  //   {
-  //     const point = data.PolyLoop.CartesianPoint[pt];
-  //     coordsList.push(point.Coordinate[0]);
-  //     coordsList.push(point.Coordinate[2]);
-  //     coordsList.push(point.Coordinate[1]);
-  //   }
-  //   const triangles = Earcut.triangulate(coordsList, null, 3);
-  //   const scene = viewer.IFC.context.getScene();
-  //   const geometry = new BufferGeometry();
-  //   const vertices = new Float32Array(triangles.length * 3);
+  //** */
+  const surface = gbxmlData.Campus.Surface;
+  for(const surf in surface)
+  {
+    // const orient = gbxmlData.Campus.Surface[surf].RectangularGeometry;
+    // const orient = surface[surf].RectangularGeometry;
+    const Wallid = surface[surf].RectangularGeometry.id;
+    const az =  surface[surf].RectangularGeometry.Azimuth;
+    const tl = surface[surf].RectangularGeometry.Tilt;
+    // const data = surface[surf].PlanarGeometry;
+    const coordsList = [];
+    for(const pt in surface[surf].PlanarGeometry.PolyLoop.CartesianPoint)
+    {
+      const point = surface[surf].PlanarGeometry.PolyLoop.CartesianPoint[pt];
+      coordsList.push(point.Coordinate[0]);
+      coordsList.push(point.Coordinate[2]);
+      coordsList.push(point.Coordinate[1]);
+    }
+    console.log(coordsList);
 
-  //   console.log(triangles);
+    const triangles = Earcut.triangulate(coordsList, null, 3);
+    const scene = viewer.IFC.context.getScene();
+    const geometry = new BufferGeometry();
+    const vertices = new Float32Array(triangles.length * 3);
 
-  //   let id = 0;
-  //   for(const idx in triangles)
-  //   {
-  //     let pt = triangles[idx];
-  //     const point = data.PolyLoop.CartesianPoint[pt];
-  //     vertices[id] = point.Coordinate[0];
-  //     id++;
-  //     vertices[id] = point.Coordinate[2];
-  //     id++;
-  //     vertices[id] = point.Coordinate[1];
-  //     id++;
-  //   }
-  //   geometry.setAttribute( 'position', new BufferAttribute( vertices, 3 ) );
-  //   const material = new MeshBasicMaterial( { color: 0xff0000 } );
-  //   const mesh = new Mesh( geometry, material );
-  //   scene.add(mesh);
-  // }
+    console.log(triangles);
 
+    let id = 0;
+    for(const idx in triangles)
+    {
+      let pt = triangles[idx];
+      const point = surface[surf].PlanarGeometry.PolyLoop.CartesianPoint[pt];
+      vertices[id] = point.Coordinate[0];
+      id++;
+      vertices[id] = point.Coordinate[2];
+      id++;
+      vertices[id] = - point.Coordinate[1];
+      id++;
+    }
+    geometry.setAttribute( 'position', new BufferAttribute( vertices, 3 ) );
+    const material = new MeshBasicMaterial( { color: 0xff0000 } );
+    const mesh = new Mesh( geometry, material );
+    scene.add(mesh);
+  }
+//** */
   for (const prop in propiedadesLimpio) {
     if (propiedadesLimpio.hasOwnProperty(prop)) {
       // textoaCerma += propiedadesLimpio[prop]['nombre']+' '+propiedadesLimpio[prop].tag+"\n";
@@ -384,9 +425,9 @@ async function aCerma() {
 
   console.log('textoaCerma:');console.log(textoaCerma);
   console.log('textoaCermaDENTROdeLOAD:');console.log(textoaCerma);
-  document.getElementById('downloadLink').setAttribute('href',generateTextFileUrl(textoaCerma));
+  document.getElementById('cerma').setAttribute('href',generateTextFileUrl(textoaCerma));
 
-}
+} // acerma
 
 
 // Setup loader
@@ -456,6 +497,7 @@ const loadIfc = async (event) => {
   model = await viewer.IFC.loadIfc(event.target.files[0], false);
 
   aCerma();
+
 
   model.material.forEach(mat => mat.side = 2);
   if (first) first = false
@@ -589,7 +631,7 @@ async function miload() {
   });
 
 
-// adquisición de datos desde el fichero ...gb.xml
+  // adquisición de datos desde el fichero ...gb.xml
   var url = "models/" + query + ".xml";
   // AJAX request
   var xhr = (window.XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP"));
@@ -609,6 +651,8 @@ async function miload() {
 
   model.material.forEach(mat => mat.side = 2);
 
+ 
+  aHulc();
   aCerma();
 
   if (first) first = false
@@ -655,11 +699,11 @@ window.ondblclick = async () => {
     if (!result) return;
     const { modelID, id } = result;
     const props = await viewer.IFC.getProperties(modelID, id, true, false);
-    console.log(props);
+    // console.log(props);
   }
 };
 async function opendir() {
-  console.log ("Estoy en opendir");
+  // console.log ("Estoy en opendir");
   var hr = new XMLHttpRequest();
   hr.open("POST", "leedir.php", true);			////MIRAR BIEN LO DE TRUE AL FINAL
   hr.setRequestHeader("Content-type","application/json; charset=utf-8");
@@ -670,7 +714,7 @@ async function opendir() {
       // console.log (hr.response+".");
 
       const listaArchivos = JSON.parse(hr.response);
-      console.log (listaArchivos);
+      // console.log (listaArchivos);
       // const dialogo = document.createElement('dialog');   
       const divListaarchivos = document.createElement('div');   
       // divListaarchivos.style.display="none";		
@@ -801,20 +845,28 @@ function generateTextFileUrl(txt) {
   return textFileUrl;
 };
 
-const aElement = document.createElement('a');
-aElement.classList.add('basic-button');
-const image = document.createElement("img");
-image.setAttribute("src", './resources/cerma3.svg');
-image.classList.add('icon');
-image.style.maxWidth = "90px";
-aElement.appendChild(image);
-
 const sideMenu = document.getElementById('side-menu-left');
-sideMenu.appendChild(aElement);
 
-aElement.setAttribute('id', 'downloadLink');
-aElement.setAttribute('download', 'cerma.xml');
-aElement.setAttribute('href', '#');
+const aElement = document.createElement('a');                 sideMenu.appendChild(aElement);
+      aElement.classList.add('basic-button');
+      aElement.setAttribute('id', 'cerma');
+      aElement.setAttribute('download', 'cerma.xml');
+      aElement.setAttribute('href', '#');
+const image = document.createElement("img");                  aElement.appendChild(image);
+      image.setAttribute("src", './resources/cerma3.svg');
+      image.classList.add('icon');
+      image.style.maxWidth = "90px";
+
+const aElement2 = document.createElement('a');                 sideMenu.appendChild(aElement2);
+      aElement2.classList.add('basic-button');
+      aElement2.setAttribute('id', 'hulc');
+      aElement2.setAttribute('download', 'hulc.xml');
+      aElement2.setAttribute('href', '#');
+const image2 = document.createElement("img");                   aElement2.appendChild(image2);
+      image2.setAttribute("src", './resources/hulc.png');
+      image2.classList.add('icon');
+      image2.style.maxWidth = "90px";
+
 
 if (typeof query !== 'undefined') 
 miload();
