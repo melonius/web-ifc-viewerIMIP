@@ -119,14 +119,14 @@ viewer.context.renderer.postProduction.active = true;
 
 async function aHulc() {
   const surfaces = gbxmlData.Campus.Surface;
-  // console.log (surfaces);
+  console.log (surfaces);
   for (const surf in surfaces) {
-   const puntos = [];
+    const puntos = [];
     for ( const pto in surfaces[surf].PlanarGeometry.PolyLoop.CartesianPoint ) {
       puntos.push (surfaces[surf].PlanarGeometry.PolyLoop.CartesianPoint[pto].Coordinate);
     }
 
-    console.log ("puntos",puntos);
+    // console.log ("puntos",puntos);
 
     const lasX = [];
     const lasY = [];
@@ -140,11 +140,71 @@ async function aHulc() {
     const mediaX = lasX.reduce((total, el) => total + el, 0) / lasX.length;
     const mediaY = lasY.reduce((total, el) => total + el, 0) / lasY.length;
     const mediaZ = lasZ.reduce((total, el) => total + el, 0) / lasZ.length;
-    console.log ( 'mediaX', mediaX);
+    // console.log ( 'mediaX', mediaX);
+    const ptoBasePoligono=[];
+    const ptosModificados = [];
+    for ( const p in puntos ) {
+      ptosModificados.push([puntos[p][0]-mediaX, puntos[p][1]-mediaY, puntos[p][2]-mediaZ]);
+    }
+    // console.log ("ptosModificados",ptosModificados);
+    
+    
+    
+    // normal del plano, definida por dos vectores   // FER UNITARI PRIMER !!!
+    const vector1 = [];
+    vector1[0] = ptosModificados[0][0]-ptosModificados[1][0]
+    vector1[1] = ptosModificados[0][1]-ptosModificados[1][1]
+    vector1[2] = ptosModificados[0][2]-ptosModificados[1][2]
+    const vector2 = [];
+    vector2[0] = ptosModificados[0][0]-ptosModificados[2][0]
+    vector2[1] = ptosModificados[0][1]-ptosModificados[2][1]
+    vector2[2] = ptosModificados[0][2]-ptosModificados[2][2]
+    // console.log(Math.cross(vector1,vector2));
+    // const normal = [];
+    const normal = CrossVectors( vector1,vector2 );
+    // const normalUnitaria = [];
+    const normalUnitaria = convertirAVectorUnitario(normal);
+    console.log(normalUnitaria);
+
+    // Math.asin
+    // falta hacer el tilt y el azimut
   }
 
-
 } // aHulc
+
+function CrossVectors( a, b ) {
+  const ax = a[0], ay = a[1], az = a[2];
+  const bx = b[0], by = b[1], bz = b[2];
+  const normal = [];
+  normal[0] = ay * bz - az * by;
+  normal[1] = az * bx - ax * bz;
+  normal[2] = ax * by - ay * bx;
+  return normal;
+}
+
+function convertirAVectorUnitario(vector) {
+  var sumaCuadrados = 0;
+  for (var i = 0; i < vector.length; i++) {
+    sumaCuadrados += Math.pow(vector[i], 2);
+  }
+  var magnitud = Math.sqrt(sumaCuadrados);
+  var vectorUnitario = [];
+  for (var i = 0; i < vector.length; i++) {
+    vectorUnitario.push(vector[i] / magnitud);
+  }
+  return vectorUnitario;
+}
+
+function calcularProductoEscalar(vector1, vector2) {
+  if (vector1.length !== vector2.length) {
+    throw new Error("Los vectores deben tener la misma longitud.");
+  }
+  let productoEscalar = 0;
+  for (let i = 0; i < vector1.length; i++) {
+    productoEscalar += vector1[i] * vector2[i];
+  }
+  return productoEscalar;
+}
 
 async function aCerma() {
 
@@ -227,7 +287,7 @@ async function aCerma() {
       plantillaCerma.DatosPersonalizados.Cerma.Cubiertas.CubiertasIncl.CubiertaIncl.Cubierta_incl_sur_m2.name = result[4]['area'];
       plantillaCerma.DatosPersonalizados.Cerma.Cubiertas.CubiertasIncl.CubiertaIncl.Cubierta_incl_norte_m2.name = result[5]['area'];
       textoaCerma = jsobj2XML(plantillaCerma, 'DatosEnergeticosDelEdificio');
-      // downloadXML(textoaCerma, 'new_cerma.xml');
+      downloadXML(textoaCerma, 'new_cerma.xml');
     }
   }
 
@@ -370,45 +430,49 @@ async function aCerma() {
   const surface = gbxmlData.Campus.Surface;
   for(const surf in surface)
   {
-    // const orient = gbxmlData.Campus.Surface[surf].RectangularGeometry;
-    // const orient = surface[surf].RectangularGeometry;
-    const Wallid = surface[surf].RectangularGeometry.id;
-    const az =  surface[surf].RectangularGeometry.Azimuth;
-    const tl = surface[surf].RectangularGeometry.Tilt;
-    // const data = surface[surf].PlanarGeometry;
-    const coordsList = [];
-    for(const pt in surface[surf].PlanarGeometry.PolyLoop.CartesianPoint)
-    {
-      const point = surface[surf].PlanarGeometry.PolyLoop.CartesianPoint[pt];
-      coordsList.push(point.Coordinate[0]);
-      coordsList.push(point.Coordinate[2]);
-      coordsList.push(point.Coordinate[1]);
-    }
-    console.log(coordsList);
+    // if (gbxmlData.Campus.Surface[surf].RectangularGeometry.surfaceType == "Shade") {
+      // const orient = gbxmlData.Campus.Surface[surf].RectangularGeometry;
+      // const orient = surface[surf].RectangularGeometry;
+      const Wallid = surface[surf].RectangularGeometry.id;
+      const az =  surface[surf].RectangularGeometry.Azimuth;
+      const tl = surface[surf].RectangularGeometry.Tilt;
+      // const data = surface[surf].PlanarGeometry;
+      const coordsList = [];
+      for(const pt in surface[surf].PlanarGeometry.PolyLoop.CartesianPoint)
+      {
+        const point = surface[surf].PlanarGeometry.PolyLoop.CartesianPoint[pt];
+        coordsList.push(point.Coordinate[0]);
+        coordsList.push(point.Coordinate[2]);
+        coordsList.push(point.Coordinate[1]);
+      }
+      // console.log(coordsList);
 
-    const triangles = Earcut.triangulate(coordsList, null, 3);
-    const scene = viewer.IFC.context.getScene();
-    const geometry = new BufferGeometry();
-    const vertices = new Float32Array(triangles.length * 3);
+      const triangles = Earcut.triangulate(coordsList, null, 3);
+      const scene = viewer.IFC.context.getScene();
+      const geometry = new BufferGeometry();
+      const vertices = new Float32Array(triangles.length * 3);
 
-    console.log(triangles);
+      // console.log(triangles);
 
-    let id = 0;
-    for(const idx in triangles)
-    {
-      let pt = triangles[idx];
-      const point = surface[surf].PlanarGeometry.PolyLoop.CartesianPoint[pt];
-      vertices[id] = point.Coordinate[0];
-      id++;
-      vertices[id] = point.Coordinate[2];
-      id++;
-      vertices[id] = - point.Coordinate[1];
-      id++;
-    }
-    geometry.setAttribute( 'position', new BufferAttribute( vertices, 3 ) );
-    const material = new MeshBasicMaterial( { color: 0xff0000 } );
-    const mesh = new Mesh( geometry, material );
-    scene.add(mesh);
+      let id = 0;
+      for(const idx in triangles)
+      {
+        let pt = triangles[idx];
+        const point = surface[surf].PlanarGeometry.PolyLoop.CartesianPoint[pt];
+        vertices[id] = point.Coordinate[0];
+        id++;
+        vertices[id] = point.Coordinate[2];
+        id++;
+        vertices[id] = point.Coordinate[1];   // Poniendo esta en negativo. Va al sitio
+        id++;
+      }
+      geometry.setAttribute( 'position', new BufferAttribute( vertices, 3 ) );
+      const material = new MeshBasicMaterial( { color: 0xff0000 } );
+      const mesh = new Mesh( geometry, material );
+      // console.log (surface[surf].surfaceType);
+      // console.log (vertices);
+      scene.add(mesh);
+    // } //if
   }
 //** */
   for (const prop in propiedadesLimpio) {
