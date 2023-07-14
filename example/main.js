@@ -148,8 +148,6 @@ async function aHulc() {
     }
     // console.log ("ptosModificados",ptosModificados);
     
-    
-    
     // normal del plano, definida por dos vectores   // FER UNITARI PRIMER !!!
     const vector1 = [];
     vector1[0] = ptosModificados[0][0]-ptosModificados[1][0]
@@ -160,14 +158,27 @@ async function aHulc() {
     vector2[1] = ptosModificados[0][1]-ptosModificados[2][1]
     vector2[2] = ptosModificados[0][2]-ptosModificados[2][2]
     // console.log(Math.cross(vector1,vector2));
-    // const normal = [];
     const normal = CrossVectors( vector1,vector2 );
-    // const normalUnitaria = [];
-    const normalUnitaria = convertirAVectorUnitario(normal);
-    console.log(normalUnitaria);
 
-    // Math.asin
-    // falta hacer el tilt y el azimut
+    // calcular tilt
+    const normalUnitaria = convertirAVectorUnitario(normal);
+    // console.log(normalUnitaria);
+    const prod = calcularProductoEscalar(normalUnitaria, [0,0,1]) ;
+    const tiltPi = Math.acos(prod);
+    const tilt = tiltPi * (180 / Math.PI);
+    var azimut;
+    if (tilt == 180 || tilt == 0 )  azimut = 0;
+    else                            azimut = calcularAzimut(normal);
+
+    console.log('tilt', tilt,'azimut', azimut);
+
+    // console.log('1,1,1', calcularAzimut([1,1,1]));
+    // console.log('-1,1,1', calcularAzimut([-1,1,1]));
+    // console.log('1,-1,1', calcularAzimut([1,-1,1]));
+    // console.log('-1,-1,1', calcularAzimut([-1,-1,1]));
+    // console.log('0,0,1', calcularAzimut([0,0,1]));
+
+    // falta girar ptosModificados con el azimut y luego con tilt
   }
 
 } // aHulc
@@ -196,6 +207,8 @@ function convertirAVectorUnitario(vector) {
 }
 
 function calcularProductoEscalar(vector1, vector2) {
+  // console.log('long1',vector1.length, vector2.length);
+
   if (vector1.length !== vector2.length) {
     throw new Error("Los vectores deben tener la misma longitud.");
   }
@@ -206,8 +219,14 @@ function calcularProductoEscalar(vector1, vector2) {
   return productoEscalar;
 }
 
-async function aCerma() {
+function calcularAzimut(vector) {
+  var azimutPi = Math.atan2(vector[1], vector[0]);
+  const azimut = azimutPi * (180 / Math.PI);
+  return azimut;
+}
 
+
+async function aCerma() {
 
   const surfaces = gbxmlData.Campus.Surface;
   // console.log(surfaces);
