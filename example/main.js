@@ -736,7 +736,7 @@ function jsobj2XML_element(obj, rootElementName, tabs = 0) {
   }
 
   // Close the root element
-  xml += ' />\n';
+  xml += '/>\n';
 
   return xml;
 }
