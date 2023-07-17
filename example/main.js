@@ -117,9 +117,12 @@ viewer.IFC.loader.ifcManager.applyWebIfcConfig({
 viewer.context.renderer.postProduction.active = true;
 
 
+
 async function aHulc() {
   const surfaces = gbxmlData.Campus.Surface;
   console.log (surfaces);
+  const mitabla = [];
+
   for (const surf in surfaces) {
     const puntos = [];
     for ( const pto in surfaces[surf].PlanarGeometry.PolyLoop.CartesianPoint ) {
@@ -154,9 +157,9 @@ async function aHulc() {
     vector1[1] = ptosModificados[0][1]-ptosModificados[1][1]
     vector1[2] = ptosModificados[0][2]-ptosModificados[1][2]
     const vector2 = [];
-    vector2[0] = ptosModificados[0][0]-ptosModificados[2][0]
-    vector2[1] = ptosModificados[0][1]-ptosModificados[2][1]
-    vector2[2] = ptosModificados[0][2]-ptosModificados[2][2]
+    vector2[0] = ptosModificados[0][0]-ptosModificados[2][0];
+    vector2[1] = ptosModificados[0][1]-ptosModificados[2][1];
+    vector2[2] = ptosModificados[0][2]-ptosModificados[2][2];
     // console.log(Math.cross(vector1,vector2));
     const normal = CrossVectors( vector1,vector2 );
 
@@ -166,22 +169,68 @@ async function aHulc() {
     const prod = calcularProductoEscalar(normalUnitaria, [0,0,1]) ;
     const tiltPi = Math.acos(prod);
     const tilt = tiltPi * (180 / Math.PI);
-    var azimut;
-    if (tilt == 180 || tilt == 0 )  azimut = 0;
-    else                            azimut = calcularAzimut(normal);
+    var azimutPi;
+    if (tilt == 180 || tilt == -180 || tilt == 0 )  azimutPi = 0;
+    else                                            azimutPi = calcularAzimutPi(normal);
 
-    console.log('tilt', tilt,'azimut', azimut);
+    // console.log('tilt', tilt,'azimutPi', azimutPi);
 
-    // console.log('1,1,1', calcularAzimut([1,1,1]));
-    // console.log('-1,1,1', calcularAzimut([-1,1,1]));
-    // console.log('1,-1,1', calcularAzimut([1,-1,1]));
-    // console.log('-1,-1,1', calcularAzimut([-1,-1,1]));
-    // console.log('0,0,1', calcularAzimut([0,0,1]));
+    // console.log('1,1,1', calcularAzimutPi([1,1,1]));
+    // console.log('-1,1,1', calcularAzimutPi([-1,1,1]));
+    // console.log('1,-1,1', calcularAzimutPi([1,-1,1]));
+    // console.log('-1,-1,1', calcularAzimutPi([-1,-1,1]));
+    // console.log('0,0,1', calcularAzimutPi([0,0,1]));
 
     // falta girar ptosModificados con el azimut y luego con tilt
+    // const ptosConGiroAzimut = [];
+    const ptosModificados2D = [];
+    for ( const p in ptosModificados ) {
+      const punto = ptosModificados[p];
+      // const ptosConGiroAzimut = [];
+      const ptoGirado = girar2DejeZPtoPI( punto, azimutPi );
+      // ptosConGiroAzimut.push(ptoGirado);
+      // console.log( punto[0],punto[1],punto[2], ptoGirado[0], ptoGirado[1], ptoGirado[2],azimutPi );
+
+      const ptoGirado2 = girar2DejeXPtoPI( ptoGirado, tiltPi );
+      ptosModificados2D.push(ptoGirado2);
+      // console.table( [punto[0],punto[1],punto[2], ptoGirado2[0], ptoGirado2[1],  ptoGirado2[2],azimutPi* (180 / Math.PI), tiltPi* (180 / Math.PI)] );
+      mitabla.push([punto[0],punto[1],punto[2], ptoGirado[0], ptoGirado[1], ptoGirado[2],ptoGirado2[0], ptoGirado2[1], ptoGirado2[2],azimutPi* (180 / Math.PI), tiltPi* (180 / Math.PI)]);
+
+    }
+    // console.log('ptosConGiroAzimut', ptosConGiroAzimut);
+
+
+
   }
+  console.table( mitabla );
 
 } // aHulc
+
+function girar2DejeZPtoPI( punto, aziPI ) {
+  var x = punto[0];
+  var y = punto[1];
+  var z = punto[2];
+  const ptoGirado = [];
+  ptoGirado[0] = x * Math.cos(aziPI) - y * Math.sin(aziPI);
+  ptoGirado[1] = x * Math.sin(aziPI) + y * Math.cos(aziPI);
+  ptoGirado[2] = z;
+
+  return ptoGirado ;
+}
+
+function girar2DejeXPtoPI( punto, tiltPI ) {
+  var x = punto[0];
+  var y = punto[1];
+  var z = punto[2];
+  const ptoGirado = [];
+  ptoGirado[0] = x ;
+  ptoGirado[1] = y * Math.cos(tiltPI) - z * Math.sin(tiltPI);
+
+  if (z == 0) ptoGirado[2] =0;
+  else        ptoGirado[2] = y * Math.sin(tiltPI) + z * Math.cos(tiltPI);
+
+  return ptoGirado ;
+}
 
 function CrossVectors( a, b ) {
   const ax = a[0], ay = a[1], az = a[2];
@@ -219,10 +268,10 @@ function calcularProductoEscalar(vector1, vector2) {
   return productoEscalar;
 }
 
-function calcularAzimut(vector) {
+function calcularAzimutPi(vector) {
   var azimutPi = Math.atan2(vector[1], vector[0]);
-  const azimut = azimutPi * (180 / Math.PI);
-  return azimut;
+  // const azimutPi = azimutPi * (180 / Math.PI);    // NO LO USAMOS DE MOMENTO
+  return azimutPi;
 }
 
 
@@ -684,7 +733,7 @@ function jsobj2XML(obj, rootElementName, tabs = 0, includeDeclaration = true) {
           xml += jsobj2XML_element(val, prop, tabs + 1);
         }
       } else {
-        xml += prop + '=\"' + val + '\" ';
+        xml += prop + '=\"' + val + '\"';
       }
     }
   }
@@ -730,7 +779,7 @@ function jsobj2XML_element(obj, rootElementName, tabs = 0) {
           xml += jsobj2XML_element(val, prop, tabs + 1);
         }
       } else {
-        xml += prop + '=\"' + val + '\" ';
+        xml += prop + '=\"' + val + '\"';
       }
     }
   }
