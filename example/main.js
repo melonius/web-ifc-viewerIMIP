@@ -706,40 +706,81 @@ function jsobj2XML(obj, rootElementName, tabs = 0, includeDeclaration = true) {
   for (var t = 0; t < tabs; t++) {
     addTabs += '\t'
   }
-  xml += addTabs + '<' + rootElementName + '>\n';
 
-  // Convert each property to an XML element
+  var isArray = true;
   for (var prop in obj) {
     if (obj.hasOwnProperty(prop)) {
-      var val = obj[prop];
-
-      // If the value is an object, recurse
-      if (typeof val === 'object') {
-        var hasObjects = false;
-        for (var prop2 in val) {
-          if (val.hasOwnProperty(prop2)) {
-            var nval = val[prop2];
-            // If the value is an object, recurse
-            if (typeof nval === 'object') {
-              hasObjects = true;
-            }
-          }
-        }
-        if(hasObjects){
-          xml += jsobj2XML(val, prop, tabs + 1, false);
-        }
-        else
-        {
-          xml += jsobj2XML_element(val, prop, tabs + 1);
-        }
-      } else {
-        xml += prop + '=\"' + val + '\"';
+      // Check if prop2 is a number or a string describing a number
+      var isNumber = !isNaN(parseFloat(prop)) && isFinite(prop);
+      if (!isNumber) {
+          isArray = false;
       }
     }
   }
 
-  // Close the root element
-  xml += addTabs + '</' + rootElementName + '>\n';
+  if(isArray) {
+
+    for (var prop in obj) {
+      if (obj.hasOwnProperty(prop)) {
+          var val = obj[prop];
+          var hasObjects = false;
+          for (var prop2 in val) {
+            if (val.hasOwnProperty(prop2)) {
+              var nval = val[prop2];
+              // If the value is an object, recurse
+              if (typeof nval === 'object') {
+                hasObjects = true;
+              }
+            }
+          }
+          if(hasObjects){
+            xml += jsobj2XML(val, rootElementName, tabs, false);
+          }
+          else
+          {
+            xml += jsobj2XML_element(val, rootElementName, tabs);
+          }
+      }
+    }
+    
+  }
+  else {
+
+    xml += addTabs + '<' + rootElementName + '>\n';
+
+    // Convert each property to an XML element
+    for (var prop in obj) {
+      if (obj.hasOwnProperty(prop)) {
+        var val = obj[prop];
+
+        // If the value is an object, recurse
+        if (typeof val === 'object') {
+          var hasObjects = false;
+          for (var prop2 in val) {
+            if (val.hasOwnProperty(prop2)) {
+              var nval = val[prop2];
+              // If the value is an object, recurse
+              if (typeof nval === 'object') {
+                hasObjects = true;
+              }
+            }
+          }
+          if(hasObjects){
+            xml += jsobj2XML(val, prop, tabs + 1, false);
+          }
+          else
+          {
+            xml += jsobj2XML_element(val, prop, tabs + 1);
+          }
+        } else {
+          xml += prop + '=\"' + val + '\"';
+        }
+      }
+    }
+
+    // Close the root element
+    xml += addTabs + '</' + rootElementName + '>\n';
+  }
 
   return xml;
 }
