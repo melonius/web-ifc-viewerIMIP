@@ -187,11 +187,11 @@ async function aHulc() {
     for ( const p in ptosModificados ) {
       const punto = ptosModificados[p];
       // const ptosConGiroAzimut = [];
-      const ptoGirado = girar2DejeZPtoPI( punto, azimutPi );
+      const ptoGirado = girarEjeZPtoPI( punto, Math.PI/2 - azimutPi );
       // ptosConGiroAzimut.push(ptoGirado);
       // console.log( punto[0],punto[1],punto[2], ptoGirado[0], ptoGirado[1], ptoGirado[2],azimutPi );
 
-      const ptoGirado2 = girar2DejeXPtoPI( ptoGirado, tiltPi );
+      const ptoGirado2 = girarEjeYPtoPI( ptoGirado, tiltPi );
       ptosModificados2D.push(ptoGirado2);
       // console.table( [punto[0],punto[1],punto[2], ptoGirado2[0], ptoGirado2[1],  ptoGirado2[2],azimutPi* (180 / Math.PI), tiltPi* (180 / Math.PI)] );
       mitabla.push([punto[0],punto[1],punto[2], ptoGirado[0], ptoGirado[1], ptoGirado[2],ptoGirado2[0], ptoGirado2[1], ptoGirado2[2],azimutPi* (180 / Math.PI), tiltPi* (180 / Math.PI)]);
@@ -199,35 +199,45 @@ async function aHulc() {
     }
     // console.log('ptosConGiroAzimut', ptosConGiroAzimut);
 
-
-
   }
   console.table( mitabla );
 
 } // aHulc
 
-function girar2DejeZPtoPI( punto, aziPI ) {
-  var x = punto[0];
-  var y = punto[1];
-  var z = punto[2];
+function girarEjeZPtoPI( punto, aziPI ) {
+  // var x = punto[0];
+  // var y = punto[1];
+  // var z = punto[2];
   const ptoGirado = [];
-  ptoGirado[0] = x * Math.cos(aziPI) - y * Math.sin(aziPI);
-  ptoGirado[1] = x * Math.sin(aziPI) + y * Math.cos(aziPI);
-  ptoGirado[2] = z;
+  ptoGirado[0] = parseFloat((punto[0] * Math.cos(aziPI) - punto[1] * Math.sin(aziPI)).toFixed(4));
+  ptoGirado[1] = parseFloat((punto[0] * Math.sin(aziPI) + punto[1]* Math.cos(aziPI)).toFixed(4));
+  ptoGirado[2] = punto[2];
 
   return ptoGirado ;
 }
 
-function girar2DejeXPtoPI( punto, tiltPI ) {
-  var x = punto[0];
-  var y = punto[1];
-  var z = punto[2];
+function girarEjeYPtoPI( punto, tiltPI ) {
+  // var x = punto[0];
+  // var y = punto[1];
+  // var z = punto[2];
   const ptoGirado = [];
-  ptoGirado[0] = x ;
-  ptoGirado[1] = y * Math.cos(tiltPI) - z * Math.sin(tiltPI);
+  ptoGirado[0] = punto[0] ;
+  ptoGirado[1] = parseFloat((punto[1] * Math.cos(tiltPI) - punto[2] * Math.sin(tiltPI)).toFixed(4));
 
-  if (z == 0) ptoGirado[2] =0;
-  else        ptoGirado[2] = y * Math.sin(tiltPI) + z * Math.cos(tiltPI);
+  if (punto[2] == 0) ptoGirado[2] =0;
+  else        ptoGirado[2] = parseFloat((punto[1] * Math.sin(tiltPI) + punto[2] * Math.cos(tiltPI)).toFixed(4));
+
+  return ptoGirado ;
+}
+
+function girarEjeXPtoPI( punto, tiltPI ) {
+  // var x = punto[0];
+  // var y = punto[1];
+  // var z = punto[2];
+  const ptoGirado = [];
+  ptoGirado[0] = punto[0] * Math.cos(tiltPI) - punto[2] * Math.sin(tiltPI);
+  ptoGirado[1] = punto[1] ;
+  ptoGirado[2] = punto[0] * Math.sin(tiltPI) + punto[2] * Math.cos(tiltPI);
 
   return ptoGirado ;
 }
