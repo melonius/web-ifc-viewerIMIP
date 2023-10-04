@@ -105,6 +105,8 @@ async function getAllWallMeshes() {
 
 let gbxmlData;
 let plantillaCerma;
+let textoLider;
+let plantillaHULC;
 
 // viewer.IFC.loader.ifcManager.useWebWorkers(true, 'files/IFCWorker.js');
 viewer.IFC.setWasmPath('files/');
@@ -116,10 +118,9 @@ viewer.IFC.loader.ifcManager.applyWebIfcConfig({
 
 viewer.context.renderer.postProduction.active = true;
 
-
-
 async function aHulc() {
   const surfaces = gbxmlData.Campus.Surface;
+  console.log ('estoy en aHulc');
   console.log (surfaces);
   const mitabla = [];
 
@@ -144,7 +145,6 @@ async function aHulc() {
     const mediaY = lasY.reduce((total, el) => total + el, 0) / lasY.length;
     const mediaZ = lasZ.reduce((total, el) => total + el, 0) / lasZ.length;
     // console.log ( 'mediaX', mediaX);
-    const ptoBasePoligono=[];
     const ptosModificados = [];
     for ( const p in puntos ) {
       ptosModificados.push([puntos[p][0]-mediaX, puntos[p][1]-mediaY, puntos[p][2]-mediaZ]);
@@ -181,29 +181,109 @@ async function aHulc() {
     // console.log('-1,-1,1', calcularAzimutPi([-1,-1,1]));
     // console.log('0,0,1', calcularAzimutPi([0,0,1]));
 
-    // falta girar ptosModificados con el azimut y luego con tilt
+    // girar ptosModificados con el azimut y luego con tilt
     // const ptosConGiroAzimut = [];
     const ptosModificados2D = [];
     for ( const p in ptosModificados ) {
       const punto = ptosModificados[p];
       // const ptosConGiroAzimut = [];
       const ptoGirado = girarEjeZPtoPI( punto, Math.PI/2 - azimutPi );
-      // ptosConGiroAzimut.push(ptoGirado);
-      // console.log( punto[0],punto[1],punto[2], ptoGirado[0], ptoGirado[1], ptoGirado[2],azimutPi );
-
       const ptoGirado2 = girarEjeYPtoPI( ptoGirado, tiltPi );
       ptosModificados2D.push(ptoGirado2);
-      // console.table( [punto[0],punto[1],punto[2], ptoGirado2[0], ptoGirado2[1],  ptoGirado2[2],azimutPi* (180 / Math.PI), tiltPi* (180 / Math.PI)] );
       mitabla.push([punto[0],punto[1],punto[2], ptoGirado[0], ptoGirado[1], ptoGirado[2],ptoGirado2[0], ptoGirado2[1], ptoGirado2[2],azimutPi* (180 / Math.PI), tiltPi* (180 / Math.PI)]);
-
     }
-    // console.log('ptosConGiroAzimut', ptosConGiroAzimut);
+  }
+  // console.table( mitabla );
+
+
+
+  // adquisición de plantilla HULC
+  var url = "visorctehexml/archivos/pilotvalencia5.ctehexml";
+
+  let response = await fetch(url);    // este es el método mas moderno de adquisicion de fichero de servidor
+  let text = await response.text();
+  // let text = await response.json();
+  // let text = await response.xml();
+  // console.log( text);
+  // console.log( XML2jsobj(text));
+
+  const parser = new DOMParser();
+  const xmlDoc = parser.parseFromString(text, "text/xml");
+  console.log( xmlDoc.documentElement);
+  // console.log( xmlDoc.documentElement.EntradaGraficaLIDER);       //NO VA
+  // console.log( xmlDoc.documentElement['EntradaGraficaLIDER']);    //NO VA
+  // console.log( xmlDoc.documentElement[EntradaGraficaLIDER]);      //NO VA
+  const childNodes = xmlDoc.documentElement.children;
+
+  for (let i = 0; i < childNodes.length; i++) {
+    const node = childNodes[i];
+    // obj[node.nodeName] = node.textContent;
+    // console.log( childNodes[i]);
+    // console.log( childNodes[i].nodeName);
+    // console.log( childNodes[i].textContent);
+
+    if (childNodes[i].nodeName == 'EntradaGraficaLIDER') textoLider = childNodes[i].textContent;
 
   }
-  console.table( mitabla );
+
+  // console.log( textoLider);
+
+  const nuevoContenido = "NUEVO CONTENIDO";
+
+  // const regex = /\$ POLIGONOS(.*?)\$/g;
+  const regex = /\$ POLIGONOS([\s\S]*?)\.\.\r\n\$/g;
+  // console.log( textoLider.replace(regex, `$ POLIGONOS${nuevoContenido}$`));
+
+  // console.log( textoLider);
+
+
+/*
+  const obj = {};
+
+  const rootElement = xmlDoc.documentElement;
+  if (rootElement.nodeName === '#document') {
+    const childNodes = rootElement.children;
+    for (let i = 0; i < childNodes.length; i++) {
+      const node = childNodes[i];
+      obj[node.nodeName] = node.textContent;
+    }
+  }
+*/
+/*
+  // AJAX request
+  var xhr = (window.XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP"));
+  xhr.onreadystatechange = XHRhandler;
+  xhr.open("GET", url, true);
+  xhr.send(null);
+  // handle response
+  function XHRhandler() {
+    if (xhr.readyState == 4) {
+      // console.log ('xhr.responseXML: ', xhr.responseXML);
+      // plantillaHULC = XML2jsobj(xhr.responseXML.documentElement);
+      plantillaHULC = xhr.responseXML.documentElement;
+      xhr = null;
+      console.log ('plantillaHULC: ',plantillaHULC);
+      // console.log ('plantillaHULCint: ',plantillaHULC.DatosGenerales);
+      // console.log ('plantillaHULCint: ',plantillaHULC['DatosGenerales']);
+      console.log ('tipeof: ',typeof(plantillaHULC));
+    }
+  }
+  */
+  
 
 } // aHulc
+/*
+function modificarContenidoEntreMarcadores(texto, nuevoContenido) {
+  const regex = /\$POLIGONOS(.*?)\$/g;
+  return texto.replace(regex, `$POLIGONOS${nuevoContenido}$`);
+}
 
+const textoOriginal = "Este es un texto con $POLIGONOScontenido antiguo$ que quiero cambiar. $OTRO_CONTENIDO$ Aquí hay más texto $POLIGONOSotro contenido$.";
+const nuevoContenido = "nuevo contenido";
+
+const textoModificado = modificarContenidoEntreMarcadores(textoOriginal, nuevoContenido);
+console.log(textoModificado);
+*/
 function girarEjeZPtoPI( punto, aziPI ) {
   // var x = punto[0];
   // var y = punto[1];
@@ -284,13 +364,11 @@ function calcularAzimutPi(vector) {
   return azimutPi;
 }
 
-
 async function aCerma() {
 
   const surfaces = gbxmlData.Campus.Surface;
   // console.log(surfaces);
   const matchingSurfaces = {};
-  let textoaCerma ='';
 
   // Iterate over surfaces and accumulate areas and other properties for each id, azimuth, and tilt
   for (const surf in surfaces) {
@@ -365,10 +443,11 @@ async function aCerma() {
       plantillaCerma.DatosPersonalizados.Cerma.Cubiertas.CubiertasIncl.CubiertaIncl.Cubierta_incl_sur_m2.name = result[4]['area'];
       plantillaCerma.DatosPersonalizados.Cerma.Cubiertas.CubiertasIncl.CubiertaIncl.Cubierta_incl_norte_m2.name = result[5]['area'];
       textoaCerma = jsobj2XML(plantillaCerma, 'DatosEnergeticosDelEdificio');
-      downloadXML(textoaCerma, 'new_cerma.xml');
+      downloadXML(textoaCerma, query+'.xml');
+      // console.log ('367:',textoaCerma);
     }
   }
-
+// console.log ('369:',textoaCerma);
   const propiedades = [];
   const propiedadesLimpio = [];
   const wallsIDs = await manager.getAllItemsOfType(0, IFCWALL, false);
@@ -504,7 +583,8 @@ async function aCerma() {
     //console.log(slabData);
   }
 
-  //** */
+  //** */     dibuja los elementos gbxml     atencion a los giros linea //**
+  // /*
   const surface = gbxmlData.Campus.Surface;
   for(const surf in surface)
   {
@@ -541,7 +621,7 @@ async function aCerma() {
         id++;
         vertices[id] = point.Coordinate[2];
         id++;
-        vertices[id] = point.Coordinate[1];   // Poniendo esta en negativo. Va al sitio
+        vertices[id] = point.Coordinate[1];   //** Poniendo esta en negativo. Va al sitio
         id++;
       }
       geometry.setAttribute( 'position', new BufferAttribute( vertices, 3 ) );
@@ -552,23 +632,7 @@ async function aCerma() {
       scene.add(mesh);
     // } //if
   }
-//** */
-  for (const prop in propiedadesLimpio) {
-    if (propiedadesLimpio.hasOwnProperty(prop)) {
-      // textoaCerma += propiedadesLimpio[prop]['nombre']+' '+propiedadesLimpio[prop].tag+"\n";
-      //console.log(`${prop}: ${propiedadesLimpio[prop]['nombre']} tag ${propiedadesLimpio[prop].tag}`);
-    }
-  }
-
-
-
-  // console.table (propiedades);
-  // console.table (propiedadesLimpio);
-
-  console.log('textoaCerma:');console.log(textoaCerma);
-  console.log('textoaCermaDENTROdeLOAD:');console.log(textoaCerma);
-  document.getElementById('cerma').setAttribute('href',generateTextFileUrl(textoaCerma));
-
+// ** */
 } // acerma
 
 
@@ -638,7 +702,7 @@ const loadIfc = async (event) => {
 
   model = await viewer.IFC.loadIfc(event.target.files[0], false);
 
-  aCerma();
+  // aCerma();
 
 
   model.material.forEach(mat => mat.side = 2);
@@ -841,7 +905,7 @@ function jsobj2XML_element(obj, rootElementName, tabs = 0) {
   return xml;
 }
 
-// let textoaCerma ='';
+let textoaCerma ='';
 async function miload() {
 
   // tests with glTF
@@ -903,7 +967,7 @@ async function miload() {
 
  
   aHulc();
-  aCerma();
+  // aCerma();
 
   if (first) first = false
   else {
@@ -1097,12 +1161,12 @@ function generateTextFileUrl(txt) {
 
 const sideMenu = document.getElementById('side-menu-left');
 
-const aElement = document.createElement('a');                 sideMenu.appendChild(aElement);
-      aElement.classList.add('basic-button');
-      aElement.setAttribute('id', 'cerma');
-      aElement.setAttribute('download', 'cerma.xml');
-      aElement.setAttribute('href', '#');
-const image = document.createElement("img");                  aElement.appendChild(image);
+const but = document.createElement('button');                 sideMenu.appendChild(but);
+      but.classList.add('basic-button');
+      but.setAttribute('id', 'cerma');
+      but.addEventListener("click", aCerma);
+      // but.onclick = aCerma();
+const image = document.createElement("img");                  but.appendChild(image);
       image.setAttribute("src", './resources/cerma3.svg');
       image.classList.add('icon');
       image.style.maxWidth = "90px";
