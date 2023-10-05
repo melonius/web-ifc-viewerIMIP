@@ -682,6 +682,8 @@ const loadIfc = async (event) => {
     [IFCOPENINGELEMENT]: false
   });
 
+  // aqui esta el error llama a ..gb.xml desde el servidor en lugar de desde el cliente
+  /*
   let url = event.target.files[0].name;
   url = "models/" + url.replace(".ifc", ".xml");
   console.log(url);
@@ -699,7 +701,112 @@ const loadIfc = async (event) => {
       console.log(gbxmlData);
     }
   }
+  */
 
+
+  // const divAbreXml = document.createElement('div');   document.getElementsByTagName('body')[0].appendChild(divAbreXml);
+  const divAbreXml = document.createElement('div');   document.body.appendChild(divAbreXml);
+
+  divAbreXml.style.top="5%";		
+  divAbreXml.style.left="5%";		
+  // divAbreXml.style.position="absolute";		
+  divAbreXml.style.width = '90%';
+  divAbreXml.style.height = '90%';
+  divAbreXml.style.backgroundColor = 'rgba(0, 0, 0, 0.8)'; // Fondo semitransparente
+  
+  divAbreXml.style.display = 'flex';
+  divAbreXml.style.flexDirection = 'row';
+  divAbreXml.style.alignItems = 'center';
+  divAbreXml.style.justifyContent = 'center';
+  divAbreXml.style.position = 'absolute';
+  // divAbreXml.style.top = '50%';
+  // divAbreXml.style.left = '50%';
+  // divAbreXml.style.transform = 'translate(-50%, -50%)';
+
+
+  divAbreXml.id="divAbreXml";						
+
+  var textElement = document.createElement('p');    divAbreXml.appendChild(textElement);
+  textElement.textContent = 'Abre el archivo XML correspondiente:';
+  // textElement.style.textAlign = 'center';
+  textElement.style.color = 'white';
+
+  // textElement.style.position = 'absolute';
+  // textElement.style.top = '40%';
+  // textElement.style.left = '50%';
+  textElement.style.marginRight = '10px'; // Espacio entre textElement e input
+  
+  var cancelButton = document.createElement('button');
+  divAbreXml.appendChild(cancelButton);
+  cancelButton.textContent = 'Cancelar';
+  // cancelButton.style.position = 'absolute';
+  // cancelButton.style.top = '60%';
+  // cancelButton.style.left = '50%';
+  // cancelButton.style.transform = 'translate(-50%, -50%)';
+  cancelButton.addEventListener('click', function() {
+    divAbreXml.style.display = 'none';
+  });
+
+  var input = document.createElement('input');    divAbreXml.appendChild(input);
+      input.type = 'file';
+      input.accept = '.xml';
+      // input.style.display = 'none';
+
+      // input.style.position = 'absolute';
+      // input.style.top = '50%';
+      // input.style.left = '50%';
+      // input.style.transform = 'translate(-50%, -50%)'; // Centra el input en el medio
+      
+      input.style.marginRight = '10px'; // Espacio entre input y cancelButton
+
+
+
+      input.addEventListener('change', function(event) {
+        console.log("ESTOY EN CHANGUE");
+        var selectedFile = event.target.files[0];
+        console.log(selectedFile);
+
+        if (selectedFile) {
+
+          var reader = new FileReader();
+          reader.onload = function(event) {
+            console.log("ESTOY EN ONLOAD");
+
+            // El contenido del archivo estará en event.target.result
+            var XmlContents = event.target.result;
+
+            // Haz lo que necesites con la variable de contenido
+            console.log('Contenido del archivo asignado a una variable:');
+            console.log(XmlContents);
+
+            // Utiliza DOMParser para analizar el contenido XML y convertirlo en un objeto XML
+            var parser = new DOMParser();
+            var xmlDoc = parser.parseFromString(XmlContents, "text/xml");
+            var xmlDocEl = xmlDoc.documentElement;
+
+            // Haz lo que necesites con el objeto XML
+            console.log('Contenido del archivo convertido en objeto XML:');
+            console.log(xmlDocEl);
+
+            gbxmlData = XML2jsobj(xmlDocEl);
+            console.log('datos gbXml');
+            console.log(gbxmlData);
+            divAbreXml.style.display="none";
+        
+          };
+          // Lee el contenido del archivo como texto
+          reader.readAsText(selectedFile);
+        } else {
+            console.log('Ningún archivo seleccionado');
+        }
+      });
+
+
+
+
+
+
+//-----------------------------------------------------------------------
   model = await viewer.IFC.loadIfc(event.target.files[0], false);
 
   // aCerma();
@@ -955,9 +1062,13 @@ async function miload() {
   // handle response
   function XHRhandler() {
     if (xhr.readyState == 4) {
+      console.log('datos gbXml como xml');
+      console.log(xhr.responseXML.documentElement);
+
+
       gbxmlData = XML2jsobj(xhr.responseXML.documentElement);
       xhr = null;
-      console.log('datos gbXml');
+      console.log('datos gbXml como obj');
       console.log(gbxmlData);
     }
   }
@@ -1128,7 +1239,6 @@ const getFileButton = createSideMenuButton('./resources/folder-icon.svg');
 getFileButton.addEventListener('click', () => {
   getFileButton.blur();
   opendir();
-  // inputElement.click();
 });
 
 const sectionButton = createSideMenuButton('./resources/section-plane-down.svg');
