@@ -119,8 +119,8 @@ viewer.IFC.loader.ifcManager.applyWebIfcConfig({
 viewer.context.renderer.postProduction.active = true;
 
 async function aHulc() {
-  const surfaces = gbxmlData.Campus.Surface;
   console.log ('estoy en aHulc');
+  const surfaces = gbxmlData.Campus.Surface;
   console.log (surfaces);
   const mitabla = [];
 
@@ -193,9 +193,8 @@ async function aHulc() {
       mitabla.push([punto[0],punto[1],punto[2], ptoGirado[0], ptoGirado[1], ptoGirado[2],ptoGirado2[0], ptoGirado2[1], ptoGirado2[2],azimutPi* (180 / Math.PI), tiltPi* (180 / Math.PI)]);
     }
   }
-  // console.table( mitabla );
-
-
+  console.log( "mitabla" );
+  console.table( mitabla );
 
   // adquisición de plantilla HULC
   var url = "visorctehexml/archivos/pilotvalencia5.ctehexml";
@@ -209,33 +208,42 @@ async function aHulc() {
 
   const parser = new DOMParser();
   const xmlDoc = parser.parseFromString(text, "text/xml");
+  console.log( "plantillaHULCenXml");
   console.log( xmlDoc.documentElement);
   // console.log( xmlDoc.documentElement.EntradaGraficaLIDER);       //NO VA
   // console.log( xmlDoc.documentElement['EntradaGraficaLIDER']);    //NO VA
   // console.log( xmlDoc.documentElement[EntradaGraficaLIDER]);      //NO VA
   const childNodes = xmlDoc.documentElement.children;
 
+  console.log(childNodes.length); ///
+
+  plantillaHULC = '<?xml version="1.0" encoding="UTF-8"?>\n<CTE-HE-XML>\n\t';
   for (let i = 0; i < childNodes.length; i++) {
     const node = childNodes[i];
     // obj[node.nodeName] = node.textContent;
     // console.log( childNodes[i]);
     // console.log( childNodes[i].nodeName);
     // console.log( childNodes[i].textContent);
-
-    if (childNodes[i].nodeName == 'EntradaGraficaLIDER') textoLider = childNodes[i].textContent;
-
+    // plantillaHULC += childNodes[i].textContent;
+    if (childNodes[i].nodeName == 'EntradaGraficaLIDER') 
+      plantillaHULC += "\n\t<EntradaGraficaLIDER>\n\t\t<![CDATA["+childNodes[i].textContent+"]]>\n\t</EntradaGraficaLIDER>\n\t";
+    else {
+      const xmlSerializer = new XMLSerializer();
+      const xmlString = xmlSerializer.serializeToString(childNodes[i]);
+      // plantillaHULC += xmlString +"\n";
+      plantillaHULC += xmlString ;
+    }
   }
+  plantillaHULC += "\n</CTE-HE-XML>";
 
-  // console.log( textoLider);
+  console.log( "plantillaHULC");
+  console.log( plantillaHULC);
 
   const nuevoContenido = "NUEVO CONTENIDO";
 
   // const regex = /\$ POLIGONOS(.*?)\$/g;
   const regex = /\$ POLIGONOS([\s\S]*?)\.\.\r\n\$/g;
-  // console.log( textoLider.replace(regex, `$ POLIGONOS${nuevoContenido}$`));
-
-  // console.log( textoLider);
-
+  // console.log( textoLiplantillaHULCder.replace(regex, `$ POLIGONOS${nuevoContenido}$`));
 
 /*
   const obj = {};
@@ -269,8 +277,7 @@ async function aHulc() {
     }
   }
   */
-  
-
+  downloadXML(plantillaHULC, query +'.ctehexml');
 } // aHulc
 /*
 function modificarContenidoEntreMarcadores(texto, nuevoContenido) {
@@ -365,7 +372,7 @@ function calcularAzimutPi(vector) {
 }
 
 async function aCerma() {
-
+  console.log("ESTOY EN aCerma")
   const surfaces = gbxmlData.Campus.Surface;
   // console.log(surfaces);
   const matchingSurfaces = {};
@@ -431,7 +438,7 @@ async function aCerma() {
       plantillaCerma = XML2jsobj(xhr.responseXML.documentElement);
       xhr = null;
       // console.log('datos plantilla CERMA');
-      // console.log(plantillaCerma);
+      console.log(plantillaCerma);
       // console.log(result);
       // console.log(plantillaCerma.DatosPersonalizados.Cerma.Muros.MurosExt.MuroExt);
       plantillaCerma.DatosPersonalizados.Cerma.Muros.MurosExt.MuroExt.U_Muro_ext_W_m2K.name = result[1]['U-value'];
@@ -443,11 +450,11 @@ async function aCerma() {
       plantillaCerma.DatosPersonalizados.Cerma.Cubiertas.CubiertasIncl.CubiertaIncl.Cubierta_incl_sur_m2.name = result[4]['area'];
       plantillaCerma.DatosPersonalizados.Cerma.Cubiertas.CubiertasIncl.CubiertaIncl.Cubierta_incl_norte_m2.name = result[5]['area'];
       textoaCerma = jsobj2XML(plantillaCerma, 'DatosEnergeticosDelEdificio');
-      downloadXML(textoaCerma, query+'.xml');
+      downloadXML(textoaCerma, query +'.xml');
       // console.log ('367:',textoaCerma);
     }
   }
-// console.log ('369:',textoaCerma);
+  // console.log ('369:',textoaCerma);
   const propiedades = [];
   const propiedadesLimpio = [];
   const wallsIDs = await manager.getAllItemsOfType(0, IFCWALL, false);
@@ -645,6 +652,7 @@ let first = true;
 let model;
 
 const loadIfc = async (event) => {
+  console.log ("Estoy en loadIFC");
 
   // tests with glTF
   // const file = event.target.files[0];
@@ -762,22 +770,22 @@ const loadIfc = async (event) => {
 
 
       input.addEventListener('change', function(event) {
-        console.log("ESTOY EN CHANGUE");
+        // console.log("ESTOY EN CHANGUE");
         var selectedFile = event.target.files[0];
-        console.log(selectedFile);
+        // console.log(selectedFile);
 
         if (selectedFile) {
 
           var reader = new FileReader();
           reader.onload = function(event) {
-            console.log("ESTOY EN ONLOAD");
+            // console.log("ESTOY EN ONLOAD");
 
             // El contenido del archivo estará en event.target.result
             var XmlContents = event.target.result;
 
             // Haz lo que necesites con la variable de contenido
-            console.log('Contenido del archivo asignado a una variable:');
-            console.log(XmlContents);
+            // console.log('Contenido del archivo asignado a una variable:');
+            // console.log(XmlContents);
 
             // Utiliza DOMParser para analizar el contenido XML y convertirlo en un objeto XML
             var parser = new DOMParser();
@@ -785,8 +793,8 @@ const loadIfc = async (event) => {
             var xmlDocEl = xmlDoc.documentElement;
 
             // Haz lo que necesites con el objeto XML
-            console.log('Contenido del archivo convertido en objeto XML:');
-            console.log(xmlDocEl);
+            // console.log('Contenido del archivo convertido en objeto XML:');
+            // console.log(xmlDocEl);
 
             gbxmlData = XML2jsobj(xmlDocEl);
             console.log('datos gbXml');
@@ -801,16 +809,10 @@ const loadIfc = async (event) => {
         }
       });
 
-
-
-
-
-
-//-----------------------------------------------------------------------
+  //-----------------------------------------------------------------------
   model = await viewer.IFC.loadIfc(event.target.files[0], false);
 
   // aCerma();
-
 
   model.material.forEach(mat => mat.side = 2);
   if (first) first = false
@@ -826,7 +828,6 @@ const loadIfc = async (event) => {
   overlay.classList.add('hidden');
 
 };
-
  
 function XML2jsobj(node) {
   /**
@@ -1014,7 +1015,7 @@ function jsobj2XML_element(obj, rootElementName, tabs = 0) {
 
 let textoaCerma ='';
 async function miload() {
-
+  console.log("Estoy en miload");
   // tests with glTF
   // const file = event.target.files[0];
   // const url = URL.createObjectURL(file);
@@ -1062,8 +1063,8 @@ async function miload() {
   // handle response
   function XHRhandler() {
     if (xhr.readyState == 4) {
-      console.log('datos gbXml como xml');
-      console.log(xhr.responseXML.documentElement);
+      // console.log('datos gbXml como xml');
+      // console.log(xhr.responseXML.documentElement);
 
 
       gbxmlData = XML2jsobj(xhr.responseXML.documentElement);
@@ -1077,7 +1078,7 @@ async function miload() {
   model.material.forEach(mat => mat.side = 2);
 
  
-  aHulc();
+  // aHulc();
   // aCerma();
 
   if (first) first = false
@@ -1275,7 +1276,6 @@ const but = document.createElement('button');                 sideMenu.appendChi
       but.classList.add('basic-button');
       but.setAttribute('id', 'cerma');
       but.addEventListener("click", aCerma);
-      // but.onclick = aCerma();
 const image = document.createElement("img");                  but.appendChild(image);
       image.setAttribute("src", './resources/cerma3.svg');
       image.classList.add('icon');
@@ -1284,8 +1284,9 @@ const image = document.createElement("img");                  but.appendChild(im
 const aElement2 = document.createElement('a');                 sideMenu.appendChild(aElement2);
       aElement2.classList.add('basic-button');
       aElement2.setAttribute('id', 'hulc');
-      aElement2.setAttribute('download', 'hulc.xml');
-      aElement2.setAttribute('href', '#');
+      // aElement2.setAttribute('download', 'hulc.xml');
+      // aElement2.setAttribute('href', '#');
+      aElement2.addEventListener("click", aHulc);
 const image2 = document.createElement("img");                   aElement2.appendChild(image2);
       image2.setAttribute("src", './resources/hulc.png');
       image2.classList.add('icon');
