@@ -404,7 +404,7 @@ async function aCerma() {
     matchingSurfaces[id][azimuth][tilt].area += area;
    
   }
-  // console.log ('PRU',matchingSurfaces);
+  console.log ('PRU',matchingSurfaces);
   // Iterate over accumulated areas and create objects with U-value, accumulated area, azimuth, and tilt
   const result = [];
   for (const id in matchingSurfaces) {
@@ -422,9 +422,8 @@ async function aCerma() {
       }
     }
   }
-  // console.log ('PRU2',result);
-
-
+  console.log("gbxml: ", gbxmlData);
+  console.log ('PRU2',result);
   // adquisición de plantilla CERMA
   var url = "models/VAlencia_V1.xml";
   // AJAX request
@@ -438,23 +437,52 @@ async function aCerma() {
       plantillaCerma = XML2jsobj(xhr.responseXML.documentElement);
       xhr = null;
       // console.log('datos plantilla CERMA');
-      console.log(plantillaCerma);
+      console.log("plantilla cerma: ", plantillaCerma);
       // console.log(result);
       // console.log(plantillaCerma.DatosPersonalizados.Cerma.Muros.MurosExt.MuroExt);
+
+      // Clasificar las superficies segun inclinacion, en paredes, suelos y techos.
+
+      // plantillaCerma.DatosPersonalizados.Cerma.Muros.MurosExt.MuroExt.U_Muro_ext_W_m2K.name = result[1]['U-value'];
+      // plantillaCerma.DatosPersonalizados.Cerma.Muros.MurosExt.MuroExt.Muro_ext_norte_m2.name = result[0]['area'];
+      // plantillaCerma.DatosPersonalizados.Cerma.Muros.MurosExt.MuroExt.Muro_ext_oeste_m2.name = result[1]['area'];
+      // plantillaCerma.DatosPersonalizados.Cerma.Muros.MurosExt.MuroExt.Muro_ext_sur_m2.name = result[2]['area'];
+      // plantillaCerma.DatosPersonalizados.Cerma.Muros.MurosExt.MuroExt.Muro_ext_este_m2.name = result[3]['area'];
+      // plantillaCerma.DatosPersonalizados.Cerma.Cubiertas.CubiertasIncl.CubiertaIncl.U_Cubierta_incl_W_m2K.name = result[4]['U-value'];
+      // plantillaCerma.DatosPersonalizados.Cerma.Cubiertas.CubiertasIncl.CubiertaIncl.Cubierta_incl_sur_m2.name = result[4]['area'];
+      // plantillaCerma.DatosPersonalizados.Cerma.Cubiertas.CubiertasIncl.CubiertaIncl.Cubierta_incl_norte_m2.name = result[5]['area'];
+      // plantillaCerma.DatosPersonalizados.Cerma.Suelos.SuelosTerreno.Suelo_terreno.Suelo_al_terreno_m2.name = result[6]['area'];
+      // plantillaCerma.DatosPersonalizados.Cerma.Suelos.SuelosTerreno.Suelo_terreno.U_Suelo_terreno_W_m2K.name = "0,12";
+
+      // Filter data for Muros, CubiertasIncl, and Suelos based on tilt and azimuth values
+      const murosData = result.filter(item => item.tilt === 90 || item.tilt === 270);
+      const cubiertasInclData = result.filter(item => item.tilt >= 0 && item.tilt <= 90);
+      const suelosData = result.filter(item => item.tilt === 0 || item.tilt === 180);
+
+      // Assign filtered data to respective variables
+      plantillaCerma.DatosPersonalizados.Cerma.Muros.MurosExt.MuroExt.Muro_ext_norte_m2.name = murosData.find(item => item.azimuth >= -45 && item.azimuth <= 45)['area'];
+      plantillaCerma.DatosPersonalizados.Cerma.Muros.MurosExt.MuroExt.Muro_ext_sur_m2.name = murosData.find(item => item.azimuth >= 135 && item.azimuth <= 225)['area'];
+      plantillaCerma.DatosPersonalizados.Cerma.Muros.MurosExt.MuroExt.Muro_ext_este_m2.name = murosData.find(item => item.azimuth > 45 && item.azimuth < 135)['area'];
+      plantillaCerma.DatosPersonalizados.Cerma.Muros.MurosExt.MuroExt.Muro_ext_oeste_m2.name = murosData.find(item => item.azimuth > 225 && item.azimuth <= 320)['area'];
+
+      plantillaCerma.DatosPersonalizados.Cerma.Cubiertas.CubiertasIncl.CubiertaIncl.Cubierta_incl_norte_m2.name = cubiertasInclData.find(item => item.azimuth === 0)['area'];
+      plantillaCerma.DatosPersonalizados.Cerma.Cubiertas.CubiertasIncl.CubiertaIncl.Cubierta_incl_sur_m2.name = cubiertasInclData.find(item => item.azimuth === 180)['area'];
+      plantillaCerma.DatosPersonalizados.Cerma.Cubiertas.CubiertasIncl.CubiertaIncl.Cubierta_incl_este_m2.name = cubiertasInclData.find(item => item.azimuth === 90)['area'];
+      plantillaCerma.DatosPersonalizados.Cerma.Cubiertas.CubiertasIncl.CubiertaIncl.Cubierta_incl_oeste_m2.name = cubiertasInclData.find(item => item.azimuth === 270)['area'];
+
+      plantillaCerma.DatosPersonalizados.Cerma.Suelos.SuelosTerreno.Suelo_terreno.Suelo_al_terreno_m2.name = suelosData.find(item => item.tilt === 180)['area'];
+
       plantillaCerma.DatosPersonalizados.Cerma.Muros.MurosExt.MuroExt.U_Muro_ext_W_m2K.name = result[1]['U-value'];
-      plantillaCerma.DatosPersonalizados.Cerma.Muros.MurosExt.MuroExt.Muro_ext_norte_m2.name = result[0]['area'];
-      plantillaCerma.DatosPersonalizados.Cerma.Muros.MurosExt.MuroExt.Muro_ext_oeste_m2.name = result[1]['area'];
-      plantillaCerma.DatosPersonalizados.Cerma.Muros.MurosExt.MuroExt.Muro_ext_sur_m2.name = result[2]['area'];
-      plantillaCerma.DatosPersonalizados.Cerma.Muros.MurosExt.MuroExt.Muro_ext_este_m2.name = result[3]['area'];
       plantillaCerma.DatosPersonalizados.Cerma.Cubiertas.CubiertasIncl.CubiertaIncl.U_Cubierta_incl_W_m2K.name = result[4]['U-value'];
-      plantillaCerma.DatosPersonalizados.Cerma.Cubiertas.CubiertasIncl.CubiertaIncl.Cubierta_incl_sur_m2.name = result[4]['area'];
-      plantillaCerma.DatosPersonalizados.Cerma.Cubiertas.CubiertasIncl.CubiertaIncl.Cubierta_incl_norte_m2.name = result[5]['area'];
+      plantillaCerma.DatosPersonalizados.Cerma.Suelos.SuelosTerreno.Suelo_terreno.U_Suelo_terreno_W_m2K.name = "0,12";
+
       textoaCerma = jsobj2XML(plantillaCerma, 'DatosEnergeticosDelEdificio');
       downloadXML(textoaCerma, query +'.xml');
       // console.log ('367:',textoaCerma);
     }
   }
   // console.log ('369:',textoaCerma);
+
   const propiedades = [];
   const propiedadesLimpio = [];
   const wallsIDs = await manager.getAllItemsOfType(0, IFCWALL, false);

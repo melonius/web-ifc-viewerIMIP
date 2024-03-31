@@ -121683,6 +121683,7 @@
 
     let gbxmlData;
     let plantillaCerma;
+    let plantillaHULC;
 
     // viewer.IFC.loader.ifcManager.useWebWorkers(true, 'files/IFCWorker.js');
     viewer.IFC.setWasmPath('files/');
@@ -121694,9 +121695,8 @@
 
     viewer.context.renderer.postProduction.active = true;
 
-
-
     async function aHulc() {
+      console.log ('estoy en aHulc');
       const surfaces = gbxmlData.Campus.Surface;
       console.log (surfaces);
       const mitabla = [];
@@ -121721,6 +121721,7 @@
         const mediaX = lasX.reduce((total, el) => total + el, 0) / lasX.length;
         const mediaY = lasY.reduce((total, el) => total + el, 0) / lasY.length;
         const mediaZ = lasZ.reduce((total, el) => total + el, 0) / lasZ.length;
+        // console.log ( 'mediaX', mediaX);
         const ptosModificados = [];
         for ( const p in puntos ) {
           ptosModificados.push([puntos[p][0]-mediaX, puntos[p][1]-mediaY, puntos[p][2]-mediaZ]);
@@ -121751,46 +121752,126 @@
         for ( const p in ptosModificados ) {
           const punto = ptosModificados[p];
           // const ptosConGiroAzimut = [];
-          const ptoGirado = girar2DejeZPtoPI( punto, azimutPi );
-          // ptosConGiroAzimut.push(ptoGirado);
-          // console.log( punto[0],punto[1],punto[2], ptoGirado[0], ptoGirado[1], ptoGirado[2],azimutPi );
-
-          const ptoGirado2 = girar2DejeXPtoPI( ptoGirado, tiltPi );
-          // console.table( [punto[0],punto[1],punto[2], ptoGirado2[0], ptoGirado2[1],  ptoGirado2[2],azimutPi* (180 / Math.PI), tiltPi* (180 / Math.PI)] );
+          const ptoGirado = girarEjeZPtoPI( punto, Math.PI/2 - azimutPi );
+          const ptoGirado2 = girarEjeYPtoPI( ptoGirado, tiltPi );
           mitabla.push([punto[0],punto[1],punto[2], ptoGirado[0], ptoGirado[1], ptoGirado[2],ptoGirado2[0], ptoGirado2[1], ptoGirado2[2],azimutPi* (180 / Math.PI), tiltPi* (180 / Math.PI)]);
-
         }
-        // console.log('ptosConGiroAzimut', ptosConGiroAzimut);
-
-
-
       }
+      console.log( "mitabla" );
       console.table( mitabla );
 
-    } // aHulc
+      // adquisición de plantilla HULC
+      var url = "visorctehexml/archivos/pilotvalencia5.ctehexml";
 
-    function girar2DejeZPtoPI( punto, aziPI ) {
-      var x = punto[0];
-      var y = punto[1];
-      var z = punto[2];
+      let response = await fetch(url);    // este es el método mas moderno de adquisicion de fichero de servidor
+      let text = await response.text();
+      // let text = await response.json();
+      // let text = await response.xml();
+      // console.log( text);
+      // console.log( XML2jsobj(text));
+
+      const parser = new DOMParser();
+      const xmlDoc = parser.parseFromString(text, "text/xml");
+      console.log( "plantillaHULCenXml");
+      console.log( xmlDoc.documentElement);
+      // console.log( xmlDoc.documentElement.EntradaGraficaLIDER);       //NO VA
+      // console.log( xmlDoc.documentElement['EntradaGraficaLIDER']);    //NO VA
+      // console.log( xmlDoc.documentElement[EntradaGraficaLIDER]);      //NO VA
+      const childNodes = xmlDoc.documentElement.children;
+
+      console.log(childNodes.length); ///
+
+      plantillaHULC = '<?xml version="1.0" encoding="UTF-8"?>\n<CTE-HE-XML>\n\t';
+      for (let i = 0; i < childNodes.length; i++) {
+        childNodes[i];
+        // obj[node.nodeName] = node.textContent;
+        // console.log( childNodes[i]);
+        // console.log( childNodes[i].nodeName);
+        // console.log( childNodes[i].textContent);
+        // plantillaHULC += childNodes[i].textContent;
+        if (childNodes[i].nodeName == 'EntradaGraficaLIDER') 
+          plantillaHULC += "\n\t<EntradaGraficaLIDER>\n\t\t<![CDATA["+childNodes[i].textContent+"]]>\n\t</EntradaGraficaLIDER>\n\t";
+        else {
+          const xmlSerializer = new XMLSerializer();
+          const xmlString = xmlSerializer.serializeToString(childNodes[i]);
+          // plantillaHULC += xmlString +"\n";
+          plantillaHULC += xmlString ;
+        }
+      }
+      plantillaHULC += "\n</CTE-HE-XML>";
+
+      console.log( "plantillaHULC");
+      console.log( plantillaHULC);
+      // console.log( textoLiplantillaHULCder.replace(regex, `$ POLIGONOS${nuevoContenido}$`));
+
+    /*
+      const obj = {};
+
+      const rootElement = xmlDoc.documentElement;
+      if (rootElement.nodeName === '#document') {
+        const childNodes = rootElement.children;
+        for (let i = 0; i < childNodes.length; i++) {
+          const node = childNodes[i];
+          obj[node.nodeName] = node.textContent;
+        }
+      }
+    */
+    /*
+      // AJAX request
+      var xhr = (window.XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP"));
+      xhr.onreadystatechange = XHRhandler;
+      xhr.open("GET", url, true);
+      xhr.send(null);
+      // handle response
+      function XHRhandler() {
+        if (xhr.readyState == 4) {
+          // console.log ('xhr.responseXML: ', xhr.responseXML);
+          // plantillaHULC = XML2jsobj(xhr.responseXML.documentElement);
+          plantillaHULC = xhr.responseXML.documentElement;
+          xhr = null;
+          console.log ('plantillaHULC: ',plantillaHULC);
+          // console.log ('plantillaHULCint: ',plantillaHULC.DatosGenerales);
+          // console.log ('plantillaHULCint: ',plantillaHULC['DatosGenerales']);
+          console.log ('tipeof: ',typeof(plantillaHULC));
+        }
+      }
+      */
+      downloadXML(plantillaHULC, query +'.ctehexml');
+    } // aHulc
+    /*
+    function modificarContenidoEntreMarcadores(texto, nuevoContenido) {
+      const regex = /\$POLIGONOS(.*?)\$/g;
+      return texto.replace(regex, `$POLIGONOS${nuevoContenido}$`);
+    }
+
+    const textoOriginal = "Este es un texto con $POLIGONOScontenido antiguo$ que quiero cambiar. $OTRO_CONTENIDO$ Aquí hay más texto $POLIGONOSotro contenido$.";
+    const nuevoContenido = "nuevo contenido";
+
+    const textoModificado = modificarContenidoEntreMarcadores(textoOriginal, nuevoContenido);
+    console.log(textoModificado);
+    */
+    function girarEjeZPtoPI( punto, aziPI ) {
+      // var x = punto[0];
+      // var y = punto[1];
+      // var z = punto[2];
       const ptoGirado = [];
-      ptoGirado[0] = x * Math.cos(aziPI) - y * Math.sin(aziPI);
-      ptoGirado[1] = x * Math.sin(aziPI) + y * Math.cos(aziPI);
-      ptoGirado[2] = z;
+      ptoGirado[0] = parseFloat((punto[0] * Math.cos(aziPI) - punto[1] * Math.sin(aziPI)).toFixed(4));
+      ptoGirado[1] = parseFloat((punto[0] * Math.sin(aziPI) + punto[1]* Math.cos(aziPI)).toFixed(4));
+      ptoGirado[2] = punto[2];
 
       return ptoGirado ;
     }
 
-    function girar2DejeXPtoPI( punto, tiltPI ) {
-      var x = punto[0];
-      var y = punto[1];
-      var z = punto[2];
+    function girarEjeYPtoPI( punto, tiltPI ) {
+      // var x = punto[0];
+      // var y = punto[1];
+      // var z = punto[2];
       const ptoGirado = [];
-      ptoGirado[0] = x ;
-      ptoGirado[1] = y * Math.cos(tiltPI) - z * Math.sin(tiltPI);
+      ptoGirado[0] = punto[0] ;
+      ptoGirado[1] = parseFloat((punto[1] * Math.cos(tiltPI) - punto[2] * Math.sin(tiltPI)).toFixed(4));
 
-      if (z == 0) ptoGirado[2] =0;
-      else        ptoGirado[2] = y * Math.sin(tiltPI) + z * Math.cos(tiltPI);
+      if (punto[2] == 0) ptoGirado[2] =0;
+      else        ptoGirado[2] = parseFloat((punto[1] * Math.sin(tiltPI) + punto[2] * Math.cos(tiltPI)).toFixed(4));
 
       return ptoGirado ;
     }
@@ -121837,13 +121918,11 @@
       return azimutPi;
     }
 
-
     async function aCerma() {
-
+      console.log("ESTOY EN aCerma");
       const surfaces = gbxmlData.Campus.Surface;
       // console.log(surfaces);
       const matchingSurfaces = {};
-      let textoaCerma ='';
 
       // Iterate over surfaces and accumulate areas and other properties for each id, azimuth, and tilt
       for (const surf in surfaces) {
@@ -121872,7 +121951,7 @@
         matchingSurfaces[id][azimuth][tilt].area += area;
        
       }
-      // console.log ('PRU',matchingSurfaces);
+      console.log ('PRU',matchingSurfaces);
       // Iterate over accumulated areas and create objects with U-value, accumulated area, azimuth, and tilt
       const result = [];
       for (const id in matchingSurfaces) {
@@ -121890,9 +121969,8 @@
           }
         }
       }
-      // console.log ('PRU2',result);
-
-
+      console.log("gbxml: ", gbxmlData);
+      console.log ('PRU2',result);
       // adquisición de plantilla CERMA
       var url = "models/VAlencia_V1.xml";
       // AJAX request
@@ -121906,21 +121984,51 @@
           plantillaCerma = XML2jsobj(xhr.responseXML.documentElement);
           xhr = null;
           // console.log('datos plantilla CERMA');
-          // console.log(plantillaCerma);
+          console.log("plantilla cerma: ", plantillaCerma);
           // console.log(result);
           // console.log(plantillaCerma.DatosPersonalizados.Cerma.Muros.MurosExt.MuroExt);
+
+          // Clasificar las superficies segun inclinacion, en paredes, suelos y techos.
+
+          // plantillaCerma.DatosPersonalizados.Cerma.Muros.MurosExt.MuroExt.U_Muro_ext_W_m2K.name = result[1]['U-value'];
+          // plantillaCerma.DatosPersonalizados.Cerma.Muros.MurosExt.MuroExt.Muro_ext_norte_m2.name = result[0]['area'];
+          // plantillaCerma.DatosPersonalizados.Cerma.Muros.MurosExt.MuroExt.Muro_ext_oeste_m2.name = result[1]['area'];
+          // plantillaCerma.DatosPersonalizados.Cerma.Muros.MurosExt.MuroExt.Muro_ext_sur_m2.name = result[2]['area'];
+          // plantillaCerma.DatosPersonalizados.Cerma.Muros.MurosExt.MuroExt.Muro_ext_este_m2.name = result[3]['area'];
+          // plantillaCerma.DatosPersonalizados.Cerma.Cubiertas.CubiertasIncl.CubiertaIncl.U_Cubierta_incl_W_m2K.name = result[4]['U-value'];
+          // plantillaCerma.DatosPersonalizados.Cerma.Cubiertas.CubiertasIncl.CubiertaIncl.Cubierta_incl_sur_m2.name = result[4]['area'];
+          // plantillaCerma.DatosPersonalizados.Cerma.Cubiertas.CubiertasIncl.CubiertaIncl.Cubierta_incl_norte_m2.name = result[5]['area'];
+          // plantillaCerma.DatosPersonalizados.Cerma.Suelos.SuelosTerreno.Suelo_terreno.Suelo_al_terreno_m2.name = result[6]['area'];
+          // plantillaCerma.DatosPersonalizados.Cerma.Suelos.SuelosTerreno.Suelo_terreno.U_Suelo_terreno_W_m2K.name = "0,12";
+
+          // Filter data for Muros, CubiertasIncl, and Suelos based on tilt and azimuth values
+          const murosData = result.filter(item => item.tilt === 90 || item.tilt === 270);
+          const cubiertasInclData = result.filter(item => item.tilt >= 0 && item.tilt <= 90);
+          const suelosData = result.filter(item => item.tilt === 0 || item.tilt === 180);
+
+          // Assign filtered data to respective variables
+          plantillaCerma.DatosPersonalizados.Cerma.Muros.MurosExt.MuroExt.Muro_ext_norte_m2.name = murosData.find(item => item.azimuth >= -45 && item.azimuth <= 45)['area'];
+          plantillaCerma.DatosPersonalizados.Cerma.Muros.MurosExt.MuroExt.Muro_ext_sur_m2.name = murosData.find(item => item.azimuth >= 135 && item.azimuth <= 225)['area'];
+          plantillaCerma.DatosPersonalizados.Cerma.Muros.MurosExt.MuroExt.Muro_ext_este_m2.name = murosData.find(item => item.azimuth > 45 && item.azimuth < 135)['area'];
+          plantillaCerma.DatosPersonalizados.Cerma.Muros.MurosExt.MuroExt.Muro_ext_oeste_m2.name = murosData.find(item => item.azimuth > 225 && item.azimuth <= 320)['area'];
+
+          plantillaCerma.DatosPersonalizados.Cerma.Cubiertas.CubiertasIncl.CubiertaIncl.Cubierta_incl_norte_m2.name = cubiertasInclData.find(item => item.azimuth === 0)['area'];
+          plantillaCerma.DatosPersonalizados.Cerma.Cubiertas.CubiertasIncl.CubiertaIncl.Cubierta_incl_sur_m2.name = cubiertasInclData.find(item => item.azimuth === 180)['area'];
+          plantillaCerma.DatosPersonalizados.Cerma.Cubiertas.CubiertasIncl.CubiertaIncl.Cubierta_incl_este_m2.name = cubiertasInclData.find(item => item.azimuth === 90)['area'];
+          plantillaCerma.DatosPersonalizados.Cerma.Cubiertas.CubiertasIncl.CubiertaIncl.Cubierta_incl_oeste_m2.name = cubiertasInclData.find(item => item.azimuth === 270)['area'];
+
+          plantillaCerma.DatosPersonalizados.Cerma.Suelos.SuelosTerreno.Suelo_terreno.Suelo_al_terreno_m2.name = suelosData.find(item => item.tilt === 180)['area'];
+
           plantillaCerma.DatosPersonalizados.Cerma.Muros.MurosExt.MuroExt.U_Muro_ext_W_m2K.name = result[1]['U-value'];
-          plantillaCerma.DatosPersonalizados.Cerma.Muros.MurosExt.MuroExt.Muro_ext_norte_m2.name = result[0]['area'];
-          plantillaCerma.DatosPersonalizados.Cerma.Muros.MurosExt.MuroExt.Muro_ext_oeste_m2.name = result[1]['area'];
-          plantillaCerma.DatosPersonalizados.Cerma.Muros.MurosExt.MuroExt.Muro_ext_sur_m2.name = result[2]['area'];
-          plantillaCerma.DatosPersonalizados.Cerma.Muros.MurosExt.MuroExt.Muro_ext_este_m2.name = result[3]['area'];
           plantillaCerma.DatosPersonalizados.Cerma.Cubiertas.CubiertasIncl.CubiertaIncl.U_Cubierta_incl_W_m2K.name = result[4]['U-value'];
-          plantillaCerma.DatosPersonalizados.Cerma.Cubiertas.CubiertasIncl.CubiertaIncl.Cubierta_incl_sur_m2.name = result[4]['area'];
-          plantillaCerma.DatosPersonalizados.Cerma.Cubiertas.CubiertasIncl.CubiertaIncl.Cubierta_incl_norte_m2.name = result[5]['area'];
+          plantillaCerma.DatosPersonalizados.Cerma.Suelos.SuelosTerreno.Suelo_terreno.U_Suelo_terreno_W_m2K.name = "0,12";
+
           textoaCerma = jsobj2XML(plantillaCerma, 'DatosEnergeticosDelEdificio');
-          downloadXML(textoaCerma, 'new_cerma.xml');
+          downloadXML(textoaCerma, query +'.xml');
+          // console.log ('367:',textoaCerma);
         }
       }
+      // console.log ('369:',textoaCerma);
 
       const propiedades = [];
       const propiedadesLimpio = [];
@@ -122057,7 +122165,8 @@
         //console.log(slabData);
       }
 
-      //** */
+      //** */     dibuja los elementos gbxml     atencion a los giros linea //**
+      // /*
       const surface = gbxmlData.Campus.Surface;
       for(const surf in surface)
       {
@@ -122094,7 +122203,7 @@
             id++;
             vertices[id] = point.Coordinate[2];
             id++;
-            vertices[id] = point.Coordinate[1];   // Poniendo esta en negativo. Va al sitio
+            vertices[id] = point.Coordinate[1];   //** Poniendo esta en negativo. Va al sitio
             id++;
           }
           geometry.setAttribute( 'position', new BufferAttribute( vertices, 3 ) );
@@ -122105,20 +122214,7 @@
           scene.add(mesh);
         // } //if
       }
-    //** */
-      for (const prop in propiedadesLimpio) {
-        if (propiedadesLimpio.hasOwnProperty(prop)) ;
-      }
-
-
-
-      // console.table (propiedades);
-      // console.table (propiedadesLimpio);
-
-      console.log('textoaCerma:');console.log(textoaCerma);
-      console.log('textoaCermaDENTROdeLOAD:');console.log(textoaCerma);
-      document.getElementById('cerma').setAttribute('href',generateTextFileUrl(textoaCerma));
-
+    // ** */
     } // acerma
 
 
@@ -122131,6 +122227,7 @@
     let model;
 
     const loadIfc = async (event) => {
+      console.log ("Estoy en loadIFC");
 
       // tests with glTF
       // const file = event.target.files[0];
@@ -122168,6 +122265,8 @@
         [IFCOPENINGELEMENT]: false
       });
 
+      // aqui esta el error llama a ..gb.xml desde el servidor en lugar de desde el cliente
+      /*
       let url = event.target.files[0].name;
       url = "models/" + url.replace(".ifc", ".xml");
       console.log(url);
@@ -122185,11 +122284,110 @@
           console.log(gbxmlData);
         }
       }
+      */
 
+
+      // const divAbreXml = document.createElement('div');   document.getElementsByTagName('body')[0].appendChild(divAbreXml);
+      const divAbreXml = document.createElement('div');   document.body.appendChild(divAbreXml);
+
+      divAbreXml.style.top="5%";		
+      divAbreXml.style.left="5%";		
+      // divAbreXml.style.position="absolute";		
+      divAbreXml.style.width = '90%';
+      divAbreXml.style.height = '90%';
+      divAbreXml.style.backgroundColor = 'rgba(0, 0, 0, 0.8)'; // Fondo semitransparente
+      
+      divAbreXml.style.display = 'flex';
+      divAbreXml.style.flexDirection = 'row';
+      divAbreXml.style.alignItems = 'center';
+      divAbreXml.style.justifyContent = 'center';
+      divAbreXml.style.position = 'absolute';
+      // divAbreXml.style.top = '50%';
+      // divAbreXml.style.left = '50%';
+      // divAbreXml.style.transform = 'translate(-50%, -50%)';
+
+
+      divAbreXml.id="divAbreXml";						
+
+      var textElement = document.createElement('p');    divAbreXml.appendChild(textElement);
+      textElement.textContent = 'Abre el archivo XML correspondiente:';
+      // textElement.style.textAlign = 'center';
+      textElement.style.color = 'white';
+
+      // textElement.style.position = 'absolute';
+      // textElement.style.top = '40%';
+      // textElement.style.left = '50%';
+      textElement.style.marginRight = '10px'; // Espacio entre textElement e input
+      
+      var cancelButton = document.createElement('button');
+      divAbreXml.appendChild(cancelButton);
+      cancelButton.textContent = 'Cancelar';
+      // cancelButton.style.position = 'absolute';
+      // cancelButton.style.top = '60%';
+      // cancelButton.style.left = '50%';
+      // cancelButton.style.transform = 'translate(-50%, -50%)';
+      cancelButton.addEventListener('click', function() {
+        divAbreXml.style.display = 'none';
+      });
+
+      var input = document.createElement('input');    divAbreXml.appendChild(input);
+          input.type = 'file';
+          input.accept = '.xml';
+          // input.style.display = 'none';
+
+          // input.style.position = 'absolute';
+          // input.style.top = '50%';
+          // input.style.left = '50%';
+          // input.style.transform = 'translate(-50%, -50%)'; // Centra el input en el medio
+          
+          input.style.marginRight = '10px'; // Espacio entre input y cancelButton
+
+
+
+          input.addEventListener('change', function(event) {
+            // console.log("ESTOY EN CHANGUE");
+            var selectedFile = event.target.files[0];
+            // console.log(selectedFile);
+
+            if (selectedFile) {
+
+              var reader = new FileReader();
+              reader.onload = function(event) {
+                // console.log("ESTOY EN ONLOAD");
+
+                // El contenido del archivo estará en event.target.result
+                var XmlContents = event.target.result;
+
+                // Haz lo que necesites con la variable de contenido
+                // console.log('Contenido del archivo asignado a una variable:');
+                // console.log(XmlContents);
+
+                // Utiliza DOMParser para analizar el contenido XML y convertirlo en un objeto XML
+                var parser = new DOMParser();
+                var xmlDoc = parser.parseFromString(XmlContents, "text/xml");
+                var xmlDocEl = xmlDoc.documentElement;
+
+                // Haz lo que necesites con el objeto XML
+                // console.log('Contenido del archivo convertido en objeto XML:');
+                // console.log(xmlDocEl);
+
+                gbxmlData = XML2jsobj(xmlDocEl);
+                console.log('datos gbXml');
+                console.log(gbxmlData);
+                divAbreXml.style.display="none";
+            
+              };
+              // Lee el contenido del archivo como texto
+              reader.readAsText(selectedFile);
+            } else {
+                console.log('Ningún archivo seleccionado');
+            }
+          });
+
+      //-----------------------------------------------------------------------
       model = await viewer.IFC.loadIfc(event.target.files[0], false);
 
-      aCerma();
-
+      // aCerma();
 
       model.material.forEach(mat => mat.side = 2);
       if (first) first = false;
@@ -122205,7 +122403,6 @@
       overlay.classList.add('hidden');
 
     };
-
      
     function XML2jsobj(node) {
       /**
@@ -122390,9 +122587,9 @@
       return xml;
     }
 
-    // let textoaCerma ='';
+    let textoaCerma ='';
     async function miload() {
-
+      console.log("Estoy en miload");
       // tests with glTF
       // const file = event.target.files[0];
       // const url = URL.createObjectURL(file);
@@ -122440,9 +122637,13 @@
       // handle response
       function XHRhandler() {
         if (xhr.readyState == 4) {
+          // console.log('datos gbXml como xml');
+          // console.log(xhr.responseXML.documentElement);
+
+
           gbxmlData = XML2jsobj(xhr.responseXML.documentElement);
           xhr = null;
-          console.log('datos gbXml');
+          console.log('datos gbXml como obj');
           console.log(gbxmlData);
         }
       }
@@ -122451,8 +122652,8 @@
       model.material.forEach(mat => mat.side = 2);
 
      
-      aHulc();
-      aCerma();
+      // aHulc();
+      // aCerma();
 
       if (first) first = false;
       else {
@@ -122612,7 +122813,6 @@
     getFileButton.addEventListener('click', () => {
       getFileButton.blur();
       opendir();
-      // inputElement.click();
     });
 
     const sectionButton = createSideMenuButton('./resources/section-plane-down.svg');
@@ -122621,35 +122821,13 @@
       viewer.clipper.toggle();
     });
 
-    // const dropBoxButton = createSideMenuButton('./resources/dropbox-icon.svg');
-    // dropBoxButton.addEventListener('click', () => {
-    //   dropBoxButton.blur();
-    //   viewer.dropbox.loadDropboxIfc();
-    // });
-
-    let textFileUrl = null;
-    function generateTextFileUrl(txt) {
-      let fileData = new Blob([txt], {type: 'text/plain'});
-
-      // If a file has been previously generated, revoke the existing URL
-      if (textFileUrl !== null) {
-          window.URL.revokeObjectURL(textFile);
-      }
-
-      textFileUrl = window.URL.createObjectURL(fileData);
-
-      // Returns a reference to the global variable holding the URL
-      // Again, this is better than generating and returning the URL itself from the function as it will eat memory if the file contents are large or regularly changing
-      return textFileUrl;
-    }
     const sideMenu = document.getElementById('side-menu-left');
 
-    const aElement = document.createElement('a');                 sideMenu.appendChild(aElement);
-          aElement.classList.add('basic-button');
-          aElement.setAttribute('id', 'cerma');
-          aElement.setAttribute('download', 'cerma.xml');
-          aElement.setAttribute('href', '#');
-    const image = document.createElement("img");                  aElement.appendChild(image);
+    const but = document.createElement('button');                 sideMenu.appendChild(but);
+          but.classList.add('basic-button');
+          but.setAttribute('id', 'cerma');
+          but.addEventListener("click", aCerma);
+    const image = document.createElement("img");                  but.appendChild(image);
           image.setAttribute("src", './resources/cerma3.svg');
           image.classList.add('icon');
           image.style.maxWidth = "90px";
@@ -122657,8 +122835,9 @@
     const aElement2 = document.createElement('a');                 sideMenu.appendChild(aElement2);
           aElement2.classList.add('basic-button');
           aElement2.setAttribute('id', 'hulc');
-          aElement2.setAttribute('download', 'hulc.xml');
-          aElement2.setAttribute('href', '#');
+          // aElement2.setAttribute('download', 'hulc.xml');
+          // aElement2.setAttribute('href', '#');
+          aElement2.addEventListener("click", aHulc);
     const image2 = document.createElement("img");                   aElement2.appendChild(image2);
           image2.setAttribute("src", './resources/hulc.png');
           image2.classList.add('icon');
